@@ -20,19 +20,21 @@ function gate(host, max) {
   });
 }
 
+// `init.html` fetches a page as text instead of JSON.
 async function get(url, init = {}, tries = 5) {
   const wd = url.includes("myworkdayjobs.com");
+  const { html, ...opts } = init;
   for (let i = 0; ; i++) {
     const release = wd ? await gate("workday", 4) : () => {};
     let wait = 0;
     try {
-      const r = await fetch(url, { ...init, headers: { ...UA, ...init.headers }, signal: AbortSignal.timeout(30000) });
+      const r = await fetch(url, { ...opts, headers: { ...UA, ...(html ? { accept: "text/html" } : {}), ...opts.headers }, signal: AbortSignal.timeout(30000) });
       if (r.status === 429 || r.status >= 500) {
         wait = Number(r.headers.get("retry-after")) * 1000 || 0;
         throw new Error(`HTTP ${r.status}`);
       }
       if (!r.ok) { const e = new Error(`HTTP ${r.status}`); e.fatal = true; throw e; }
-      return await r.json();
+      return html ? await r.text() : await r.json();
     } catch (e) {
       if (e.fatal || i >= tries - 1) throw e;
       wait = Math.max(wait, 2000 * 2 ** i + Math.random() * 1000);
@@ -218,4 +220,133 @@ async function amazon() {
   }));
 }
 
-export const fetchers = { gh: greenhouse, lv: lever, ab: ashby, sr: smartrecruiters, wd: workday, amzn: amazon };
+// Avature -----------------------------------------------------------------
+//
+// Portals at {base}/SearchJobs. The RSS feed only ever holds the newest 20,
+// so we page the HTML instead: ~10 cards a page, ?search= and ?jobOffset=.
+// A card has the public title and one location line ("Multiple Locations"
+// often); the detail page fills in the rest for postings we keep.
+//
+// Company options: `all` pulls the whole portal (small boards); `queries`
+// overrides the keyword list; `early` names queries whose results are
+// early-career by construction (Deloitte's "campus").
+
+const AV_QUERIES = ["intern", "new grad", "entry level", "analyst", "campus", "co-op", "university", "graduate"];
+const AV_MAX_PER_QUERY = 400;
+
+function avatureCards(html, base) {
+  const origin = new URL(base).origin;
+  return html.split(/<article\b/).slice(1).map((a) => {
+    const m = /href="([^"]*\/JobDetail\/[^"]*?\/(\d+))"[^>]*>([\s\S]*?)<\/a>/.exec(a);
+    if (!m) return null;
+    const sub = /class="[^"]*subtitle[^"]*"[^>]*>([\s\S]*?)<\/div>/.exec(a)?.[1] || "";
+    const spans = [...sub.matchAll(/<span[^>]*>([\s\S]*?)<\/span>/g)].map((s) => plain(s[1])).filter(Boolean);
+    const loc = plain(/class="list-item-location"[^>]*>([\s\S]*?)</.exec(a)?.[1] || "") || spans.at(-1) || "";
+    return { sourceId: m[2], url: new URL(m[1], origin).href, title: plain(m[3]), location: loc };
+  }).filter(Boolean);
+}
+
+async function avature(c) {
+  const seen = new Map();
+  for (const q of c.all ? [""] : c.queries || AV_QUERIES) {
+    let total = Infinity;
+    for (let offset = 0; offset < Math.min(total, c.all ? 3000 : AV_MAX_PER_QUERY); ) {
+      const html = await get(`${c.base}/SearchJobs/?search=${encodeURIComponent(q)}&jobOffset=${offset}`, { html: true });
+      const cards = avatureCards(html, c.base);
+      total = Number(/data-total="(\d+)"/.exec(html)?.[1] || /aria-label="(\d+) results"/.exec(html)?.[1] || total);
+      let fresh = 0;
+      for (const card of cards) {
+        // Seen under a plain keyword first? An early-career query still counts.
+        if (seen.has(card.sourceId)) { if (c.early?.includes(q)) seen.get(card.sourceId).employment = "entry"; continue; }
+        fresh++;
+        seen.set(card.sourceId, {
+          sourceId: card.sourceId,
+          title: card.title,
+          locations: /multiple locations/i.test(card.location) ? [] : [card.location].filter(Boolean),
+          url: card.url,
+          postedAt: null,
+          employment: c.early?.includes(q) ? "entry" : null,
+          workplace: null,
+          text: "",
+          pay: null,
+        });
+      }
+      if (!cards.length || !fresh) break;
+      offset += cards.length;
+    }
+  }
+  return [...seen.values()];
+}
+
+/* Detail page: JSON-LD when the portal has it (date posted, description,
+ * the internal title), and the location list either way -- "Same job
+ * available in 13 locations" (Deloitte) or a "Location" field (Bloomberg). */
+avature.detail = async (c, r) => {
+  const html = await get(r.url, { html: true });
+  const ld = [...html.matchAll(/<script type="application\/ld\+json">([\s\S]*?)<\/script>/g)]
+    .map((m) => { try { return JSON.parse(m[1]); } catch { return null; } })
+    .filter((j) => j?.["@type"] === "JobPosting");
+  const lines = html.replace(/<script[\s\S]*?<\/script>|<style[\s\S]*?<\/style>/g, "").replace(/<[^>]+>/g, "\n").split("\n").map((s) => plain(s)).filter(Boolean);
+
+  let locations = [...r.locations];
+  const many = lines.findIndex((s) => /available in \d+ locations?/i.test(s));
+  if (many >= 0) {
+    const n = Number(/(\d+)/.exec(lines[many])[1]);
+    locations = lines.slice(many + 1, many + 1 + n).filter((s) => s.includes(","));
+  } else {
+    const at = lines.findIndex((s) => /^(job )?locations?$|^work locations?$/i.test(s));
+    if (at >= 0 && lines[at + 1]) locations = [lines[at + 1]];
+  }
+  for (const j of ld) {
+    const a = [].concat(j.jobLocation || []).map((l) => l?.address).filter((x) => x?.addressLocality);
+    if (!locations.length && a.length) locations = a.map((x) => [x.addressLocality, x.addressRegion, x.addressCountry].filter(Boolean).join(", "));
+  }
+
+  // Deloitte's internal titles say who a req is for: "US C" campus, "US E"
+  // experienced. Trust it over the keyword that found the posting.
+  const internal = ld.map((j) => j.title || "").join(" ");
+  let employment = r.employment;
+  if (/^US C\b/.test(internal)) employment = "entry campus";
+  else if (/^US E\b/.test(internal)) employment = null;
+
+  const posted = ld.find((j) => j.datePosted)?.datePosted;
+  const text = ld.length ? plain(ld.map((j) => j.description || "").join(" ")) : lines.slice(0, 400).join(" ");
+  return {
+    ...r,
+    locations,
+    employment,
+    text,
+    postedAt: posted ? new Date(`${posted.slice(0, 10)}T12:00:00Z`).toISOString() : r.postedAt,
+    postedApprox: !!posted,
+  };
+};
+
+// Bank of America ---------------------------------------------------------
+//
+// careers.bankofamerica.com's own search service: every posting, with a
+// minimum-years field we can trust more than any title.
+
+async function bofa() {
+  // `rows` is an end index, not a page size: one call returns everything.
+  const j = await get("https://careers.bankofamerica.com/services/jobssearchservlet?start=0&rows=10000&search=getAllJobs");
+  return (j.jobsList || []).map((p) => {
+    const [m, d, y] = (p.postedDate || "").split("/");
+    return {
+      sourceId: p.jobRequisitionId,
+      title: p.postingTitle,
+      locations: [
+        [p.city, p.state, p.country].filter(Boolean).join(", "),
+        ...(p.additionalLocationsList || "").split(";").map((s) => s.split(",").slice(-3).join(",").trim()).filter(Boolean),
+      ],
+      url: `https://careers.bankofamerica.com${p.jcrURL}`,
+      postedAt: y ? new Date(`${y}-${m}-${d}T12:00:00Z`).toISOString() : null,
+      postedApprox: true,
+      employment: p.minYearsOfExperience === 0 ? "entry" : null,
+      workplace: null,
+      text: p.minYearsOfExperience != null ? `${p.minYearsOfExperience}+ years of experience` : "",
+      pay: null,
+    };
+  });
+}
+
+export const fetchers = { gh: greenhouse, lv: lever, ab: ashby, sr: smartrecruiters, wd: workday, amzn: amazon, av: avature, bofa };

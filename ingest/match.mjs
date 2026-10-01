@@ -8,7 +8,7 @@ import companies from "./companies.mjs";
 // Parent companies, subsidiaries and the usual spellings. First match wins,
 // so the specific ones (GDIT) sit above the general ones (General Dynamics).
 const PARENTS = [
-  [/northrop/, "Northrop Grumman"],
+  [/northrop|northrup/, "Northrop Grumman"], // "Northrup" appears 22 times in VT's report
   [/lockheed/, "Lockheed Martin"],
   [/booz ?allen/, "Booz Allen Hamilton"],
   [/general dynamics information technology|^gdit\b|general dynamics it\b/, "GDIT"],

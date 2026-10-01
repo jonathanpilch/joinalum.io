@@ -6,7 +6,9 @@
  *   ab  Ashby           api.ashbyhq.com/posting-api/job-board/{slug}
  *   sr  SmartRecruiters api.smartrecruiters.com/v1/companies/{slug}
  *   wd  Workday         {tenant}.{host}.myworkdayjobs.com/wday/cxs/{tenant}/{site}
+ *   av  Avature         {base}/SearchJobs (HTML pages; see sources.mjs)
  *   amzn                amazon.jobs/en/search.json
+ *   bofa                careers.bankofamerica.com's own search service
  *
  * `sector` drives the industry chip. Whether an employer actually hires
  * Hokies comes from VT's placement report (ingest/placements.mjs), not here. */
@@ -16,6 +18,7 @@ const lv = (name, slug, domain, sector) => ({ name, ats: "lv", slug, domain, sec
 const ab = (name, slug, domain, sector) => ({ name, ats: "ab", slug, domain, sector });
 const sr = (name, slug, domain, sector) => ({ name, ats: "sr", slug, domain, sector });
 const wd = (name, tenant, host, site, domain, sector) => ({ name, ats: "wd", tenant, host, site, domain, sector });
+const av = (name, base, domain, sector, opts = {}) => ({ name, ats: "av", base, domain, sector, ...opts });
 
 export default [
   // Defense, government tech, and the DC/NoVA pipeline
@@ -41,10 +44,18 @@ export default [
   wd("Freddie Mac", "freddiemac", "wd5", "External", "freddiemac.com", "Finance"),
   wd("Fannie Mae", "fanniemae", "wd1", "FannieMaeCareers", "fanniemae.com", "Finance"),
   wd("Mastercard", "mastercard", "wd1", "CorporateCareers", "mastercard.com", "Finance"),
-  wd("Bank of America", "ghr", "wd1", "Lateral-US", "bankofamerica.com", "Finance"),
+  // Its campus portal (bac.avature.net) refuses outside requests; the main
+  // careers site's search service covers campus and lateral alike.
+  { name: "Bank of America", ats: "bofa", domain: "bankofamerica.com", sector: "Finance" },
+  av("Bloomberg", "https://bloomberg.avature.net/careers", "bloomberg.com", "Finance", { all: true }),
   wd("Wells Fargo", "wf", "wd1", "WellsFargoJobs", "wellsfargo.com", "Finance"),
   wd("Vanguard", "vanguard", "wd5", "vanguard_external", "vanguard.com", "Finance"),
-  wd("PwC", "pwc", "wd3", "Global_Experienced_Careers", "pwc.com", "Consulting"),
+  wd("PwC", "pwc", "wd3", "US_Entry_Level_Careers", "pwc.com", "Consulting"),
+  // Deloitte's "campus" search returns campus reqs; detail pages confirm
+  // each one ("US C" vs "US E" internal titles).
+  av("Deloitte", "https://apply.deloitte.com/en_US/careers", "deloitte.com", "Consulting", { early: ["campus", "analyst", "new grad", "entry level"] }),
+  wd("Protiviti", "roberthalf", "wd1", "ProtivitiNA", "protiviti.com", "Consulting"),
+  sr("CapTech", "CapTechConsulting", "captechconsulting.com", "Consulting"),
   wd("CoStar Group", "costar", "wd1", "CoStarCareers", "costargroup.com", "Software"),
   wd("General Motors", "generalmotors", "wd5", "Careers_GM", "gm.com", "Automotive"),
   gh("Stripe", "stripe", "stripe.com", "Fintech"),

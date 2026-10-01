@@ -6,7 +6,7 @@
 
 const SENIOR = /\b(senior|sr\.?|staff|principal|lead|leader|manager|mgr|director|head of|vp|vice president|chief|architect|distinguished|expert|mid[- ]level|experienced|supervisor|partner|counsel|level\s*[2-9]|grade\s*[3-9]|band\s*[3-9])\b/i;
 const ROMAN = /\b(II|III|IV|V|2|3|4|5)\s*$|\b(II|III|IV)\b|\bEngineer\s+[2-5]\b/;
-const INTERN = /\b(intern|interns|internship|summer analyst|summer associate|summer engineer)\b/i;
+const INTERN = /\b(intern|interns|internship|summer analyst|summer associate|summer engineer|summer scholar)\b/i;
 const COOP = /\bco-?op\b/i;
 // Explicit early-career language beats any seniority word ("Product Manager:
 // New Grad Accelerator"); softer signals ("Associate", "Engineer I") don't.
@@ -47,18 +47,21 @@ const FN = [
   ["Security", /\b(security|cyber|cybersecurity|soc analyst|penetration|pen test|red team|blue team|threat|vulnerab|infosec|malware|reverse engineer|detection)\b/i],
   ["AI / ML", /\b(machine learning|ml|ai|deep learning|computer vision|nlp|llm|research scientist|applied scientist|research engineer|perception|autonomy)\b/i],
   ["Data", /\b(data scien|data engineer|data analy|analytics|business intelligence|bi developer|statistic|data platform|decision scien)/i],
-  ["Hardware", /\b(hardware|embedded|firmware|fpga|asic|silicon|electrical|rf|circuit|pcb|chip|design verification|photonic|semiconductor|avionics|power electronics|analog|digital design|layout)\b/i],
+  ["Hardware", /\b(hardware|embedded|firmware|fpga|asic|silicon (?:engineer|design|validation)|electrical|rf|circuit|pcb|chip|design verification|photonic|semiconductor|avionics|power electronics|analog|digital design|layout)\b/i],
   ["Software", /\b(software|developer|swe|sde|programmer|full[- ]?stack|front[- ]?end|back[- ]?end|mobile|ios|android|web|devops|site reliability|sre|platform engineer|infrastructure engineer|production engineer|forward deployed|application engineer|tools engineer|game(play)? engineer|graphics|compiler|kernel|distributed systems)\b/i],
-  ["Cloud / IT", /\b(cloud|network|systems administrator|sysadmin|information technology|it support|it specialist|help ?desk|desktop support|technical support|support engineer|solutions engineer|sales engineer|customer engineer|implementation engineer|technical account)\b|\bIT\b/i],
+  ["Cloud / IT", /\b(cloud|network (?:engineer|administrator|admin|analyst|operations|security|technician)|networking|systems administrator|sysadmin|information technology|it support|it specialist|help ?desk|desktop support|technical support|support engineer|solutions engineer|sales engineer|customer engineer|implementation engineer|technical account)\b|\bIT\b/i],
   ["Product", /\b(product manag|program manag|technical program|product owner|product analyst|associate product)/i],
   ["Design", /\b(ux|ui|product design|designer|user research|interaction design)\b/i],
   ["Engineering", /\b(engineer|engineering|robotics|gnc|mechatronics)\b/i],
-  ["Research", /\b(research|scientist|physicist|quantum)\b/i],
-  ["Tech Consulting", /\b(technology consult|tech consult|technology analyst|technology associate|solutions analyst|business analyst|systems analyst|digital consult|cyber consult)\b/i],
+  ["Research", /\b(research (?:scientist|engineer|intern|assistant|associate)|scientist|physicist|quantum)\b/i],
+  ["Tech Consulting", /\b(technology (?:consult\w*|analyst|associate|transformation|strategy|controls|advisory|risk|solutions)|tech (?:consult\w*|strategy)|enterprise tech|digital (?:consult\w*|transformation)|solutions analyst|business analyst|systems analyst|cyber consult\w*|it audit|it advisory)\b/i],
 ];
 
 export function fn(title) {
-  for (const [name, re] of FN) if (re.test(title)) return name;
+  // Words that look like functions but aren't: "Silicon Valley - Tax Intern",
+  // "Research Triangle Financial Center", a tax LLM (the law degree).
+  const t = title.replace(/silicon valley|research triangle|network of|business network|tax llm|\bllm - tax/gi, " ");
+  for (const [name, re] of FN) if (re.test(t)) return name;
   return null;
 }
 
@@ -104,6 +107,10 @@ export function place(raw) {
     const st = abbr(parts[i]);
     if (st) return { city: clean(parts[i - 1]), state: st };
   }
+  // PwC: "IL-Rosemont", "CA-Silicon Valley"
+  m = /^([A-Z]{2})\s*-\s*([A-Za-z .'-]+)$/.exec(s);
+  if (m && STATES[m[1]]) return { city: clean(m[2]), state: m[1] };
+
   // "VA - Richmond - Midlothian", "USA HI Camp Smith" handled above
   if (parts.length > 1 && abbr(parts[0])) return { city: clean(parts[parts.length - 1]), state: abbr(parts[0]) };
   if (parts.length === 1) {

@@ -71,7 +71,7 @@ const results = await pool(targets, CONCURRENCY, async (c) => {
 });
 
 function shape(c, r, lvl, f, locs) {
-  const id = `${c.ats}:${c.slug || c.tenant || "amzn"}:${r.sourceId}`;
+  const id = `${c.ats}:${c.slug || c.tenant || (c.ats === "amzn" ? "amzn" : c.name)}:${r.sourceId}`;
   const firstSeenAt = state.firstSeen[id] || nowIso;
   state.firstSeen[id] = firstSeenAt;
   // The board's own timestamp when it's exact and sane, else our first
