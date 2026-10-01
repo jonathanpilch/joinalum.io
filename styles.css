@@ -177,6 +177,8 @@ svg { width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width:
 }
 .school-chip img { height: 16px; background: #fff; border-radius: 4px; padding: 2px 3px; }
 
+.updated { font-family: var(--mono); font-size: 12px; color: var(--green); }
+
 .sample-tag {
   font-family: var(--mono);
   font-size: 11px;
@@ -308,6 +310,10 @@ svg { width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width:
   letter-spacing: -0.02em;
   box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.14);
 }
+.logo { position: relative; overflow: hidden; }
+.logo img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: contain; padding: 7px; background: #fff; opacity: 0; transition: opacity 200ms ease; }
+.logo.has-img img { opacity: 1; }
+.logo.has-img > span { visibility: hidden; }
 .logo.lg { width: 56px; height: 56px; border-radius: 15px; font-size: 19px; }
 .role-text { min-width: 0; }
 .role-title { color: var(--ink); font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
@@ -346,6 +352,14 @@ svg { width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width:
 .face:first-child { margin-left: 0; }
 .alums .n { color: var(--ink); font-weight: 700; }
 .alums .none { color: var(--muted); }
+
+.pay { font-size: 14px; color: var(--ink); font-variant-numeric: tabular-nums; }
+.pay .none { color: var(--muted); }
+.lvl { display: inline-block; padding: 3px 10px; border-radius: 999px; font-size: 12px; font-weight: 700; background: var(--btn-soft); color: var(--ink); white-space: nowrap; }
+.lvl-internship { background: rgba(143, 209, 158, 0.14); color: var(--green); }
+.lvl-coop { background: rgba(213, 198, 255, 0.14); color: #d5c6ff; }
+.lvl-newgrad { background: rgba(202, 185, 140, 0.16); color: var(--gold-text); }
+code { font-family: var(--mono); font-size: 0.92em; color: var(--ink); }
 
 .score {
   height: 28px;
@@ -532,7 +546,9 @@ svg { width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width:
 
 @media (max-width: 760px) {
   .hero { padding: 44px 0 30px; }
-  .sample-tag { display: none; }
+  .updated { font-family: var(--mono); font-size: 12px; color: var(--green); }
+
+.sample-tag { display: none; }
   .row.head { display: none; }
   .row.job {
     grid-template-columns: 1fr auto;

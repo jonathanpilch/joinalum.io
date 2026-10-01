@@ -1,0 +1,27 @@
+# Hourly: pull every board, commit data/jobs.json if anything changed.
+name: ingest
+on:
+  schedule:
+    - cron: "7 * * * *"
+  workflow_dispatch:
+permissions:
+  contents: write
+concurrency:
+  group: ingest
+  cancel-in-progress: false
+jobs:
+  ingest:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - run: node ingest/run.mjs
+      - name: Commit data
+        run: |
+          git config user.name "alum-ingest"
+          git config user.email "actions@users.noreply.github.com"
+          git add data/
+          git diff --cached --quiet || git commit -m "data: $(node -e "const d=require('./data/jobs.json');console.log(d.jobs.length+' roles')")" && git push

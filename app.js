@@ -1,11 +1,11 @@
-/* Alum -- the explore board. One school per page (?school=slug, default vt);
- * everything school-specific comes from SCHOOLS, every role from JOBS. */
-(function () {
+/* Alum -- the explore board. One school per page (?school=slug, default vt).
+ * Roles come from data/jobs.json, written hourly by ingest/run.mjs straight
+ * from each company's own careers board. */
+(async function () {
   const $ = (s, el = document) => el.querySelector(s);
   const params = new URLSearchParams(location.search);
   const school = SCHOOLS[params.get("school")] || SCHOOLS.vt;
-  const recruiters = new Set(school.recruiters);
-  const PAGE = 25;
+  const PAGE = 30;
 
   const icon = {
     x: '<svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6 6 18"/></svg>',
@@ -13,8 +13,10 @@
     caret: '<svg class="caret" viewBox="0 0 24 24"><path d="m6 9 6 6 6-6"/></svg>',
   };
   const esc = (s) => String(s).replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]);
-  const initials = (name) => name.split(/\s+/).filter((w) => /^[A-Z]/.test(w)).slice(0, 2).map((w) => w[0]).join("") || name[0];
+  const initials = (name) => name.split(/\s+/).filter((w) => /^[A-Z0-9]/.test(w)).slice(0, 2).map((w) => w[0]).join("") || name[0];
   const fmt = (n) => n.toLocaleString("en-US");
+  const hue = (s) => [...s].reduce((h, c) => (h * 31 + c.charCodeAt(0)) % 360, 7);
+  const ATS = { gh: "Greenhouse", lv: "Lever", ab: "Ashby", sr: "SmartRecruiters", wd: "Workday", amzn: "amazon.jobs" };
 
   // School identity ---------------------------------------------------
 
@@ -22,46 +24,72 @@
   document.title = `Alum · ${school.name}`;
   $("#school-mark").src = school.mark;
   $("#school-name").textContent = school.name;
-  $("#hero-eyebrow").textContent = `For ${school.demonym}, from ${school.demonym}`;
-  $("#hero-title").innerHTML = `Apply where ${esc(school.demonym)}<br />already work.`;
-  $("#hero-lede").textContent = `Fresh internships and early career roles at the employers that recruit at ${school.shortName}, with the alumni already on the team. Updated hourly, matched to your resume.`;
-  $("#hero-proof").innerHTML = `<b>${fmt(school.alumni)}+</b> ${esc(school.demonym)} in the network · <b>${school.recruiters.length}</b> employers recruiting on campus`;
-  $("#alumni-col").textContent = school.demonym;
-  $("#signin-mark").src = school.mark;
-  $("#signin-title").textContent = "See your match scores";
-  $("#signin-lede").textContent = `Sign in with your ${school.domain} address. We'll score every role against your resume and major.`;
-  $("#signin-email").placeholder = `you@${school.domain}`;
+  $("#hero-eyebrow").textContent = `Built by ${school.demonym}, for ${school.demonym}`;
+  $("#hero-title").innerHTML = "Tech internships and<br />new-grad roles, first.";
+
+  // Data ----------------------------------------------------------------
+
+  let data;
+  try {
+    data = await fetch("data/jobs.json", { cache: "no-cache" }).then((r) => r.json());
+  } catch {
+    $("#rows").innerHTML = '<div class="empty"><p>No data yet. Run <code>npm run ingest</code>.</p></div>';
+    return;
+  }
+  const now = Date.now();
+  const JOBS = data.jobs.map((j) => ({ ...j, minutesAgo: Math.max(0, Math.round((now - Date.parse(j.postedAt)) / 60000)) }));
+  const companyCount = new Set(JOBS.map((j) => j.company)).size;
+  const vtNote = `${school.shortName} pipeline`;
+
+  $("#hero-lede").textContent = `Pulled straight from ${data.companies} companies' own career sites every hour, so you see roles the hour they post, not days later on LinkedIn or Handshake. Internships, co-ops and new-grad only.`;
+  $("#hero-proof").innerHTML = `<b>${fmt(JOBS.length)}</b> open roles · <b>${companyCount}</b> companies hiring · <b>${fmt(JOBS.filter((j) => j.minutesAgo < 1440).length)}</b> new today`;
+  $("#updated").textContent = `Updated ${ago(Math.round((now - Date.parse(data.generatedAt)) / 60000)).toLowerCase()}`;
+  $("#foot-note").textContent = `Data refreshed ${new Date(data.generatedAt).toLocaleString()}`;
 
   // Filters -----------------------------------------------------------
 
-  const posted = [["1", "Last 24 hrs (fresh roles)"], ["7", "Last 7 days"], ["14", "Last 14 days"], ["all", "All time"]];
-  const groups = [
-    { key: "type", label: "Role type", options: ["Internship", "Co-op", "Full-time"] },
-    { key: "arrangement", label: "Work arrangement", options: ["On-site", "Hybrid", "Remote"] },
-    { key: "fn", label: "Function", options: [...new Set(JOBS.map((j) => j.fn))].sort() },
-    { key: "majors", label: "Major", options: school.majors, one: true },
-    { key: "classYears", label: "Class year", options: ["2026", "2027", "2028", "2029"] },
-    { key: "state", label: "Location", options: [...new Set(JOBS.map((j) => stateOf(j.location)))].sort() },
-  ];
-  function stateOf(loc) { return loc === "Remote" ? "Remote" : loc.split(", ").pop(); }
+  const countBy = (k) => {
+    const m = new Map();
+    for (const j of JOBS) for (const v of [].concat(j[k] ?? [])) if (v) m.set(v, (m.get(v) || 0) + 1);
+    return [...m.entries()].sort((a, b) => b[1] - a[1]).map(([v]) => v);
+  };
+  const STATE_NAMES = { AL: "Alabama", AK: "Alaska", AZ: "Arizona", AR: "Arkansas", CA: "California", CO: "Colorado", CT: "Connecticut", DE: "Delaware", DC: "Washington, DC", FL: "Florida", GA: "Georgia", HI: "Hawaii", ID: "Idaho", IL: "Illinois", IN: "Indiana", IA: "Iowa", KS: "Kansas", KY: "Kentucky", LA: "Louisiana", ME: "Maine", MD: "Maryland", MA: "Massachusetts", MI: "Michigan", MN: "Minnesota", MS: "Mississippi", MO: "Missouri", MT: "Montana", NE: "Nebraska", NV: "Nevada", NH: "New Hampshire", NJ: "New Jersey", NM: "New Mexico", NY: "New York", NC: "North Carolina", ND: "North Dakota", OH: "Ohio", OK: "Oklahoma", OR: "Oregon", PA: "Pennsylvania", RI: "Rhode Island", SC: "South Carolina", SD: "South Dakota", TN: "Tennessee", TX: "Texas", UT: "Utah", VT: "Vermont", VA: "Virginia", WA: "Washington", WV: "West Virginia", WI: "Wisconsin", WY: "Wyoming" };
 
-  const blank = () => ({ q: "", posted: "1", recruitsOnly: false, alumsOnly: false, ...Object.fromEntries(groups.map((g) => [g.key, new Set()])) });
+  const posted = [["1", "Last 24 hrs (fresh roles)"], ["3", "Last 3 days"], ["7", "Last 7 days"], ["all", "All open roles"]];
+  const groups = [
+    { key: "level", label: "Level", options: ["Internship", "Co-op", "New grad"] },
+    { key: "fn", label: "Function", options: countBy("fn") },
+    { key: "sector", label: "Industry", options: countBy("sector") },
+    { key: "arrangement", label: "Work arrangement", options: ["On-site", "Hybrid", "Remote", "Remote OK"] },
+    { key: "states", label: "Location", options: countBy("states"), name: (v) => STATE_NAMES[v] || v },
+    { key: "term", label: "Start", options: countBy("term").filter((t) => /20(2[6-9])/.test(t)).sort() },
+    { key: "company", label: "Company", options: countBy("company").sort((a, b) => a.localeCompare(b)), one: true },
+  ];
+  const flags = [
+    ["vtOnly", vtNote, `Employers that recruit hard out of ${school.shortName}`],
+    ["payOnly", "Pay listed", "Only roles that post a salary or hourly rate"],
+    ["titleOnly", "Clearly early-career", "Hide roles we matched from the posting text, not the title"],
+  ];
+  const label = (g, v) => (g.name ? g.name(v) : v);
+
+  const blank = () => ({ q: "", posted: "1", ...Object.fromEntries(flags.map(([k]) => [k, false])), ...Object.fromEntries(groups.map((g) => [g.key, new Set()])) });
   let state = blank();
+  // Few roles in the last day (a quiet hour, a fresh install): open wider.
+  if (JOBS.filter((j) => j.minutesAgo < 1440).length < 15) state.posted = "7";
   let draft = null;
   let shown = PAGE;
 
   function matches(j, s) {
     if (s.posted !== "all" && j.minutesAgo > Number(s.posted) * 1440) return false;
-    if (s.recruitsOnly && !recruiters.has(j.company)) return false;
-    if (s.alumsOnly && !j.onTeam) return false;
+    if (s.vtOnly && !j.vt) return false;
+    if (s.payOnly && !j.pay) return false;
+    if (s.titleOnly && j.fromPosting) return false;
     for (const g of groups) {
       const want = s[g.key];
-      if (!want.size) continue;
-      const have = g.key === "state" ? [stateOf(j.location)] : [].concat(j[g.key]);
-      if (!have.some((v) => want.has(v))) return false;
+      if (want.size && ![].concat(j[g.key] ?? []).some((v) => want.has(v))) return false;
     }
     if (s.q) {
-      const hay = `${j.title} ${j.company} ${j.location} ${j.industry} ${j.fn}`.toLowerCase();
+      const hay = `${j.title} ${j.company} ${j.location} ${j.sector} ${j.fn} ${j.level} ${j.term || ""} ${j.states.map((x) => STATE_NAMES[x] || x).join(" ")}`.toLowerCase();
       if (!s.q.toLowerCase().split(/\s+/).every((w) => hay.includes(w))) return false;
     }
     return true;
@@ -70,36 +98,37 @@
   // Board -------------------------------------------------------------
 
   function ago(m) {
-    if (m < 5) return "Just now";
+    if (m < 2) return "Just now";
     if (m < 60) return `${m}m ago`;
     if (m < 1440) return `${Math.floor(m / 60)}h ago`;
     const d = Math.floor(m / 1440);
     return d === 1 ? "Yesterday" : `${d}d ago`;
   }
 
-  function faces(list) {
-    return `<span class="faces">${list.slice(0, 3).map((a) => `<span class="face">${esc(initials(a.name))}</span>`).join("")}</span>`;
+  // Workday only says "Posted Today" / "N Days Ago": don't fake minutes.
+  const when = (j) => (j.postedApprox && j.minutesAgo >= 60 ? (j.minutesAgo < 1440 ? "Today" : ago(j.minutesAgo)) : ago(j.minutesAgo));
+
+  function logo(j, cls = "") {
+    const bg = `hsl(${hue(j.company)} 45% 32%)`;
+    return `<span class="logo ${cls}" style="background:${bg}"><span>${esc(initials(j.company))}</span><img src="https://www.google.com/s2/favicons?domain=${esc(j.domain)}&sz=128" alt="" loading="lazy" onload="this.naturalWidth>16?this.parentNode.classList.add('has-img'):this.remove()" onerror="this.remove()" /></span>`;
   }
 
   function rowHtml(j, i) {
-    const alums = j.onTeam
-      ? `${faces(j.alumni)}<span class="n">${j.onTeam}</span>`
-      : `<span class="none">None yet</span>`;
-    return `<div class="row job" role="row" data-id="${j.id}" style="animation-delay:${Math.min(i, 12) * 18}ms">
+    return `<div class="row job" role="row" data-id="${esc(j.id)}" style="animation-delay:${Math.min(i, 12) * 16}ms">
       <div class="role">
-        <span class="logo" style="background:${j.color}">${esc(initials(j.company))}</span>
+        ${logo(j)}
         <div class="role-text">
           <div class="role-title">${esc(j.title)}</div>
-          <div class="role-co">${esc(j.company)}${recruiters.has(j.company) ? `<span class="recruits">Recruits at ${esc(school.shortName)}</span>` : ""}</div>
+          <div class="role-co">${esc(j.company)}${j.vt ? `<span class="recruits">${esc(vtNote)}</span>` : ""}</div>
         </div>
       </div>
       <div class="meta">
-        <div class="loc">${esc(j.location)}<small>${esc(j.arrangement)} · ${esc(j.type)}</small></div>
-        <div class="when ${j.minutesAgo < 1440 ? "fresh" : ""}">${ago(j.minutesAgo)}</div>
-        <div class="alums" title="${j.onTeam} ${esc(school.demonym)} on this team">${alums}</div>
-        <div><button class="score" data-signin>Get score</button></div>
+        <div class="loc">${esc(j.location)}<small>${esc(j.arrangement)} · ${esc(j.fn)}</small></div>
+        <div class="when ${j.minutesAgo < 1440 ? "fresh" : ""}" title="${esc(new Date(j.postedAt).toLocaleString())}${j.postedApprox ? " (approx.)" : ""}">${when(j)}</div>
+        <div class="pay">${j.pay ? esc(j.pay) : '<span class="none">—</span>'}</div>
+        <div><span class="lvl lvl-${j.level.replace(/\W/g, "").toLowerCase()}">${esc(j.level)}</span></div>
       </div>
-      <a class="apply" href="#" data-apply aria-label="Apply to ${esc(j.title)} at ${esc(j.company)}">${icon.out}</a>
+      <a class="apply" href="${esc(j.url)}" target="_blank" rel="noopener" aria-label="Apply to ${esc(j.title)} at ${esc(j.company)}">${icon.out}</a>
     </div>`;
   }
 
@@ -108,27 +137,23 @@
     $("#rows").innerHTML = list.slice(0, shown).map(rowHtml).join("");
     $("#empty").hidden = list.length > 0;
     $("#more").hidden = list.length <= shown;
-
-    const fresh = JOBS.filter((j) => j.minutesAgo < 1440).length;
-    const withAlums = list.filter((j) => j.onTeam).length;
-    $("#tally").innerHTML = state.posted === "1" && !activeCount()
-      ? `${fresh} fresh roles added today ✦ <span>${withAlums} with ${esc(school.demonym)} on the team</span>`
-      : `${list.length} roles ✦ <span>${withAlums} with ${esc(school.demonym)} on the team</span>`;
-
+    $("#more").textContent = `Load more roles (${fmt(list.length - shown)} left)`;
+    const fresh = list.filter((j) => j.minutesAgo < 1440).length;
+    $("#tally").innerHTML = state.posted === "1"
+      ? `${fmt(list.length)} fresh roles in the last 24 hrs ✦ <span>${fmt(list.filter((j) => j.vt).length)} from ${esc(vtNote)} employers</span>`
+      : `${fmt(list.length)} roles ✦ <span>${fmt(fresh)} posted today</span>`;
     renderChips();
   }
 
   function activeCount(s = state) {
-    return groups.reduce((n, g) => n + s[g.key].size, 0) + (s.recruitsOnly ? 1 : 0) + (s.alumsOnly ? 1 : 0) + (s.posted !== "1" ? 1 : 0);
+    return groups.reduce((n, g) => n + s[g.key].size, 0) + flags.filter(([k]) => s[k]).length + (s.posted !== "1" ? 1 : 0);
   }
 
   function renderChips() {
     const chips = [];
-    const label = posted.find((p) => p[0] === state.posted)[1];
-    chips.push([label, () => (state.posted = state.posted === "1" ? "all" : "1")]);
-    if (state.recruitsOnly) chips.push([`Recruits at ${school.shortName}`, () => (state.recruitsOnly = false)]);
-    if (state.alumsOnly) chips.push([`${school.demonym} on the team`, () => (state.alumsOnly = false)]);
-    for (const g of groups) for (const v of state[g.key]) chips.push([v, () => state[g.key].delete(v)]);
+    chips.push([posted.find((p) => p[0] === state.posted)[1], () => (state.posted = state.posted === "1" ? "all" : "1")]);
+    for (const [k, name] of flags) if (state[k]) chips.push([name, () => (state[k] = false)]);
+    for (const g of groups) for (const v of state[g.key]) chips.push([label(g, v), () => state[g.key].delete(v)]);
 
     const box = $("#active-chips");
     box.innerHTML = chips.map(([t], i) => `<span class="chip">${esc(t)}<button data-chip="${i}" aria-label="Remove ${esc(t)}">${icon.x}</button></span>`).join("");
@@ -143,95 +168,76 @@
 
   function renderFilters() {
     const d = draft;
-    const section = (label, hint, body, open) =>
-      `<details class="section" ${open ? "open" : ""}><summary>${esc(label)}<span class="hint">${esc(hint)}</span>${icon.caret}</summary>${body}</details>`;
+    const section = (title, hint, body, open) =>
+      `<details class="section" ${open ? "open" : ""}><summary>${esc(title)}<span class="hint">${esc(hint)}</span>${icon.caret}</summary>${body}</details>`;
 
-    let html = section(
-      "Posted within", "",
-      `<div class="options">${posted.map(([v, t]) => `<label class="opt"><input type="radio" name="posted" value="${v}" ${d.posted === v ? "checked" : ""}/>${esc(t)}</label>`).join("")}</div>`,
-      true,
-    );
-    html += section(
-      `${school.shortName} network`, (d.recruitsOnly || d.alumsOnly) ? "On" : "",
-      `<div class="options one">
-        <label class="opt toggle"><span>Recruits at ${esc(school.shortName)}<small>Employers at ${esc(school.name)} career fairs</small></span><input type="checkbox" data-flag="recruitsOnly" ${d.recruitsOnly ? "checked" : ""}/></label>
-        <label class="opt toggle"><span>${esc(school.demonym)} on the team<small>At least one alum works on this team</small></span><input type="checkbox" data-flag="alumsOnly" ${d.alumsOnly ? "checked" : ""}/></label>
-      </div>`,
-      true,
-    );
+    let html = section("Posted within", "",
+      `<div class="options">${posted.map(([v, t]) => `<label class="opt"><input type="radio" name="posted" value="${v}" ${d.posted === v ? "checked" : ""}/>${esc(t)}</label>`).join("")}</div>`, true);
+    html += section("Shortcuts", flags.some(([k]) => d[k]) ? "On" : "",
+      `<div class="options one">${flags.map(([k, name, sub]) => `<label class="opt toggle"><span>${esc(name)}<small>${esc(sub)}</small></span><input type="checkbox" data-flag="${k}" ${d[k] ? "checked" : ""}/></label>`).join("")}</div>`, true);
     for (const g of groups) {
       const set = d[g.key];
-      html += section(
-        g.label, set.size ? `${set.size} selected` : "",
-        `<div class="options ${g.one ? "one" : ""}">${g.options.map((o) => `<label class="opt"><input type="checkbox" data-group="${g.key}" value="${esc(o)}" ${set.has(o) ? "checked" : ""}/>${esc(o)}</label>`).join("")}</div>`,
-        set.size > 0,
-      );
+      html += section(g.label, set.size ? `${set.size} selected` : "",
+        `<div class="options ${g.one ? "one" : ""}">${g.options.map((o) => `<label class="opt"><input type="checkbox" data-group="${g.key}" value="${esc(o)}" ${set.has(o) ? "checked" : ""}/>${esc(label(g, o))}</label>`).join("")}</div>`,
+        set.size > 0 || g.key === "level");
     }
     $("#filter-body").innerHTML = html;
   }
+
+  const showCount = () => ($("#apply").textContent = `Show ${fmt(JOBS.filter((j) => matches(j, draft)).length)} roles`);
 
   $("#filter-body").addEventListener("change", (e) => {
     const t = e.target;
     if (t.name === "posted") draft.posted = t.value;
     else if (t.dataset.flag) draft[t.dataset.flag] = t.checked;
-    else if (t.dataset.group) draft[t.dataset.group][t.checked ? "add" : "delete"](t.value);
-    const hint = t.closest("details").querySelector(".hint");
-    if (t.dataset.group && hint) hint.textContent = draft[t.dataset.group].size ? `${draft[t.dataset.group].size} selected` : "";
-    $("#apply").textContent = `Show ${JOBS.filter((j) => matches(j, draft)).length} roles`;
+    else if (t.dataset.group) {
+      draft[t.dataset.group][t.checked ? "add" : "delete"](t.value);
+      const n = draft[t.dataset.group].size;
+      t.closest("details").querySelector(".hint").textContent = n ? `${n} selected` : "";
+    }
+    showCount();
   });
 
-  function clone(s) {
-    return { ...s, ...Object.fromEntries(groups.map((g) => [g.key, new Set(s[g.key])])) };
-  }
+  const clone = (s) => ({ ...s, ...Object.fromEntries(groups.map((g) => [g.key, new Set(s[g.key])])) });
 
-  function openFilters() {
-    draft = clone(state);
-    renderFilters();
-    $("#apply").textContent = `Show ${JOBS.filter((j) => matches(j, draft)).length} roles`;
-    open("#filters");
-  }
-
-  $("#open-filters").addEventListener("click", openFilters);
+  $("#open-filters").addEventListener("click", () => { draft = clone(state); renderFilters(); showCount(); open("#filters"); });
   $("#apply").addEventListener("click", () => { state = draft; shown = PAGE; close(); render(); });
-  $("#reset").addEventListener("click", () => { draft = { ...blank(), q: state.q }; renderFilters(); $("#apply").textContent = `Show ${JOBS.filter((j) => matches(j, draft)).length} roles`; });
-  $("#reset-empty").addEventListener("click", () => { state = blank(); $("#q").value = ""; shown = PAGE; render(); });
+  $("#reset").addEventListener("click", () => { draft = { ...blank(), q: state.q }; renderFilters(); showCount(); });
+  $("#reset-empty").addEventListener("click", () => { state = { ...blank(), posted: "all" }; $("#q").value = ""; shown = PAGE; render(); });
 
   // Role detail -------------------------------------------------------
 
   function openDetail(j) {
-    const people = j.alumni.length
-      ? j.alumni.map((a) => `<div class="person"><span class="face">${esc(initials(a.name))}</span>
-          <div class="who"><b>${esc(a.name)} '${String(a.year).slice(2)}</b><span>${esc(a.title)} · ${esc(a.major)}</span></div>
-          <button class="btn soft sm" data-signin>Ask for referral</button></div>`).join("")
-      : `<p>No ${esc(school.demonym)} on this team yet. ${fmt(j.alumniTotal)} work elsewhere at ${esc(j.company)}.</p>`;
+    const facts = [
+      j.location, j.arrangement, j.level, j.term && `Starts ${j.term}`, j.pay,
+      `Posted ${when(j).toLowerCase()}`,
+    ].filter(Boolean);
+    const why = j.fromPosting
+      ? `The title doesn't say early-career; we kept it because the posting asks for ${j.yearsMin != null ? `${j.yearsMin === 0 ? "no" : `${j.yearsMin}+ year${j.yearsMin === 1 ? "" : "s"} of`} prior experience` : "new or recent grads"}.`
+      : `${j.level} in the title.${j.yearsMin != null ? ` Posting asks for ${j.yearsMin}+ years of experience.` : ""}`;
 
+    $("#detail-apply").href = j.url;
     $("#detail-body").innerHTML = `
       <div class="d-top">
-        <span class="logo lg" style="background:${j.color}">${esc(initials(j.company))}</span>
-        <div><h2>${esc(j.title)}</h2><p>${esc(j.company)} · ${esc(j.industry)}</p></div>
+        ${logo(j, "lg")}
+        <div><h2>${esc(j.title)}</h2><p>${esc(j.company)} · ${esc(j.sector)} · ${esc(j.fn)}</p></div>
       </div>
       <div class="pills">
-        <span class="pill">${esc(j.location)}</span>
-        <span class="pill">${esc(j.arrangement)}</span>
-        <span class="pill">${esc(j.type)}</span>
-        <span class="pill">${esc(j.pay)}</span>
-        <span class="pill">Posted ${ago(j.minutesAgo).toLowerCase()}</span>
-        ${recruiters.has(j.company) ? `<span class="pill gold">Recruits at ${esc(school.shortName)}</span>` : ""}
+        ${facts.map((f) => `<span class="pill">${esc(f)}</span>`).join("")}
+        ${j.vt ? `<span class="pill gold">${esc(vtNote)}</span>` : ""}
+      </div>
+      <div class="panel">
+        <h3>Why it's here</h3>
+        <p>${esc(why)}</p>
+      </div>
+      <div class="panel">
+        <h3>Source</h3>
+        <p>Pulled from ${esc(j.company)}'s own ${esc(ATS[j.ats] || "careers")} board, first seen ${esc(new Date(j.firstSeenAt).toLocaleString())}. Apply goes straight to the employer.</p>
+        <a class="btn sm" href="${esc(j.url)}" target="_blank" rel="noopener">Open the posting ${icon.out}</a>
       </div>
       <div class="panel">
         <h3>${esc(school.demonym)} at ${esc(j.company)}</h3>
-        <p>${j.onTeam} on this team · ${fmt(j.alumniTotal)} across the company</p>
-        ${people}
-      </div>
-      <div class="panel">
-        <h3>Who it fits</h3>
-        <p>Majors and class years the posting targets.</p>
-        <div class="fit">${j.majors.map((m) => `<span class="pill">${esc(m)}</span>`).join("")}${j.classYears.map((y) => `<span class="pill">Class of ${y}</span>`).join("")}</div>
-      </div>
-      <div class="panel">
-        <h3>Your match</h3>
-        <p>Sign in with your ${esc(school.domain)} address to score this role against your resume.</p>
-        <button class="btn sm" data-signin>Get match score</button>
+        <p>Alumni on the team, with a way to reach them. Next on the list.</p>
       </div>`;
     open("#detail");
   }
@@ -243,7 +249,7 @@
     close();
     current = $(sel);
     current.hidden = false;
-    if (current.classList.contains("drawer")) $("#scrim").hidden = false;
+    $("#scrim").hidden = false;
   }
   function close() {
     if (current) current.hidden = true;
@@ -251,36 +257,24 @@
     current = null;
   }
 
-  let toastTimer;
-  function toast(msg) {
-    const t = $("#toast");
-    t.textContent = msg;
-    t.hidden = false;
-    clearTimeout(toastTimer);
-    toastTimer = setTimeout(() => (t.hidden = true), 2600);
-  }
-
   document.addEventListener("click", (e) => {
-    if (e.target.closest("[data-signin]")) { e.stopPropagation(); open("#signin"); $("#signin-email").focus(); return; }
-    if (e.target.closest("[data-apply]") || e.target.closest("#detail-apply")) { e.preventDefault(); e.stopPropagation(); toast("Apply links go to the employer's posting (not wired up in the demo)"); return; }
-    if (e.target.closest("[data-close]") || e.target === $("#scrim") || e.target === $("#signin")) { close(); return; }
+    if (e.target.closest("a")) return;
+    if (e.target.closest("[data-close]") || e.target === $("#scrim")) { close(); return; }
     const row = e.target.closest(".row.job");
     if (row) openDetail(JOBS.find((j) => j.id === row.dataset.id));
   });
   document.addEventListener("keydown", (e) => { if (e.key === "Escape") close(); });
 
-  $("#signin-form").addEventListener("submit", (e) => {
-    e.preventDefault();
-    const v = $("#signin-email").value.trim().toLowerCase();
-    if (!v.endsWith("@" + school.domain)) { toast(`Use your ${school.domain} address`); return; }
-    close();
-    toast("Sign-in isn't wired up in the demo yet");
-  });
-
   let qTimer;
   $("#q").addEventListener("input", (e) => {
     clearTimeout(qTimer);
-    qTimer = setTimeout(() => { state.q = e.target.value.trim(); shown = PAGE; render(); }, 120);
+    qTimer = setTimeout(() => {
+      state.q = e.target.value.trim();
+      // Searching for something specific: don't hide it behind "last 24 hrs".
+      if (state.q && state.posted === "1") state.posted = "all";
+      shown = PAGE;
+      render();
+    }, 120);
   });
   $("#more").addEventListener("click", () => { shown += PAGE; render(); });
 

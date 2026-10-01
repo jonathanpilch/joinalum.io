@@ -20,8 +20,7 @@
         <span id="school-name"></span>
       </span>
       <span class="spacer"></span>
-      <span class="sample-tag" title="Roles and alumni on this page are generated for the demo">Sample data</span>
-      <button class="btn soft sm" data-signin>Sign in</button>
+      <span class="updated" id="updated"></span>
     </header>
 
     <main class="main">
@@ -29,11 +28,11 @@
         <p class="eyebrow" id="hero-eyebrow"></p>
         <h1 id="hero-title"></h1>
         <p class="lede" id="hero-lede"></p>
-        <button class="btn" data-signin>Get match scores</button>
+        <a class="btn" href="#board">Browse roles</a>
         <p class="proof" id="hero-proof"></p>
       </section>
 
-      <section class="board">
+      <section class="board" id="board">
         <div class="searchbar glass-card">
           <label class="search">
             <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7" /><path d="m20 20-3.5-3.5" /></svg>
@@ -56,8 +55,8 @@
             <span role="columnheader">Role</span>
             <span role="columnheader">Location</span>
             <span role="columnheader">Posted</span>
-            <span role="columnheader" id="alumni-col"></span>
-            <span role="columnheader">Match</span>
+            <span role="columnheader">Pay</span>
+            <span role="columnheader">Level</span>
             <span role="columnheader" class="right">Apply</span>
           </div>
           <div id="rows"></div>
@@ -71,7 +70,7 @@
 
       <footer class="foot">
         <span>alum · a <strong>nublock</strong> product, alongside Ndex</span>
-        <span>Proof of concept. Roles and alumni are sample data.</span>
+        <span id="foot-note"></span>
       </footer>
     </main>
 
@@ -104,22 +103,9 @@
       <div class="drawer-body" id="detail-body"></div>
     </aside>
 
-    <!-- Sign in (not wired up in the proof of concept) -->
-    <div class="modal" id="signin" hidden>
-      <form class="modal-card glass-card" id="signin-form" novalidate>
-        <img class="seal" id="signin-mark" alt="" />
-        <h2 id="signin-title"></h2>
-        <p id="signin-lede"></p>
-        <input type="email" id="signin-email" autocomplete="email" />
-        <button class="btn" type="submit">Continue</button>
-        <button class="link" type="button" data-close>Not now</button>
-      </form>
-    </div>
-
     <div class="toast" id="toast" role="status" hidden></div>
 
     <script src="schools.js"></script>
-    <script src="data.js"></script>
     <script src="app.js"></script>
   </body>
 </html>
