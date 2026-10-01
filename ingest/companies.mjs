@@ -8,38 +8,45 @@
  *   wd  Workday         {tenant}.{host}.myworkdayjobs.com/wday/cxs/{tenant}/{site}
  *   amzn                amazon.jobs/en/search.json
  *
- * `vt: true` marks employers that recruit hard out of Virginia Tech -- our own
- * list, from career-fair rosters and where Hokies end up. `sector` drives the
- * industry chip. */
+ * `sector` drives the industry chip. Whether an employer actually hires
+ * Hokies comes from VT's placement report (ingest/placements.mjs), not here. */
 
-const gh = (name, slug, domain, sector, vt = false) => ({ name, ats: "gh", slug, domain, sector, vt });
-const lv = (name, slug, domain, sector, vt = false) => ({ name, ats: "lv", slug, domain, sector, vt });
-const ab = (name, slug, domain, sector, vt = false) => ({ name, ats: "ab", slug, domain, sector, vt });
-const sr = (name, slug, domain, sector, vt = false) => ({ name, ats: "sr", slug, domain, sector, vt });
-const wd = (name, tenant, host, site, domain, sector, vt = false) => ({ name, ats: "wd", tenant, host, site, domain, sector, vt });
+const gh = (name, slug, domain, sector) => ({ name, ats: "gh", slug, domain, sector });
+const lv = (name, slug, domain, sector) => ({ name, ats: "lv", slug, domain, sector });
+const ab = (name, slug, domain, sector) => ({ name, ats: "ab", slug, domain, sector });
+const sr = (name, slug, domain, sector) => ({ name, ats: "sr", slug, domain, sector });
+const wd = (name, tenant, host, site, domain, sector) => ({ name, ats: "wd", tenant, host, site, domain, sector });
 
 export default [
   // Defense, government tech, and the DC/NoVA pipeline
-  wd("Northrop Grumman", "ngc", "wd1", "Northrop_Grumman_External_Site", "northropgrumman.com", "Defense", true),
-  wd("Booz Allen Hamilton", "bah", "wd1", "BAH_Jobs", "boozallen.com", "Defense", true),
-  wd("Leidos", "leidos", "wd5", "External", "leidos.com", "Defense", true),
-  wd("GDIT", "gdit", "wd5", "External_Career_Site", "gdit.com", "Defense", true),
-  wd("CACI", "caci", "wd1", "External", "caci.com", "Defense", true),
-  wd("Boeing", "boeing", "wd1", "EXTERNAL_CAREERS", "boeing.com", "Aerospace", true),
-  wd("RTX", "globalhr", "wd5", "REC_RTX_Ext_Gateway", "rtx.com", "Aerospace", true),
+  wd("Northrop Grumman", "ngc", "wd1", "Northrop_Grumman_External_Site", "northropgrumman.com", "Defense"),
+  wd("Booz Allen Hamilton", "bah", "wd1", "BAH_Jobs", "boozallen.com", "Defense"),
+  wd("Leidos", "leidos", "wd5", "External", "leidos.com", "Defense"),
+  wd("GDIT", "gdit", "wd5", "External_Career_Site", "gdit.com", "Defense"),
+  wd("CACI", "caci", "wd1", "External", "caci.com", "Defense"),
+  wd("Boeing", "boeing", "wd1", "EXTERNAL_CAREERS", "boeing.com", "Aerospace"),
+  wd("RTX", "globalhr", "wd5", "REC_RTX_Ext_Gateway", "rtx.com", "Aerospace"),
   gh("Anduril", "andurilindustries", "anduril.com", "Defense"),
-  lv("Palantir", "palantir", "palantir.com", "Defense", true),
+  lv("Palantir", "palantir", "palantir.com", "Defense"),
   lv("Shield AI", "shieldai", "shield.ai", "Defense"),
   gh("Epirus", "epirus", "epirusinc.com", "Defense"),
   ab("Saronic", "saronic", "saronic.com", "Defense"),
   gh("Shift5", "shift5", "shift5.io", "Security"),
-  gh("Appian", "appian", "appian.com", "Software", true),
+  gh("Appian", "appian", "appian.com", "Software"),
+  wd("MITRE", "mitre", "wd5", "MITRE", "mitre.org", "Defense"),
+  wd("ManTech", "mantech", "wd1", "External", "mantech.com", "Defense"),
 
   // Finance and fintech
-  wd("Capital One", "capitalone", "wd12", "Capital_One", "capitalone.com", "Finance", true),
-  wd("Freddie Mac", "freddiemac", "wd5", "External", "freddiemac.com", "Finance", true),
-  wd("Fannie Mae", "fanniemae", "wd1", "FannieMaeCareers", "fanniemae.com", "Finance", true),
-  wd("Mastercard", "mastercard", "wd1", "CorporateCareers", "mastercard.com", "Finance", true),
+  wd("Capital One", "capitalone", "wd12", "Capital_One", "capitalone.com", "Finance"),
+  wd("Freddie Mac", "freddiemac", "wd5", "External", "freddiemac.com", "Finance"),
+  wd("Fannie Mae", "fanniemae", "wd1", "FannieMaeCareers", "fanniemae.com", "Finance"),
+  wd("Mastercard", "mastercard", "wd1", "CorporateCareers", "mastercard.com", "Finance"),
+  wd("Bank of America", "ghr", "wd1", "Lateral-US", "bankofamerica.com", "Finance"),
+  wd("Wells Fargo", "wf", "wd1", "WellsFargoJobs", "wellsfargo.com", "Finance"),
+  wd("Vanguard", "vanguard", "wd5", "vanguard_external", "vanguard.com", "Finance"),
+  wd("PwC", "pwc", "wd3", "Global_Experienced_Careers", "pwc.com", "Consulting"),
+  wd("CoStar Group", "costar", "wd1", "CoStarCareers", "costargroup.com", "Software"),
+  wd("General Motors", "generalmotors", "wd5", "Careers_GM", "gm.com", "Automotive"),
   gh("Stripe", "stripe", "stripe.com", "Fintech"),
   gh("Robinhood", "robinhood", "robinhood.com", "Fintech"),
   gh("Coinbase", "coinbase", "coinbase.com", "Fintech"),
@@ -60,7 +67,7 @@ export default [
   gh("Virtu Financial", "virtu", "virtu.com", "Quant"),
 
   // Big tech and enterprise
-  { name: "Amazon", ats: "amzn", domain: "amazon.com", sector: "Big Tech", vt: true },
+  { name: "Amazon", ats: "amzn", domain: "amazon.com", sector: "Big Tech" },
   wd("NVIDIA", "nvidia", "wd5", "NVIDIAExternalCareerSite", "nvidia.com", "Semiconductors"),
   wd("Salesforce", "salesforce", "wd12", "External_Career_Site", "salesforce.com", "Software"),
   wd("Cisco", "cisco", "wd5", "Cisco_Careers", "cisco.com", "Networking"),
@@ -70,8 +77,8 @@ export default [
   wd("HP", "hp", "wd5", "ExternalCareerSite", "hp.com", "Hardware"),
   wd("Workday", "workday", "wd5", "Workday", "workday.com", "Software"),
   wd("Disney", "disney", "wd5", "disneycareer", "disney.com", "Media"),
-  wd("Accenture", "accenture", "wd103", "AccentureCareers", "accenture.com", "Consulting", true),
-  wd("CarMax", "carmax", "wd1", "External", "carmax.com", "Retail Tech", true),
+  wd("Accenture", "accenture", "wd103", "AccentureCareers", "accenture.com", "Consulting"),
+  wd("CarMax", "carmax", "wd1", "External", "carmax.com", "Retail Tech"),
   sr("ServiceNow", "ServiceNow", "servicenow.com", "Software"),
   sr("Bosch", "BoschGroup", "bosch.com", "Hardware"),
   sr("Western Digital", "WesternDigital", "westerndigital.com", "Hardware"),

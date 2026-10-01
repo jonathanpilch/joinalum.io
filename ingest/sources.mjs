@@ -8,17 +8,38 @@
 
 const UA = { "user-agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/129.0 Safari/537.36", accept: "application/json" };
 
-async function get(url, init = {}, tries = 3) {
+// Workday shares rate limits across tenants, so every Workday call goes
+// through one small gate; everything else runs free.
+const gates = new Map();
+function gate(host, max) {
+  if (!gates.has(host)) gates.set(host, { n: 0, max, q: [] });
+  const g = gates.get(host);
+  return new Promise((go) => {
+    const run = () => { g.n++; go(() => { g.n--; g.q.shift()?.(); }); };
+    g.n < g.max ? run() : g.q.push(run);
+  });
+}
+
+async function get(url, init = {}, tries = 5) {
+  const wd = url.includes("myworkdayjobs.com");
   for (let i = 0; ; i++) {
+    const release = wd ? await gate("workday", 4) : () => {};
+    let wait = 0;
     try {
       const r = await fetch(url, { ...init, headers: { ...UA, ...init.headers }, signal: AbortSignal.timeout(30000) });
-      if (r.status === 429 || r.status >= 500) throw new Error(`HTTP ${r.status}`);
+      if (r.status === 429 || r.status >= 500) {
+        wait = Number(r.headers.get("retry-after")) * 1000 || 0;
+        throw new Error(`HTTP ${r.status}`);
+      }
       if (!r.ok) { const e = new Error(`HTTP ${r.status}`); e.fatal = true; throw e; }
       return await r.json();
     } catch (e) {
       if (e.fatal || i >= tries - 1) throw e;
-      await new Promise((ok) => setTimeout(ok, 1000 * 2 ** i + Math.random() * 500));
+      wait = Math.max(wait, 2000 * 2 ** i + Math.random() * 1000);
+    } finally {
+      release();
     }
+    await new Promise((ok) => setTimeout(ok, wait));
   }
 }
 

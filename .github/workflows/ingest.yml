@@ -3,6 +3,8 @@ name: ingest
 on:
   schedule:
     - cron: "7 * * * *"
+    # VT's placement report changes once a year; Mondays is plenty.
+    - cron: "37 9 * * 1"
   workflow_dispatch:
 permissions:
   contents: write
@@ -19,6 +21,8 @@ jobs:
         with:
           node-version: 22
       - run: node ingest/run.mjs
+      - if: github.event.schedule == '37 9 * * 1' || github.event_name == 'workflow_dispatch'
+        run: node ingest/placements.mjs
       - name: Commit data
         run: |
           git config user.name "alum-ingest"

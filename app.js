@@ -39,10 +39,19 @@
   const now = Date.now();
   const JOBS = data.jobs.map((j) => ({ ...j, minutesAgo: Math.max(0, Math.round((now - Date.parse(j.postedAt)) / 60000)) }));
   const companyCount = new Set(JOBS.map((j) => j.company)).size;
+  // Where Hokies were actually hired (VT's First Destination Report), keyed
+  // by board company. Optional: the board works without it.
+  const P = await fetch("data/placements.json", { cache: "no-cache" }).then((r) => r.json()).catch(() => null);
+  const hires = (j) => (P && P.employers[P.boardIndex[j.company]]) || null;
+  const PIPELINE = 5; // hires across the recent cohorts that make a "proven" pipeline
+  const proven = (j) => (hires(j)?.recent || 0) >= PIPELINE;
+  // Cohort "2022-2023" is the class of 2023.
+  const recentSpan = P ? `the classes of ${P.recentCohorts[0].slice(5)}–${P.recentCohorts.at(-1).slice(5)}` : "";
   const vtNote = `${school.shortName} pipeline`;
+  for (const j of JOBS) j.majors = Object.keys(hires(j)?.byMajor || {});
 
   $("#hero-lede").textContent = `Pulled straight from ${data.companies} companies' own career sites every hour, so you see roles the hour they post, not days later on LinkedIn or Handshake. Internships, co-ops and new-grad only.`;
-  $("#hero-proof").innerHTML = `<b>${fmt(JOBS.length)}</b> open roles · <b>${companyCount}</b> companies hiring · <b>${fmt(JOBS.filter((j) => j.minutesAgo < 1440).length)}</b> new today`;
+  $("#hero-proof").innerHTML = `<b>${fmt(JOBS.length)}</b> open roles · <b>${companyCount}</b> companies hiring · <b>${fmt(JOBS.filter((j) => j.minutesAgo < 1440).length)}</b> new today${P ? ` · <b>${fmt(P.placed)}</b> ${esc(school.demonym.replace(/s$/, ""))} placements tracked` : ""}`;
   $("#updated").textContent = `Updated ${ago(Math.round((now - Date.parse(data.generatedAt)) / 60000)).toLowerCase()}`;
   $("#foot-note").textContent = `Data refreshed ${new Date(data.generatedAt).toLocaleString()}`;
 
@@ -63,10 +72,12 @@
     { key: "arrangement", label: "Work arrangement", options: ["On-site", "Hybrid", "Remote", "Remote OK"] },
     { key: "states", label: "Location", options: countBy("states"), name: (v) => STATE_NAMES[v] || v },
     { key: "term", label: "Start", options: countBy("term").filter((t) => /20(2[6-9])/.test(t)).sort() },
+    // Majors VT actually placed at board companies, most common first.
+    ...(P ? [{ key: "majors", label: `Hires my major`, options: countBy("majors").filter((m) => m && JOBS.some((j) => (hires(j)?.byMajor[m] || 0) >= 2)), one: true }] : []),
     { key: "company", label: "Company", options: countBy("company").sort((a, b) => a.localeCompare(b)), one: true },
   ];
   const flags = [
-    ["vtOnly", vtNote, `Employers that recruit hard out of ${school.shortName}`],
+    ...(P ? [["vtOnly", `Proven ${vtNote}`, `Hired ${PIPELINE}+ ${school.demonym} from ${recentSpan}, per VT's placement report`]] : []),
     ["payOnly", "Pay listed", "Only roles that post a salary or hourly rate"],
     ["titleOnly", "Clearly early-career", "Hide roles we matched from the posting text, not the title"],
   ];
@@ -81,7 +92,7 @@
 
   function matches(j, s) {
     if (s.posted !== "all" && j.minutesAgo > Number(s.posted) * 1440) return false;
-    if (s.vtOnly && !j.vt) return false;
+    if (s.vtOnly && !proven(j)) return false;
     if (s.payOnly && !j.pay) return false;
     if (s.titleOnly && j.fromPosting) return false;
     for (const g of groups) {
@@ -113,13 +124,19 @@
     return `<span class="logo ${cls}" style="background:${bg}"><span>${esc(initials(j.company))}</span><img src="https://www.google.com/s2/favicons?domain=${esc(j.domain)}&sz=128" alt="" loading="lazy" onload="this.naturalWidth>16?this.parentNode.classList.add('has-img'):this.remove()" onerror="this.remove()" /></span>`;
   }
 
+  function hiredBadge(j) {
+    const h = hires(j);
+    if (!h || h.n < 2) return "";
+    return `<span class="recruits ${proven(j) ? "" : "dim"}" title="${esc(school.demonym)} hired: ${h.recent} in ${recentSpan}, ${h.n} since the class of ${P.cohorts[0].slice(5)}">${fmt(h.n)} hired</span>`;
+  }
+
   function rowHtml(j, i) {
     return `<div class="row job" role="row" data-id="${esc(j.id)}" style="animation-delay:${Math.min(i, 12) * 16}ms">
       <div class="role">
         ${logo(j)}
         <div class="role-text">
           <div class="role-title">${esc(j.title)}</div>
-          <div class="role-co">${esc(j.company)}${j.vt ? `<span class="recruits">${esc(vtNote)}</span>` : ""}</div>
+          <div class="role-co">${esc(j.company)}${hiredBadge(j)}</div>
         </div>
       </div>
       <div class="meta">
@@ -140,7 +157,7 @@
     $("#more").textContent = `Load more roles (${fmt(list.length - shown)} left)`;
     const fresh = list.filter((j) => j.minutesAgo < 1440).length;
     $("#tally").innerHTML = state.posted === "1"
-      ? `${fmt(list.length)} fresh roles in the last 24 hrs ✦ <span>${fmt(list.filter((j) => j.vt).length)} from ${esc(vtNote)} employers</span>`
+      ? `${fmt(list.length)} fresh roles in the last 24 hrs ✦ <span>${fmt(list.filter(proven).length)} at proven ${esc(vtNote)} employers</span>`
       : `${fmt(list.length)} roles ✦ <span>${fmt(fresh)} posted today</span>`;
     renderChips();
   }
@@ -224,7 +241,7 @@
       </div>
       <div class="pills">
         ${facts.map((f) => `<span class="pill">${esc(f)}</span>`).join("")}
-        ${j.vt ? `<span class="pill gold">${esc(vtNote)}</span>` : ""}
+        ${proven(j) ? `<span class="pill gold">Proven ${esc(vtNote)}</span>` : ""}
       </div>
       <div class="panel">
         <h3>Why it's here</h3>
@@ -235,11 +252,29 @@
         <p>Pulled from ${esc(j.company)}'s own ${esc(ATS[j.ats] || "careers")} board, first seen ${esc(new Date(j.firstSeenAt).toLocaleString())}. Apply goes straight to the employer.</p>
         <a class="btn sm" href="${esc(j.url)}" target="_blank" rel="noopener">Open the posting ${icon.out}</a>
       </div>
-      <div class="panel">
-        <h3>${esc(school.demonym)} at ${esc(j.company)}</h3>
-        <p>Alumni on the team, with a way to reach them. Next on the list.</p>
-      </div>`;
+      ${hiredPanel(j)}`;
     open("#detail");
+  }
+
+  function hiredPanel(j) {
+    const h = hires(j);
+    const since = P ? `the class of ${P.cohorts[0].slice(5)}` : "";
+    if (!h) return P ? `<div class="panel"><h3>${esc(school.demonym)} hired at ${esc(j.company)}</h3><p>No ${esc(school.shortName)} grads reported landing here since ${since}. Could be a new door.</p></div>` : "";
+    const bars = P.cohorts.map((c) => h.byCohort[c] || 0);
+    const peak = Math.max(...bars, 1);
+    const majors = Object.entries(h.byMajor).slice(0, 8);
+    return `<div class="panel">
+        <h3>${esc(school.demonym)} hired at ${esc(j.company)}</h3>
+        <p>${fmt(h.n)} ${esc(school.shortName)} grads since ${since}, ${fmt(h.recent)} of them from ${recentSpan}.</p>
+        <div class="spark" aria-label="Hires per graduating class">${P.cohorts.map((c, i) => `<span style="height:${Math.max(4, (bars[i] / peak) * 100)}%" title="Class of ${c.slice(5)}: ${bars[i]}"></span>`).join("")}</div>
+        <div class="spark-axis"><span>${P.cohorts[0].slice(5)}</span><span>${P.cohorts.at(-1).slice(5)}</span></div>
+        <h4>Majors they came from</h4>
+        <div class="fit">${majors.map(([m, n]) => `<span class="pill">${esc(m)} <b>${n}</b></span>`).join("")}</div>
+        <h4>Titles they started in</h4>
+        <ul class="titles">${h.titles.slice(0, 6).map(([t, n]) => `<li><span>${esc(t)}</span><b>${n}</b></li>`).join("")}</ul>
+        ${h.places.length ? `<h4>Where</h4><p class="places">${h.places.slice(0, 4).map(([p, n]) => `${esc(p)} (${n})`).join(" · ")}</p>` : ""}
+        <p class="src">From <a href="${esc(P.sourceUrl)}" target="_blank" rel="noopener">${esc(school.shortName)}'s First Destination Report</a>: graduates' self-reported first jobs.</p>
+      </div>`;
   }
 
   // Overlays ----------------------------------------------------------

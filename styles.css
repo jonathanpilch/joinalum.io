@@ -329,6 +329,21 @@ svg { width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width:
   padding: 1px 6px;
 }
 
+.recruits.dim { color: var(--muted); background: var(--btn-soft); }
+
+.panel h4 { margin: 16px 0 8px; font-size: 12px; font-family: var(--mono); letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); font-weight: 600; }
+.panel .pill b { color: var(--gold-text); margin-left: 4px; }
+.spark { display: flex; align-items: flex-end; gap: 4px; height: 56px; margin-top: 4px; }
+.spark span { flex: 1; min-width: 6px; border-radius: 4px 4px 2px 2px; background: linear-gradient(180deg, var(--gold), rgba(202, 185, 140, 0.35)); }
+.spark-axis { display: flex; justify-content: space-between; margin-top: 4px; font-family: var(--mono); font-size: 11px; color: var(--muted); }
+.titles { list-style: none; margin: 0; padding: 0; }
+.titles li { display: flex; justify-content: space-between; gap: 12px; padding: 6px 0; border-top: 1px solid var(--line); font-size: 14px; color: var(--ink); }
+.titles li:first-child { border-top: 0; }
+.titles b { color: var(--muted); font-weight: 600; }
+.places { color: var(--text) !important; margin: 0 !important; }
+.src { margin: 14px 0 0 !important; font-size: 12px !important; }
+.src a { color: var(--gold-text); text-decoration: underline; text-underline-offset: 2px; }
+
 .loc { font-size: 14px; }
 .loc small { display: block; color: var(--muted); font-size: 12px; }
 .when { font-size: 14px; color: var(--muted); }

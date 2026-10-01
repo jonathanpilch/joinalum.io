@@ -90,7 +90,6 @@ function shape(c, r, lvl, f, locs) {
     company: c.name,
     domain: c.domain,
     sector: c.sector,
-    vt: !!c.vt,
     ats: c.ats,
     url: r.url,
     level: lvl,

@@ -11,8 +11,11 @@ ingest/companies.mjs             who we pull from, and which ATS board each uses
 ingest/sources.mjs               one fetcher per ATS: Greenhouse, Lever, Ashby, SmartRecruiters, Workday, Amazon
 ingest/classify.mjs              rules: early-career? tech? US? plus location, arrangement, start term, pay
 ingest/run.mjs                   runs it all, keeps first-seen times, writes data/
+ingest/placements.mjs            VT's First Destination Report -> where Hokies got hired, by employer and major
+ingest/match.mjs                 employer-name matching ("Northrop Grumman Mission Systems" = Northrop Grumman)
 data/jobs.json                   what the page shows
 data/state.json                  first time we saw each posting (our freshness clock)
+data/placements.json             ~25k anonymous VT placements, 2014-2025, rolled up by employer
 .github/workflows/ingest.yml     runs the ingest hourly and commits data/
 ```
 
@@ -20,6 +23,7 @@ data/state.json                  first time we saw each posting (our freshness c
 
 ```
 npm run ingest        # ~1-2 min, all boards
+npm run placements    # VT placement report (weekly in CI)
 npm run dev           # http://localhost:5178
 ```
 
@@ -27,7 +31,7 @@ npm run dev           # http://localhost:5178
 
 ## Adding a company
 
-Find its board: `boards-api.greenhouse.io/v1/boards/{slug}/jobs`, `api.lever.co/v0/postings/{slug}`, `api.ashbyhq.com/posting-api/job-board/{slug}`, `api.smartrecruiters.com/v1/companies/{slug}/postings`, or for Workday the `{tenant}.wdN.myworkdayjobs.com/{site}` in its careers URL. Add a line to `ingest/companies.mjs`; set `vt: true` if it recruits hard out of VT.
+Find its board: `boards-api.greenhouse.io/v1/boards/{slug}/jobs`, `api.lever.co/v0/postings/{slug}`, `api.ashbyhq.com/posting-api/job-board/{slug}`, `api.smartrecruiters.com/v1/companies/{slug}/postings`, or for Workday the `{tenant}.wdN.myworkdayjobs.com/{site}` in its careers URL. Add a line to `ingest/companies.mjs`. `npm run placements` prints the biggest VT employers not on the board yet -- start there.
 
 ## How it decides
 
