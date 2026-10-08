@@ -2,14 +2,15 @@
   "name": "joinalum",
   "private": true,
   "type": "module",
-  "description": "Alum: tech internships and new-grad roles, pulled hourly from companies' own career boards.",
+  "description": "Alum: internships at the companies that hire Hokies, pulled from companies' own career boards.",
   "scripts": {
     "ingest": "node ingest/run.mjs",
     "placements": "node ingest/placements.mjs",
     "targets": "node ingest/targets.mjs",
     "fantastic": "node --env-file=.env ingest/fantastic.mjs",
     "fantastic:probe": "node --env-file=.env ingest/fantastic.mjs --probe",
-    "dev": "python3 -m http.server 5178"
+    "dev": "python3 -m http.server 5178",
+    "build": "node scripts/build.mjs"
   },
   "engines": {
     "node": ">=20"

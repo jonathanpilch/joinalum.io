@@ -1,10 +1,12 @@
-# Hourly: pull every board, commit data/ if anything changed.
+# Every 2 hours: pull every board, commit data/ if anything changed. Each
+# commit triggers a Cloudflare Pages build, and the free plan allows 500 a
+# month: hourly would be ~720, every 2 hours ~360 plus room for code pushes.
 # Daily: fantastic.jobs for the target employers we can't pull directly.
 # Weekly: VT's placement report and the target list built from it.
 name: ingest
 on:
   schedule:
-    - cron: "7 * * * *"
+    - cron: "7 */2 * * *"
     # VT's placement report changes once a year; Mondays is plenty.
     - cron: "37 9 * * 1"
     # fantastic.jobs once a day (7am ET) while on the trial's 50 requests a
