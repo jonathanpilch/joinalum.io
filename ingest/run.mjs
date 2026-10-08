@@ -13,7 +13,7 @@
 import { readFile, writeFile, mkdir } from "node:fs/promises";
 import companies from "./companies.mjs";
 import { fetchers } from "./sources.mjs";
-import { level, fn, places, arrangement, term, pay, yearsMin, stateName } from "./classify.mjs";
+import { level, fn, places, arrangement, term, pay, yearsMin, locationLabel } from "./classify.mjs";
 
 const ROOT = new URL("../", import.meta.url);
 const OUT = new URL("data/jobs.json", ROOT);
@@ -79,11 +79,6 @@ function shape(c, r, lvl, f, locs) {
   // never be later than when we first saw the posting.
   let postedAt = r.postedAt && Date.parse(r.postedAt) <= now.getTime() ? r.postedAt : firstSeenAt;
   if (r.postedApprox && Date.parse(firstSeenAt) < Date.parse(postedAt)) postedAt = firstSeenAt;
-  const shown = locs.filter((l) => !l.multi);
-  const location = !locs.length ? "United States"
-    : locs[0].multi ? locs[0].city
-    : shown.length > 1 ? `${fmt(shown[0])} + ${shown.length - 1} more`
-    : fmt(shown[0]);
   return {
     id,
     title: r.title.replace(/\s+/g, " ").trim(),
@@ -94,7 +89,7 @@ function shape(c, r, lvl, f, locs) {
     url: r.url,
     level: lvl,
     fn: f,
-    location,
+    location: locationLabel(locs),
     states: [...new Set(locs.map((l) => l.state).filter(Boolean))],
     arrangement: arrangement(r.workplace, locs, r.text),
     term: term(r.title, r.text),
@@ -105,15 +100,17 @@ function shape(c, r, lvl, f, locs) {
     firstSeenAt,
   };
 }
-function fmt(l) {
-  return l.remote ? (l.state ? `Remote (${l.state})` : "Remote (US)") : l.city && l.state ? `${l.city}, ${l.state}` : l.city || (l.state ? stateName(l.state) : "United States");
-}
 
 // Merge: fresh results replace a company's jobs; a failed board keeps its
 // last good set; a partial run keeps everyone it didn't touch.
 const touched = new Set(targets.filter((_, i) => results[i]).map((c) => c.name));
-let jobs = previous.jobs.filter((j) => !touched.has(j.company));
+let jobs = previous.jobs.filter((j) => j.ats !== "fantastic" && !touched.has(j.company));
 for (const r of results) if (r) jobs.push(...r);
+
+// fantastic.jobs rows (written daily by ingest/fantastic.mjs) go in after the
+// direct ones, so a direct copy of the same posting wins the merge below.
+const fantastic = await readJson(new URL("data/fantastic-jobs.json", ROOT), { jobs: [] });
+jobs.push(...fantastic.jobs);
 
 // Same title, same company, same level, posted as separate reqs per city:
 // one row, every location.

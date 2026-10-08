@@ -29,7 +29,7 @@ const PARENTS = [
   [/^ey\b|ernst (and|&) young/, "EY"],
   [/pricewaterhouse|^pwc\b/, "PwC"],
   [/^kpmg\b/, "KPMG"],
-  [/^rsm\b/, "RSM"],
+  [/^rsm\b|^mcgladrey/, "RSM"],
   [/^grant thornton/, "Grant Thornton"],
   [/^amazon|^aws\b|annapurna labs/, "Amazon"],
   [/^microsoft/, "Microsoft"],
@@ -71,6 +71,22 @@ const PARENTS = [
   [/^kimley[- ]horn/, "Kimley-Horn"],
   [/^whiting[- ]turner/, "Whiting-Turner"],
   [/^memoryblue/, "memoryBlue"],
+  [/^ge\b|^general electric|^ge aviation|^ge aerospace|^ge vernova/, "GE"],
+  [/^cognizant/, "Cognizant"],
+  [/^citi\b|^citigroup|^citibank/, "Citi"],
+  [/^altec\b/, "Altec"],
+  [/^textron/, "Textron"],
+  [/^honeywell/, "Honeywell"],
+  [/^eastman( chemical)?\b/, "Eastman"],
+  [/^groundswell/, "Groundswell"],
+  [/^systems planning (and|&) analysis|^spa\b/, "Systems Planning and Analysis (SPA)"],
+  [/johns hopkins (university )?applied physics|^jhu ?apl\b/, "Johns Hopkins APL"],
+  // Successors: VT's older cohorts name companies that have since merged.
+  [/^orbital atk|^orbital sciences/, "Northrop Grumman"],
+  [/^vencore|^perspecta/, "Peraton"],
+  [/^dixon hughes goodman|^forvis/, "Forvis Mazars"],
+  [/^clarabridge/, "Qualtrics"],
+  [/^vmware/, "Broadcom"],
   [/^us army|^u s army|^united states army|^army\b|^army national guard/, "U.S. Army"],
   [/^us navy|^u s navy|^united states navy|^navy\b|^navsea|^naval /, "U.S. Navy"],
   [/^us air force|^u s air force|^united states air force|^air force\b/, "U.S. Air Force"],
@@ -92,16 +108,19 @@ export function norm(s) {
     .trim();
 }
 
+// Placeholders, not employers.
+const NOT_AN_EMPLOYER = /not applicable|^-+$|^'?-$|^n\/?a$|^none$|^other$|^self|confidential/i;
+
 /* Display name for any spelling, or null for "--Not Applicable" and blanks. */
 export function canonical(raw) {
-  if (!raw || /not applicable|^-+$|^'?-$|^n\/?a$|^none$|^self|confidential/i.test(raw.trim())) return null;
+  if (!raw || NOT_AN_EMPLOYER.test(raw.trim())) return null;
   const n = norm(raw);
   if (!n) return null;
   for (const [re, name] of PARENTS) if (re.test(n)) return name;
   return null; // caller falls back to a cleaned-up raw name
 }
 
-export const key = (raw) => canonical(raw) || norm(raw).replace(SUFFIX, " ").replace(/\s+/g, " ").trim();
+export const key = (raw) => (!raw || NOT_AN_EMPLOYER.test(raw.trim()) ? null : canonical(raw) || norm(raw).replace(SUFFIX, " ").replace(/\s+/g, " ").trim());
 
 // Ingest companies, by every name they go by.
 const boardByKey = new Map();

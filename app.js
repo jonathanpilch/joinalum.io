@@ -25,7 +25,7 @@
   $("#school-mark").src = school.mark;
   $("#school-name").textContent = school.name;
   $("#hero-eyebrow").textContent = `Built by ${school.demonym}, for ${school.demonym}`;
-  $("#hero-title").innerHTML = "Tech internships and<br />new-grad roles, first.";
+  $("#hero-title").innerHTML = "Internships where<br />Hokies get hired.";
 
   // Data ----------------------------------------------------------------
 
@@ -37,7 +37,10 @@
     return;
   }
   const now = Date.now();
-  const JOBS = data.jobs.map((j) => ({ ...j, minutesAgo: Math.max(0, Math.round((now - Date.parse(j.postedAt)) / 60000)) }));
+  // v1 is internships only (co-ops count). New-grad roles stay in the data
+  // for later; they just aren't shown.
+  const LEVELS = ["Internship", "Co-op"];
+  const JOBS = data.jobs.filter((j) => LEVELS.includes(j.level)).map((j) => ({ ...j, minutesAgo: Math.max(0, Math.round((now - Date.parse(j.postedAt)) / 60000)) }));
   const companyCount = new Set(JOBS.map((j) => j.company)).size;
   // Where Hokies were actually hired (VT's First Destination Report), keyed
   // by board company. Optional: the board works without it.
@@ -50,7 +53,7 @@
   const vtNote = `${school.shortName} pipeline`;
   for (const j of JOBS) j.majors = Object.keys(hires(j)?.byMajor || {});
 
-  $("#hero-lede").textContent = `Pulled straight from ${data.companies} companies' own career sites every hour, so you see roles the hour they post, not days later on LinkedIn or Handshake. Internships, co-ops and new-grad only.`;
+  $("#hero-lede").textContent = `Pulled straight from ${data.companies} companies' own career sites every hour, so you see roles the hour they post, not days later on LinkedIn or Handshake. Internships and co-ops only.`;
   $("#hero-proof").innerHTML = `<b>${fmt(JOBS.length)}</b> open roles · <b>${companyCount}</b> companies hiring · <b>${fmt(JOBS.filter((j) => j.minutesAgo < 1440).length)}</b> new today${P ? ` · <b>${fmt(P.placed)}</b> ${esc(school.demonym.replace(/s$/, ""))} placements tracked` : ""}`;
   $("#updated").textContent = `Updated ${ago(Math.round((now - Date.parse(data.generatedAt)) / 60000)).toLowerCase()}`;
   $("#foot-note").textContent = `Data refreshed ${new Date(data.generatedAt).toLocaleString()}`;
@@ -66,7 +69,7 @@
 
   const posted = [["1", "Last 24 hrs (fresh roles)"], ["3", "Last 3 days"], ["7", "Last 7 days"], ["all", "All open roles"]];
   const groups = [
-    { key: "level", label: "Level", options: ["Internship", "Co-op", "New grad"] },
+    { key: "level", label: "Type", options: LEVELS },
     { key: "fn", label: "Function", options: countBy("fn") },
     { key: "sector", label: "Industry", options: countBy("sector") },
     { key: "arrangement", label: "Work arrangement", options: ["On-site", "Hybrid", "Remote", "Remote OK"] },

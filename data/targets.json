@@ -1,0 +1,2454 @@
+{
+ "generatedAt": "2026-10-08T22:29:51.202Z",
+ "launchMajors": [
+  "Computer Science",
+  "Computer Engineering",
+  "Electrical Engineering",
+  "Mechanical Engineering",
+  "Aerospace Engineering",
+  "Industrial and Systems Engineering",
+  "Business Information Technology",
+  "Finance",
+  "Accounting and Information Systems",
+  "Computational Modeling and Data Analytics"
+ ],
+ "targets": [
+  {
+   "name": "Deloitte",
+   "hires": 502,
+   "recent": 151,
+   "majors": {
+    "Computer Science": 13,
+    "Computer Engineering": 3,
+    "Mechanical Engineering": 14,
+    "Industrial and Systems Engineering": 71,
+    "Business Information Technology": 241,
+    "Finance": 73,
+    "Accounting and Information Systems": 70,
+    "Computational Modeling and Data Analytics": 17
+   },
+   "source": "direct",
+   "board": "Deloitte",
+   "domains": null
+  },
+  {
+   "name": "EY",
+   "hires": 345,
+   "recent": 143,
+   "majors": {
+    "Computer Science": 6,
+    "Industrial and Systems Engineering": 11,
+    "Business Information Technology": 183,
+    "Finance": 31,
+    "Accounting and Information Systems": 108,
+    "Computational Modeling and Data Analytics": 6
+   },
+   "source": "fantastic",
+   "board": null,
+   "domains": [
+    "ey.com"
+   ]
+  },
+  {
+   "name": "Capital One",
+   "hires": 299,
+   "recent": 70,
+   "majors": {
+    "Computer Science": 126,
+    "Computer Engineering": 22,
+    "Electrical Engineering": 1,
+    "Mechanical Engineering": 2,
+    "Aerospace Engineering": 1,
+    "Industrial and Systems Engineering": 27,
+    "Business Information Technology": 65,
+    "Finance": 38,
+    "Accounting and Information Systems": 8,
+    "Computational Modeling and Data Analytics": 9
+   },
+   "source": "direct",
+   "board": "Capital One",
+   "domains": null
+  },
+  {
+   "name": "KPMG",
+   "hires": 296,
+   "recent": 81,
+   "majors": {
+    "Computer Science": 5,
+    "Computer Engineering": 1,
+    "Industrial and Systems Engineering": 9,
+    "Business Information Technology": 118,
+    "Finance": 49,
+    "Accounting and Information Systems": 114
+   },
+   "source": "fantastic",
+   "board": null,
+   "domains": [
+    "kpmg.com"
+   ]
+  },
+  {
+   "name": "Lockheed Martin",
+   "hires": 282,
+   "recent": 80,
+   "majors": {
+    "Computer Science": 53,
+    "Computer Engineering": 20,
+    "Electrical Engineering": 19,
+    "Mechanical Engineering": 51,
+    "Aerospace Engineering": 99,
+    "Industrial and Systems Engineering": 14,
+    "Business Information Technology": 9,
+    "Finance": 14,
+    "Computational Modeling and Data Analytics": 3
+   },
+   "source": "fantastic",
+   "board": null,
+   "domains": [
+    "lockheedmartin.com"
+   ]
+  },
+  {
+   "name": "Accenture",
+   "hires": 222,
+   "recent": 60,
+   "majors": {
+    "Computer Science": 24,
+    "Computer Engineering": 3,
+    "Electrical Engineering": 5,
+    "Mechanical Engineering": 12,
+    "Aerospace Engineering": 1,
+    "Industrial and Systems Engineering": 49,
+    "Business Information Technology": 86,
+    "Finance": 31,
+    "Accounting and Information Systems": 1,
+    "Computational Modeling and Data Analytics": 10
+   },
+   "source": "direct",
+   "board": "Accenture",
+   "domains": null
+  },
+  {
+   "name": "PwC",
+   "hires": 191,
+   "recent": 65,
+   "majors": {
+    "Computer Science": 2,
+    "Computer Engineering": 2,
+    "Industrial and Systems Engineering": 5,
+    "Business Information Technology": 79,
+    "Finance": 25,
+    "Accounting and Information Systems": 74,
+    "Computational Modeling and Data Analytics": 4
+   },
+   "source": "direct",
+   "board": "PwC",
+   "domains": null
+  },
+  {
+   "name": "Northrop Grumman",
+   "hires": 185,
+   "recent": 85,
+   "majors": {
+    "Computer Science": 18,
+    "Computer Engineering": 13,
+    "Electrical Engineering": 17,
+    "Mechanical Engineering": 41,
+    "Aerospace Engineering": 48,
+    "Industrial and Systems Engineering": 24,
+    "Business Information Technology": 9,
+    "Finance": 12,
+    "Accounting and Information Systems": 1,
+    "Computational Modeling and Data Analytics": 2
+   },
+   "source": "direct",
+   "board": "Northrop Grumman",
+   "domains": null
+  },
+  {
+   "name": "Amazon",
+   "hires": 182,
+   "recent": 81,
+   "majors": {
+    "Computer Science": 94,
+    "Computer Engineering": 13,
+    "Mechanical Engineering": 7,
+    "Industrial and Systems Engineering": 17,
+    "Business Information Technology": 31,
+    "Finance": 10,
+    "Computational Modeling and Data Analytics": 10
+   },
+   "source": "direct",
+   "board": "Amazon",
+   "domains": null
+  },
+  {
+   "name": "Boeing",
+   "hires": 166,
+   "recent": 119,
+   "majors": {
+    "Computer Science": 12,
+    "Computer Engineering": 14,
+    "Electrical Engineering": 7,
+    "Mechanical Engineering": 39,
+    "Aerospace Engineering": 69,
+    "Industrial and Systems Engineering": 15,
+    "Business Information Technology": 5,
+    "Finance": 3,
+    "Computational Modeling and Data Analytics": 2
+   },
+   "source": "direct",
+   "board": "Boeing",
+   "domains": null
+  },
+  {
+   "name": "Booz Allen Hamilton",
+   "hires": 144,
+   "recent": 38,
+   "majors": {
+    "Computer Science": 36,
+    "Computer Engineering": 14,
+    "Electrical Engineering": 2,
+    "Mechanical Engineering": 5,
+    "Aerospace Engineering": 5,
+    "Industrial and Systems Engineering": 15,
+    "Business Information Technology": 41,
+    "Finance": 5,
+    "Accounting and Information Systems": 2,
+    "Computational Modeling and Data Analytics": 19
+   },
+   "source": "direct",
+   "board": "Booz Allen Hamilton",
+   "domains": null
+  },
+  {
+   "name": "IBM",
+   "hires": 128,
+   "recent": 40,
+   "majors": {
+    "Computer Science": 43,
+    "Computer Engineering": 11,
+    "Electrical Engineering": 3,
+    "Industrial and Systems Engineering": 12,
+    "Business Information Technology": 48,
+    "Finance": 5,
+    "Computational Modeling and Data Analytics": 6
+   },
+   "source": "fantastic",
+   "board": null,
+   "domains": [
+    "ibm.com"
+   ]
+  },
+  {
+   "name": "General Motors",
+   "hires": 110,
+   "recent": 11,
+   "majors": {
+    "Computer Science": 6,
+    "Computer Engineering": 12,
+    "Electrical Engineering": 20,
+    "Mechanical Engineering": 68,
+    "Industrial and Systems Engineering": 1,
+    "Business Information Technology": 2,
+    "Finance": 1
+   },
+   "source": "direct",
+   "board": "General Motors",
+   "domains": null
+  },
+  {
+   "name": "RSM",
+   "hires": 103,
+   "recent": 33,
+   "majors": {
+    "Industrial and Systems Engineering": 1,
+    "Business Information Technology": 25,
+    "Finance": 13,
+    "Accounting and Information Systems": 64
+   },
+   "source": "fantastic",
+   "board": null,
+   "domains": [
+    "rsmus.com"
+   ]
+  },
+  {
+   "name": "GE",
+   "hires": 100,
+   "recent": 29,
+   "majors": {
+    "Computer Science": 3,
+    "Computer Engineering": 3,
+    "Electrical Engineering": 4,
+    "Mechanical Engineering": 42,
+    "Aerospace Engineering": 18,
+    "Industrial and Systems Engineering": 22,
+    "Business Information Technology": 3,
+    "Finance": 4,
+    "Accounting and Information Systems": 1
+   },
+   "source": "fantastic",
+   "board": null,
+   "domains": [
+    "ge.com",
+    "geaerospace.com",
+    "gevernova.com"
+   ]
+  },
+  {
+   "name": "CGI",
+   "hires": 100,
+   "recent": 22,
+   "majors": {
+    "Computer Science": 9,
+    "Computer Engineering": 2,
+    "Industrial and Systems Engineering": 5,
+    "Business Information Technology": 75,
+    "Finance": 7,
+    "Accounting and Information Systems": 1,
+    "Computational Modeling and Data Analytics": 1
+   },
+   "source": "fantastic",
+   "board": null,
+   "domains": [
+    "cgi.com"
+   ]
+  },
+  {
+   "name": "Microsoft",
+   "hires": 100,
+   "recent": 11,
+   "majors": {
+    "Computer Science": 69,
+    "Computer Engineering": 13,
+    "Industrial and Systems Engineering": 2,
+    "Business Information Technology": 13,
+    "Computational Modeling and Data Analytics": 3
+   },
+   "source": "fantastic",
+   "board": null,
+   "domains": [
+    "microsoft.com"
+   ]
+  },
+  {
+   "name": "Bank of America",
+   "hires": 95,
+   "recent": 44,
+   "majors": {
+    "Computer Science": 12,
+    "Computer Engineering": 2,
+    "Industrial and Systems Engineering": 6,
+    "Business Information Technology": 19,
+    "Finance": 50,
+    "Accounting and Information Systems": 1,
+    "Computational Modeling and Data Analytics": 5
+   },
+   "source": "direct",
+   "board": "Bank of America",
+   "domains": null
+  },
+  {
+   "name": "Huntington Ingalls (HII)",
+   "hires": 89,
+   "recent": 80,
+   "majors": {
+    "Computer Science": 1,
+    "Computer Engineering": 1,
+    "Electrical Engineering": 5,
+    "Mechanical Engineering": 54,
+    "Aerospace Engineering": 15,
+    "Industrial and Systems Engineering": 9,
+    "Business Information Technology": 1,
+    "Finance": 2,
+    "Computational Modeling and Data Analytics": 1
+   },
+   "source": "fantastic",
+   "board": null,
+   "domains": [
+    "hii.com"
+   ]
+  },
+  {
+   "name": "RTX",
+   "hires": 82,
+   "recent": 50,
+   "majors": {
+    "Computer Science": 5,
+    "Computer Engineering": 9,
+    "Electrical Engineering": 2,
+    "Mechanical Engineering": 22,
+    "Aerospace Engineering": 29,
+    "Industrial and Systems Engineering": 8,
+    "Business Information Technology": 3,
+    "Finance": 1,
+    "Computational Modeling and Data Analytics": 3
+   },
+   "source": "direct",
+   "board": "RTX",
+   "domains": null
+  },
+  {
+   "name": "Freddie Mac",
+   "hires": 72,
+   "recent": 31,
+   "majors": {
+    "Computer Science": 8,
+    "Computer Engineering": 1,
+    "Business Information Technology": 45,
+    "Finance": 15,
+    "Computational Modeling and Data Analytics": 3
+   },
+   "source": "direct",
+   "board": "Freddie Mac",
+   "domains": null
+  },
+  {
+   "name": "Peraton",
+   "hires": 71,
+   "recent": 39,
+   "majors": {
+    "Computer Science": 37,
+    "Electrical Engineering": 2,
+    "Mechanical Engineering": 2,
+    "Aerospace Engineering": 4,
+    "Industrial and Systems Engineering": 19,
+    "Business Information Technology": 3,
+    "Finance": 1,
+    "Computational Modeling and Data Analytics": 3
+   },
+   "source": "fantastic",
+   "board": null,
+   "domains": [
+    "peraton.com"
+   ]
+  },
+  {
+   "name": "Fannie Mae",
+   "hires": 68,
+   "recent": 34,
+   "majors": {
+    "Computer Science": 21,
+    "Computer Engineering": 1,
+    "Electrical Engineering": 1,
+    "Business Information Technology": 26,
+    "Finance": 14,
+    "Accounting and Information Systems": 2,
+    "Computational Modeling and Data Analytics": 3
+   },
+   "source": "direct",
+   "board": "Fannie Mae",
+   "domains": null
+  },
+  {
+   "name": "General Dynamics",
+   "hires": 66,
+   "recent": 31,
+   "majors": {
+    "Computer Science": 6,
+    "Computer Engineering": 4,
+    "Electrical Engineering": 6,
+    "Mechanical Engineering": 24,
+    "Aerospace Engineering": 10,
+    "Industrial and Systems Engineering": 4,
+    "Business Information Technology": 8,
+    "Computational Modeling and Data Analytics": 4
+   },
+   "source": "fantastic",
+   "board": null,
+   "domains": [
+    "gd.com",
+    "gdmissionsystems.com",
+    "gdeb.com",
+    "gdls.com",
+    "gulfstream.com"
+   ]
+  },
+  {
+   "name": "Grant Thornton",
+   "hires": 63,
+   "recent": 6,
+   "majors": {
+    "Industrial and Systems Engineering": 10,
+    "Business Information Technology": 30,
+    "Finance": 10,
+    "Accounting and Information Systems": 13
+   },
+   "source": "fantastic",
+   "board": null,
+   "domains": [
+    "grantthornton.com"
+   ]
+  },
+  {
+   "name": "Wells Fargo",
+   "hires": 54,
+   "recent": 38,
+   "majors": {
+    "Computer Science": 6,
+    "Computer Engineering": 1,
+    "Industrial and Systems Engineering": 1,
+    "Business Information Technology": 9,
+    "Finance": 34,
+    "Accounting and Information Systems": 3
+   },
+   "source": "direct",
+   "board": "Wells Fargo",
+   "domains": null
+  },
+  {
+   "name": "CACI",
+   "hires": 50,
+   "recent": 46,
+   "majors": {
+    "Computer Science": 27,
+    "Computer Engineering": 4,
+    "Mechanical Engineering": 2,
+    "Aerospace Engineering": 2,
+    "Industrial and Systems Engineering": 2,
+    "Business Information Technology": 6,
+    "Finance": 3,
+    "Computational Modeling and Data Analytics": 4
+   },
+   "source": "direct",
+   "board": "CACI",
+   "domains": null
+  },
+  {
+   "name": "Baker Tilly",
+   "hires": 49,
+   "recent": 22,
+   "majors": {
+    "Industrial and Systems Engineering": 1,
+    "Business Information Technology": 19,
+    "Finance": 15,
+    "Accounting and Information Systems": 14
+   },
+   "source": "fantastic",
+   "board": null,
+   "domains": [
+    "bakertilly.com"
+   ]
+  },
+  {
+   "name": "Vanguard",
+   "hires": 49,
+   "recent": 13,
+   "majors": {
+    "Computer Science": 6,
+    "Business Information Technology": 1,
+    "Finance": 42
+   },
+   "source": "direct",
+   "board": "Vanguard",
+   "domains": null
+  },
+  {
+   "name": "Altec",
+   "hires": 48,
+   "recent": 12,
+   "majors": {
+    "Computer Engineering": 1,
+    "Mechanical Engineering": 39,
+    "Aerospace Engineering": 1,
+    "Industrial and Systems Engineering": 6,
+    "Computational Modeling and Data Analytics": 1
+   },
+   "source": "fantastic",
+   "board": null,
+   "domains": [
+    "altec.com"
+   ]
+  },
+  {
+   "name": "Leidos",
+   "hires": 46,
+   "recent": 33,
+   "majors": {
+    "Computer Science": 13,
+    "Computer Engineering": 1,
+    "Electrical Engineering": 2,
+    "Mechanical Engineering": 2,
+    "Aerospace Engineering": 2,
+    "Industrial and Systems Engineering": 3,
+    "Business Information Technology": 8,
+    "Finance": 14,
+    "Accounting and Information Systems": 1
+   },
+   "source": "direct",
+   "board": "Leidos",
+   "domains": null
+  },
+  {
+   "name": "Appian",
+   "hires": 44,
+   "recent": 11,
+   "majors": {
+    "Computer Science": 8,
+    "Computer Engineering": 2,
+    "Mechanical Engineering": 2,
+    "Industrial and Systems Engineering": 14,
+    "Business Information Technology": 17,
+    "Computational Modeling and Data Analytics": 1
+   },
+   "source": "direct",
+   "board": "Appian",
+   "domains": null
+  },
+  {
+   "name": "Cherry Bekaert",
+   "hires": 43,
+   "recent": 16,
+   "majors": {
+    "Business Information Technology": 5,
+    "Finance": 3,
+    "Accounting and Information Systems": 35
+   },
+   "source": "fantastic",
+   "board": null,
+   "domains": [
+    "cbh.com"
+   ]
+  },
+  {
+   "name": "Epic",
+   "hires": 42,
+   "recent": 25,
+   "majors": {
+    "Computer Science": 10,
+    "Computer Engineering": 2,
+    "Mechanical Engineering": 9,
+    "Aerospace Engineering": 1,
+    "Industrial and Systems Engineering": 5,
+    "Business Information Technology": 8,
+    "Finance": 5,
+    "Accounting and Information Systems": 1,
+    "Computational Modeling and Data Analytics": 1
+   },
+   "source": "fantastic",
+   "board": null,
+   "domains": [
+    "epic.com"
+   ]
+  },
+  {
+   "name": "Altria",
+   "hires": 41,
+   "recent": 17,
+   "majors": {
+    "Electrical Engineering": 2,
+    "Mechanical Engineering": 5,
+    "Industrial and Systems Engineering": 11,
+    "Business Information Technology": 10,
+    "Finance": 12,
+    "Accounting and Information Systems": 1
+   },
+   "source": "fantastic",
+   "board": null,
+   "domains": [
+    "altria.com"
+   ]
+  },
+  {
+   "name": "MITRE",
+   "hires": 41,
+   "recent": 17,
+   "majors": {
+    "Computer Science": 7,
+    "Computer Engineering": 3,
+    "Electrical Engineering": 1,
+    "Mechanical Engineering": 1,
+    "Aerospace Engineering": 4,
+    "Industrial and Systems Engineering": 5,
+    "Business Information Technology": 1,
+    "Finance": 4,
+    "Computational Modeling and Data Analytics": 15
+   },
+   "source": "direct",
+   "board": "MITRE",
+   "domains": null
+  },
+  {
+   "name": "Protiviti",
+   "hires": 39,
+   "recent": 13,
+   "majors": {
+    "Industrial and Systems Engineering": 1,
+    "Business Information Technology": 25,
+    "Finance": 10,
+    "Accounting and Information Systems": 2,
+    "Computational Modeling and Data Analytics": 1
+   },
+   "source": "direct",
+   "board": "Protiviti",
+   "domains": null
+  },
+  {
+   "name": "Ford Motor Company",
+   "hires": 37,
+   "recent": 1,
+   "majors": {
+    "Computer Science": 2,
+    "Computer Engineering": 1,
+    "Electrical Engineering": 3,
+    "Mechanical Engineering": 18,
+    "Industrial and Systems Engineering": 6,
+    "Business Information Technology": 6,
+    "Computational Modeling and Data Analytics": 1
+   },
+   "source": "fantastic",
+   "board": null,
+   "domains": [
+    "ford.com"
+   ]
+  },
+  {
+   "name": "CapTech",
+   "hires": 36,
+   "recent": 10,
+   "majors": {
+    "Computer Science": 16,
+    "Computer Engineering": 3,
+    "Mechanical Engineering": 1,
+    "Industrial and Systems Engineering": 4,
+    "Business Information Technology": 7,
+    "Computational Modeling and Data Analytics": 5
+   },
+   "source": "direct",
+   "board": "CapTech",
+   "domains": null
+  },
+  {
+   "name": "Dominion Energy",
+   "hires": 36,
+   "recent": 29,
+   "majors": {
+    "Computer Engineering": 2,
+    "Electrical Engineering": 8,
+    "Mechanical Engineering": 12,
+    "Industrial and Systems Engineering": 2,
+    "Business Information Technology": 6,
+    "Finance": 5,
+    "Computational Modeling and Data Analytics": 1
+   },
+   "source": "fantastic",
+   "board": null,
+   "domains": [
+    "dominionenergy.com"
+   ]
+  },
+  {
+   "name": "M.C. Dean",
+   "hires": 36,
+   "recent": 30,
+   "majors": {
+    "Computer Engineering": 2,
+    "Electrical Engineering": 5,
+    "Mechanical Engineering": 18,
+    "Industrial and Systems Engineering": 9,
+    "Business Information Technology": 2
+   },
+   "source": "fantastic",
+   "board": null,
+   "domains": [
+    "mcdean.com"
+   ]
+  },
+  {
+   "name": "BDO",
+   "hires": 34,
+   "recent": 1,
+   "majors": {
+    "Business Information Technology": 6,
+    "Finance": 8,
+    "Accounting and Information Systems": 20
+   },
+   "source": "fantastic",
+   "board": null,
+   "domains": [
+    "bdo.com"
+   ]
+  },
+  {
+   "name": "Cognizant",
+   "hires": 33,
+   "recent": 1,
+   "majors": {
+    "Computer Science": 1,
+    "Computer Engineering": 2,
+    "Industrial and Systems Engineering": 7,
+    "Business Information Technology": 21,
+    "Computational Modeling and Data Analytics": 2
+   },
+   "source": "fantastic",
+   "board": null,
+   "domains": [
+    "cognizant.com"
+   ]
+  },
+  {
+   "name": "Citi",
+   "hires": 32,
+   "recent": 14,
+   "majors": {
+    "Computer Science": 1,
+    "Industrial and Systems Engineering": 2,
+    "Business Information Technology": 4,
+    "Finance": 22,
+    "Accounting and Information Systems": 3
+   },
+   "source": "fantastic",
+   "board": null,
+   "domains": [
+    "citi.com"
+   ]
+  },
+  {
+   "name": "Kearney & Company",
+   "hires": 32,
+   "recent": 19,
+   "majors": {
+    "Business Information Technology": 18,
+    "Finance": 3,
+    "Accounting and Information Systems": 11
+   },
+   "source": "fantastic",
+   "board": null,
+   "domains": [
+    "kearneyco.com"
+   ]
+  },
+  {
+   "name": "L3Harris",
+   "hires": 31,
+   "recent": 18,
+   "majors": {
+    "Computer Science": 6,
+    "Electrical Engineering": 4,
+    "Mechanical Engineering": 5,
+    "Aerospace Engineering": 8,
+    "Industrial and Systems Engineering": 2,
+    "Business Information Technology": 2,
+    "Finance": 1,
+    "Computational Modeling and Data Analytics": 3
+   },
+   "source": "fantastic",
+   "board": null,
+   "domains": [
+    "l3harris.com"
+   ]
+  },
+  {
+   "name": "PepsiCo",
+   "hires": 30,
+   "recent": 31,
+   "majors": {
+    "Computer Engineering": 1,
+    "Mechanical Engineering": 7,
+    "Industrial and Systems Engineering": 12,
+    "Business Information Technology": 9,
+    "Finance": 1
+   },
+   "source": "fantastic",
+   "board": null,
+   "domains": [
+    "pepsico.com"
+   ]
+  },
+  {
+   "name": "Textron",
+   "hires": 30,
+   "recent": 7,
+   "majors": {
+    "Computer Science": 3,
+    "Computer Engineering": 4,
+    "Electrical Engineering": 3,
+    "Mechanical Engineering": 12,
+    "Aerospace Engineering": 1,
+    "Industrial and Systems Engineering": 1,
+    "Business Information Technology": 3,
+    "Finance": 2,
+    "Accounting and Information Systems": 1
+   },
+   "source": "fantastic",
+   "board": null,
+   "domains": [
+    "textron.com"
+   ]
+  },
+  {
+   "name": "CoStar Group",
+   "hires": 30,
+   "recent": 66,
+   "majors": {
+    "Computer Science": 16,
+    "Industrial and Systems Engineering": 1,
+    "Business Information Technology": 6,
+    "Finance": 7
+   },
+   "source": "direct",
+   "board": "CoStar Group",
+   "domains": null
+  },
+  {
+   "name": "JPMorgan Chase",
+   "hires": 30,
+   "recent": 24,
+   "majors": {
+    "Computer Science": 3,
+    "Computer Engineering": 1,
+    "Industrial and Systems Engineering": 2,
+    "Business Information Technology": 3,
+    "Finance": 19,
+    "Computational Modeling and Data Analytics": 2
+   },
+   "source": "fantastic",
+   "board": null,
+   "domains": [
+    "jpmorganchase.com"
+   ]
+  },
+  {
+   "name": "Fidelity Investments",
+   "hires": 29,
+   "recent": 12,
+   "majors": {
+    "Computer Science": 13,
+    "Computer Engineering": 1,
+    "Business Information Technology": 9,
+    "Finance": 5,
+    "Computational Modeling and Data Analytics": 1
+   },
+   "source": "fantastic",
+   "board": null,
+   "domains": [
+    "fidelity.com"
+   ]
+  },
+  {
+   "name": "Goldman Sachs",
+   "hires": 28,
+   "recent": 10,
+   "majors": {
+    "Computer Engineering": 2,
+    "Industrial and Systems Engineering": 4,
+    "Business Information Technology": 3,
+    "Finance": 16,
+    "Accounting and Information Systems": 2,
+    "Computational Modeling and Data Analytics": 1
+   },
+   "source": "fantastic",
+   "board": null,
+   "domains": [
+    "goldmansachs.com"
+   ]
+  },
+  {
+   "name": "BAE Systems",
+   "hires": 27,
+   "recent": 12,
+   "majors": {
+    "Computer Science": 3,
+    "Computer Engineering": 5,
+    "Electrical Engineering": 1,
+    "Mechanical Engineering": 6,
+    "Aerospace Engineering": 3,
+    "Industrial and Systems Engineering": 5,
+    "Business Information Technology": 1,
+    "Finance": 1,
+    "Computational Modeling and Data Analytics": 2
+   },
+   "source": "fantastic",
+   "board": null,
+   "domains": [
+    "baesystems.com"
+   ]
+  },
+  {
+   "name": "Google",
+   "hires": 27,
+   "recent": 6,
+   "majors": {
+    "Computer Science": 21,
+    "Computer Engineering": 2,
+    "Industrial and Systems Engineering": 1,
+    "Business Information Technology": 2,
+    "Finance": 1
+   },
+   "source": "fantastic",
+   "board": null,
+   "domains": [
+    "google.com"
+   ]
+  },
+  {
+   "name": "Bloomberg",
+   "hires": 25,
+   "recent": 5,
+   "majors": {
+    "Computer Science": 22,
+    "Computer Engineering": 1,
+    "Industrial and Systems Engineering": 1,
+    "Finance": 1
+   },
+   "source": "direct",
+   "board": "Bloomberg",
+   "domains": null
+  },
+  {
+   "name": "GEICO",
+   "hires": 24,
+   "recent": 8,
+   "majors": {
+    "Computer Science": 5,
+    "Computer Engineering": 1,
+    "Business Information Technology": 14,
+    "Finance": 3,
+    "Computational Modeling and Data Analytics": 1
+   },
+   "source": "fantastic",
+   "board": null,
+   "domains": [
+    "geico.com"
+   ]
+  },
+  {
+   "name": "Volvo Group",
+   "hires": 24,
+   "recent": 12,
+   "majors": {
+    "Computer Science": 3,
+    "Mechanical Engineering": 12,
+    "Industrial and Systems Engineering": 7,
+    "Finance": 1,
+    "Computational Modeling and Data Analytics": 1
+   },
+   "source": "fantastic",
+   "board": null,
+   "domains": [
+    "volvogroup.com"
+   ]
+  },
+  {
+   "name": "Meta",
+   "hires": 24,
+   "recent": 3,
+   "majors": {
+    "Computer Science": 21,
+    "Computer Engineering": 2,
+    "Computational Modeling and Data Analytics": 1
+   },
+   "source": "fantastic",
+   "board": null,
+   "domains": [
+    "meta.com"
+   ]
+  },
+  {
+   "name": "Groundswell",
+   "hires": 24,
+   "recent": 17,
+   "majors": {
+    "Computer Science": 1,
+    "Mechanical Engineering": 2,
+    "Aerospace Engineering": 1,
+    "Industrial and Systems Engineering": 17,
+    "Business Information Technology": 3
+   },
+   "source": "fantastic",
+   "board": null,
+   "domains": null
+  },
+  {
+   "name": "Cisco",
+   "hires": 23,
+   "recent": 3,
+   "majors": {
+    "Computer Science": 6,
+    "Computer Engineering": 3,
+    "Electrical Engineering": 2,
+    "Business Information Technology": 11,
+    "Finance": 1
+   },
+   "source": "direct",
+   "board": "Cisco",
+   "domains": null
+  },
+  {
+   "name": "Solers, Inc.",
+   "hires": 22,
+   "recent": 0,
+   "majors": {
+    "Computer Science": 16,
+    "Computer Engineering": 4,
+    "Aerospace Engineering": 1,
+    "Business Information Technology": 1
+   },
+   "source": "fantastic",
+   "board": null,
+   "domains": [
+    "solers.com"
+   ]
+  },
+  {
+   "name": "Cummins Inc.",
+   "hires": 22,
+   "recent": 4,
+   "majors": {
+    "Computer Science": 1,
+    "Mechanical Engineering": 14,
+    "Industrial and Systems Engineering": 5,
+    "Business Information Technology": 1,
+    "Finance": 1
+   },
+   "source": "fantastic",
+   "board": null,
+   "domains": [
+    "cummins.com"
+   ]
+  },
+  {
+   "name": "Honeywell",
+   "hires": 21,
+   "recent": 3,
+   "majors": {
+    "Computer Science": 1,
+    "Computer Engineering": 1,
+    "Mechanical Engineering": 6,
+    "Aerospace Engineering": 3,
+    "Industrial and Systems Engineering": 10
+   },
+   "source": "fantastic",
+   "board": null,
+   "domains": [
+    "honeywell.com"
+   ]
+  },
+  {
+   "name": "Deutsche Bank",
+   "hires": 21,
+   "recent": 7,
+   "majors": {
+    "Computer Science": 14,
+    "Computer Engineering": 2,
+    "Business Information Technology": 2,
+    "Finance": 2,
+    "Computational Modeling and Data Analytics": 1
+   },
+   "source": "fantastic",
+   "board": null,
+   "domains": [
+    "db.com"
+   ]
+  },
+  {
+   "name": "Eastman",
+   "hires": 21,
+   "recent": 9,
+   "majors": {
+    "Computer Science": 2,
+    "Electrical Engineering": 2,
+    "Mechanical Engineering": 14,
+    "Industrial and Systems Engineering": 1,
+    "Business Information Technology": 2
+   },
+   "source": "fantastic",
+   "board": null,
+   "domains": [
+    "eastman.com"
+   ]
+  },
+  {
+   "name": "Forvis Mazars",
+   "hires": 20,
+   "recent": 11,
+   "majors": {
+    "Business Information Technology": 2,
+    "Finance": 5,
+    "Accounting and Information Systems": 13
+   },
+   "source": "fantastic",
+   "board": null,
+   "domains": [
+    "forvismazars.us"
+   ]
+  },
+  {
+   "name": "Lowe's Companies, Inc.",
+   "hires": 19,
+   "recent": 8,
+   "majors": {
+    "Computer Science": 1,
+    "Industrial and Systems Engineering": 9,
+    "Business Information Technology": 6,
+    "Finance": 3
+   },
+   "source": "fantastic",
+   "board": null,
+   "domains": [
+    "lowes.com"
+   ]
+  },
+  {
+   "name": "Johns Hopkins APL",
+   "hires": 19,
+   "recent": 6,
+   "majors": {
+    "Computer Science": 3,
+    "Computer Engineering": 4,
+    "Electrical Engineering": 6,
+    "Mechanical Engineering": 3,
+    "Aerospace Engineering": 2,
+    "Computational Modeling and Data Analytics": 1
+   },
+   "source": "fantastic",
+   "board": null,
+   "domains": [
+    "jhuapl.edu"
+   ]
+  },
+  {
+   "name": "Qualcomm",
+   "hires": 19,
+   "recent": 4,
+   "majors": {
+    "Computer Science": 7,
+    "Computer Engineering": 10,
+    "Electrical Engineering": 2
+   },
+   "source": "fantastic",
+   "board": null,
+   "domains": [
+    "qualcomm.com"
+   ]
+  },
+  {
+   "name": "Kollmorgen Corporation",
+   "hires": 19,
+   "recent": 3,
+   "majors": {
+    "Computer Engineering": 1,
+    "Electrical Engineering": 2,
+    "Mechanical Engineering": 11,
+    "Aerospace Engineering": 1,
+    "Industrial and Systems Engineering": 1,
+    "Business Information Technology": 3
+   },
+   "source": "fantastic",
+   "board": null,
+   "domains": [
+    "kollmorgen.com",
+    "regalrexnord.com"
+   ]
+  },
+  {
+   "name": "NTT DATA",
+   "hires": 18,
+   "recent": 11,
+   "majors": {
+    "Industrial and Systems Engineering": 1,
+    "Business Information Technology": 14,
+    "Finance": 1,
+    "Computational Modeling and Data Analytics": 2
+   },
+   "source": "fantastic",
+   "board": null,
+   "domains": [
+    "nttdata.com"
+   ]
+  },
+  {
+   "name": "Clark Construction Group",
+   "hires": 17,
+   "recent": 39,
+   "majors": {
+    "Electrical Engineering": 2,
+    "Mechanical Engineering": 2,
+    "Industrial and Systems Engineering": 4,
+    "Business Information Technology": 7,
+    "Finance": 2
+   },
+   "source": "fantastic",
+   "board": null,
+   "domains": [
+    "clarkconstruction.com"
+   ]
+  },
+  {
+   "name": "ExxonMobil",
+   "hires": 17,
+   "recent": 0,
+   "majors": {
+    "Computer Science": 1,
+    "Electrical Engineering": 1,
+    "Mechanical Engineering": 11,
+    "Industrial and Systems Engineering": 4
+   },
+   "source": "fantastic",
+   "board": null,
+   "domains": [
+    "exxonmobil.com"
+   ]
+  },
+  {
+   "name": "Innovative Refrigeration Systems, Inc.",
+   "hires": 17,
+   "recent": 8,
+   "majors": {
+    "Computer Science": 1,
+    "Electrical Engineering": 1,
+    "Mechanical Engineering": 14,
+    "Accounting and Information Systems": 1
+   },
+   "source": "fantastic",
+   "board": null,
+   "domains": null
+  },
+  {
+   "name": "Framatome Inc.",
+   "hires": 17,
+   "recent": 9,
+   "majors": {
+    "Computer Engineering": 1,
+    "Mechanical Engineering": 15,
+    "Aerospace Engineering": 1
+   },
+   "source": "fantastic",
+   "board": null,
+   "domains": [
+    "framatome.com"
+   ]
+  },
+  {
+   "name": "SpaceX",
+   "hires": 16,
+   "recent": 9,
+   "majors": {
+    "Computer Engineering": 2,
+    "Mechanical Engineering": 8,
+    "Aerospace Engineering": 6
+   },
+   "source": "direct",
+   "board": "SpaceX",
+   "domains": null
+  },
+  {
+   "name": "Excella Consulting",
+   "hires": 16,
+   "recent": 0,
+   "majors": {
+    "Computer Science": 8,
+    "Industrial and Systems Engineering": 3,
+    "Business Information Technology": 5
+   },
+   "source": "fantastic",
+   "board": null,
+   "domains": [
+    "excella.com"
+   ]
+  },
+  {
+   "name": "Texas Instruments",
+   "hires": 16,
+   "recent": 7,
+   "majors": {
+    "Computer Engineering": 4,
+    "Electrical Engineering": 10,
+    "Mechanical Engineering": 1,
+    "Industrial and Systems Engineering": 1
+   },
+   "source": "fantastic",
+   "board": null,
+   "domains": [
+    "ti.com"
+   ]
+  },
+  {
+   "name": "Alarm.com",
+   "hires": 16,
+   "recent": 4,
+   "majors": {
+    "Computer Science": 7,
+    "Computer Engineering": 2,
+    "Electrical Engineering": 2,
+    "Mechanical Engineering": 1,
+    "Industrial and Systems Engineering": 4
+   },
+   "source": "fantastic",
+   "board": null,
+   "domains": [
+    "alarm.com"
+   ]
+  },
+  {
+   "name": "BWX Technologies, Inc.",
+   "hires": 16,
+   "recent": 14,
+   "majors": {
+    "Computer Science": 1,
+    "Mechanical Engineering": 13,
+    "Aerospace Engineering": 1,
+    "Industrial and Systems Engineering": 1
+   },
+   "source": "fantastic",
+   "board": null,
+   "domains": [
+    "bwxt.com"
+   ]
+  },
+  {
+   "name": "Coalfire Systems",
+   "hires": 16,
+   "recent": 0,
+   "majors": {
+    "Business Information Technology": 16
+   },
+   "source": "fantastic",
+   "board": null,
+   "domains": [
+    "coalfire.com"
+   ]
+  },
+  {
+   "name": "Oracle",
+   "hires": 15,
+   "recent": 5,
+   "majors": {
+    "Computer Science": 5,
+    "Computer Engineering": 1,
+    "Business Information Technology": 8,
+    "Finance": 1
+   },
+   "source": "fantastic",
+   "board": null,
+   "domains": [
+    "oracle.com"
+   ]
+  },
+  {
+   "name": "Nielsen Company",
+   "hires": 14,
+   "recent": 0,
+   "majors": {
+    "Computer Engineering": 1,
+    "Industrial and Systems Engineering": 7,
+    "Business Information Technology": 1,
+    "Finance": 3,
+    "Computational Modeling and Data Analytics": 2
+   },
+   "source": "fantastic",
+   "board": null,
+   "domains": [
+    "nielsen.com"
+   ]
+  },
+  {
+   "name": "CarMax",
+   "hires": 14,
+   "recent": 1,
+   "majors": {
+    "Computer Science": 2,
+    "Computer Engineering": 2,
+    "Industrial and Systems Engineering": 3,
+    "Business Information Technology": 5,
+    "Finance": 1,
+    "Computational Modeling and Data Analytics": 1
+   },
+   "source": "direct",
+   "board": "CarMax",
+   "domains": null
+  },
+  {
+   "name": "Norfolk Southern Corporation",
+   "hires": 13,
+   "recent": 2,
+   "majors": {
+    "Computer Engineering": 1,
+    "Electrical Engineering": 2,
+    "Mechanical Engineering": 2,
+    "Business Information Technology": 4,
+    "Finance": 1,
+    "Accounting and Information Systems": 3
+   },
+   "source": "fantastic",
+   "board": null,
+   "domains": [
+    "norfolksouthern.com"
+   ]
+  },
+  {
+   "name": "Disney",
+   "hires": 13,
+   "recent": 23,
+   "majors": {
+    "Computer Science": 1,
+    "Mechanical Engineering": 6,
+    "Industrial and Systems Engineering": 2,
+    "Business Information Technology": 1,
+    "Finance": 1,
+    "Accounting and Information Systems": 1,
+    "Computational Modeling and Data Analytics": 1
+   },
+   "source": "direct",
+   "board": "Disney",
+   "domains": null
+  },
+  {
+   "name": "Cotton & Company LLP",
+   "hires": 13,
+   "recent": 0,
+   "majors": {
+    "Industrial and Systems Engineering": 1,
+    "Business Information Technology": 9,
+    "Accounting and Information Systems": 3
+   },
+   "source": "fantastic",
+   "board": null,
+   "domains": [
+    "cottoncpa.com"
+   ]
+  },
+  {
+   "name": "Moog",
+   "hires": 13,
+   "recent": 6,
+   "majors": {
+    "Mechanical Engineering": 3,
+    "Aerospace Engineering": 2,
+    "Industrial and Systems Engineering": 5,
+    "Business Information Technology": 2,
+    "Finance": 1
+   },
+   "source": "fantastic",
+   "board": null,
+   "domains": [
+    "moog.com"
+   ]
+  },
+  {
+   "name": "SAIC",
+   "hires": 13,
+   "recent": 9,
+   "majors": {
+    "Computer Engineering": 3,
+    "Mechanical Engineering": 1,
+    "Aerospace Engineering": 6,
+    "Industrial and Systems Engineering": 1,
+    "Business Information Technology": 2
+   },
+   "source": "fantastic",
+   "board": null,
+   "domains": [
+    "saic.com"
+   ]
+  },
+  {
+   "name": "GDIT",
+   "hires": 13,
+   "recent": 8,
+   "majors": {
+    "Computer Science": 5,
+    "Business Information Technology": 7,
+    "Finance": 1
+   },
+   "source": "direct",
+   "board": "GDIT",
+   "domains": null
+  },
+  {
+   "name": "Systems Planning and Analysis (SPA)",
+   "hires": 13,
+   "recent": 10,
+   "majors": {
+    "Aerospace Engineering": 2,
+    "Industrial and Systems Engineering": 6,
+    "Business Information Technology": 2,
+    "Computational Modeling and Data Analytics": 3
+   },
+   "source": "fantastic",
+   "board": null,
+   "domains": [
+    "spa.com"
+   ]
+  },
+  {
+   "name": "Verizon",
+   "hires": 12,
+   "recent": 9,
+   "majors": {
+    "Computer Science": 3,
+    "Computer Engineering": 1,
+    "Electrical Engineering": 1,
+    "Industrial and Systems Engineering": 1,
+    "Business Information Technology": 3,
+    "Finance": 1,
+    "Computational Modeling and Data Analytics": 2
+   },
+   "source": "fantastic",
+   "board": null,
+   "domains": [
+    "verizon.com"
+   ]
+  },
+  {
+   "name": "Rolls-Royce",
+   "hires": 12,
+   "recent": 3,
+   "majors": {
+    "Mechanical Engineering": 6,
+    "Aerospace Engineering": 3,
+    "Industrial and Systems Engineering": 3
+   },
+   "source": "fantastic",
+   "board": null,
+   "domains": [
+    "rolls-royce.com"
+   ]
+  },
+  {
+   "name": "Technomics",
+   "hires": 12,
+   "recent": 9,
+   "majors": {
+    "Computer Science": 1,
+    "Mechanical Engineering": 1,
+    "Aerospace Engineering": 1,
+    "Industrial and Systems Engineering": 7,
+    "Computational Modeling and Data Analytics": 2
+   },
+   "source": "fantastic",
+   "board": null,
+   "domains": [
+    "technomics.net"
+   ]
+  },
+  {
+   "name": "NewDay USA",
+   "hires": 12,
+   "recent": 4,
+   "majors": {
+    "Business Information Technology": 2,
+    "Finance": 10
+   },
+   "source": "fantastic",
+   "board": null,
+   "domains": [
+    "newdayusa.com"
+   ]
+  },
+  {
+   "name": "Parsons",
+   "hires": 11,
+   "recent": 9,
+   "majors": {
+    "Computer Science": 5,
+    "Computer Engineering": 2,
+    "Business Information Technology": 3,
+    "Computational Modeling and Data Analytics": 1
+   },
+   "source": "fantastic",
+   "board": null,
+   "domains": [
+    "parsons.com"
+   ]
+  },
+  {
+   "name": "Red Hat",
+   "hires": 11,
+   "recent": 3,
+   "majors": {
+    "Computer Science": 7,
+    "Computer Engineering": 2,
+    "Business Information Technology": 1,
+    "Computational Modeling and Data Analytics": 1
+   },
+   "source": "fantastic",
+   "board": null,
+   "domains": [
+    "redhat.com"
+   ]
+  },
+  {
+   "name": "MicroStrategy, Inc.",
+   "hires": 11,
+   "recent": 0,
+   "majors": {
+    "Computer Science": 5,
+    "Industrial and Systems Engineering": 3,
+    "Business Information Technology": 3
+   },
+   "source": "fantastic",
+   "board": null,
+   "domains": [
+    "strategy.com",
+    "microstrategy.com"
+   ]
+  },
+  {
+   "name": "Davenport & Company LLC",
+   "hires": 11,
+   "recent": 7,
+   "majors": {
+    "Finance": 11
+   },
+   "source": "fantastic",
+   "board": null,
+   "domains": [
+    "investdavenport.com"
+   ]
+  },
+  {
+   "name": "Broadcom",
+   "hires": 11,
+   "recent": 0,
+   "majors": {
+    "Computer Engineering": 1,
+    "Industrial and Systems Engineering": 2,
+    "Business Information Technology": 8
+   },
+   "source": "fantastic",
+   "board": null,
+   "domains": [
+    "broadcom.com"
+   ]
+  },
+  {
+   "name": "American Woodmark",
+   "hires": 10,
+   "recent": 6,
+   "majors": {
+    "Mechanical Engineering": 2,
+    "Industrial and Systems Engineering": 2,
+    "Business Information Technology": 3,
+    "Finance": 2,
+    "Accounting and Information Systems": 1
+   },
+   "source": "fantastic",
+   "board": null,
+   "domains": [
+    "americanwoodmark.com"
+   ]
+  },
+  {
+   "name": "Intel",
+   "hires": 10,
+   "recent": 1,
+   "majors": {
+    "Computer Engineering": 2,
+    "Electrical Engineering": 1,
+    "Mechanical Engineering": 3,
+    "Industrial and Systems Engineering": 3,
+    "Finance": 1
+   },
+   "source": "direct",
+   "board": "Intel",
+   "domains": null
+  },
+  {
+   "name": "AECOM",
+   "hires": 10,
+   "recent": 10,
+   "majors": {
+    "Electrical Engineering": 6,
+    "Mechanical Engineering": 4
+   },
+   "source": "fantastic",
+   "board": null,
+   "domains": [
+    "aecom.com"
+   ]
+  },
+  {
+   "name": "Noblis",
+   "hires": 10,
+   "recent": 3,
+   "majors": {
+    "Computer Science": 2,
+    "Computer Engineering": 1,
+    "Industrial and Systems Engineering": 1,
+    "Business Information Technology": 3,
+    "Computational Modeling and Data Analytics": 3
+   },
+   "source": "fantastic",
+   "board": null,
+   "domains": [
+    "noblis.org"
+   ]
+  },
+  {
+   "name": "Alpine Consulting Partners",
+   "hires": 10,
+   "recent": 7,
+   "majors": {
+    "Computer Science": 1,
+    "Mechanical Engineering": 2,
+    "Industrial and Systems Engineering": 6,
+    "Business Information Technology": 1
+   },
+   "source": "fantastic",
+   "board": null,
+   "domains": null
+  },
+  {
+   "name": "Guidehouse",
+   "hires": 10,
+   "recent": 13,
+   "majors": {
+    "Computer Science": 1,
+    "Mechanical Engineering": 3,
+    "Industrial and Systems Engineering": 1,
+    "Business Information Technology": 5
+   },
+   "source": "fantastic",
+   "board": null,
+   "domains": [
+    "guidehouse.com"
+   ]
+  },
+  {
+   "name": "Keiter",
+   "hires": 9,
+   "recent": 4,
+   "majors": {
+    "Finance": 1,
+    "Accounting and Information Systems": 8
+   },
+   "source": "fantastic",
+   "board": null,
+   "domains": [
+    "keitercpa.com"
+   ]
+  },
+  {
+   "name": "ViaSat, Inc.",
+   "hires": 9,
+   "recent": 0,
+   "majors": {
+    "Computer Science": 4,
+    "Computer Engineering": 2,
+    "Electrical Engineering": 1,
+    "Aerospace Engineering": 1,
+    "Industrial and Systems Engineering": 1
+   },
+   "source": "fantastic",
+   "board": null,
+   "domains": [
+    "viasat.com"
+   ]
+  },
+  {
+   "name": "Carahsoft Technology Corp.",
+   "hires": 9,
+   "recent": 24,
+   "majors": {
+    "Computer Science": 1,
+    "Business Information Technology": 5,
+    "Finance": 3
+   },
+   "source": "fantastic",
+   "board": null,
+   "domains": [
+    "carahsoft.com"
+   ]
+  },
+  {
+   "name": "NetApp",
+   "hires": 9,
+   "recent": 0,
+   "majors": {
+    "Computer Science": 2,
+    "Computer Engineering": 2,
+    "Industrial and Systems Engineering": 1,
+    "Business Information Technology": 3,
+    "Finance": 1
+   },
+   "source": "fantastic",
+   "board": null,
+   "domains": [
+    "netapp.com"
+   ]
+  },
+  {
+   "name": "memoryBlue",
+   "hires": 9,
+   "recent": 20,
+   "majors": {
+    "Business Information Technology": 2,
+    "Finance": 6,
+    "Accounting and Information Systems": 1
+   },
+   "source": "fantastic",
+   "board": null,
+   "domains": [
+    "memoryblue.com"
+   ]
+  },
+  {
+   "name": "HITT Contracting, Inc.",
+   "hires": 9,
+   "recent": 25,
+   "majors": {
+    "Mechanical Engineering": 4,
+    "Industrial and Systems Engineering": 2,
+    "Business Information Technology": 2,
+    "Finance": 1
+   },
+   "source": "fantastic",
+   "board": null,
+   "domains": [
+    "hitt.com"
+   ]
+  },
+  {
+   "name": "Parker Hannifin Corporation",
+   "hires": 9,
+   "recent": 4,
+   "majors": {
+    "Computer Science": 1,
+    "Mechanical Engineering": 3,
+    "Industrial and Systems Engineering": 3,
+    "Business Information Technology": 1,
+    "Accounting and Information Systems": 1
+   },
+   "source": "fantastic",
+   "board": null,
+   "domains": [
+    "parker.com"
+   ]
+  },
+  {
+   "name": "AT&T",
+   "hires": 9,
+   "recent": 2,
+   "majors": {
+    "Electrical Engineering": 2,
+    "Aerospace Engineering": 1,
+    "Industrial and Systems Engineering": 1,
+    "Business Information Technology": 2,
+    "Finance": 1,
+    "Computational Modeling and Data Analytics": 2
+   },
+   "source": "fantastic",
+   "board": null,
+   "domains": [
+    "att.com"
+   ]
+  },
+  {
+   "name": "W.L. Gore & Associates, Inc.",
+   "hires": 9,
+   "recent": 2,
+   "majors": {
+    "Mechanical Engineering": 4,
+    "Industrial and Systems Engineering": 5
+   },
+   "source": "fantastic",
+   "board": null,
+   "domains": [
+    "gore.com"
+   ]
+  },
+  {
+   "name": "WestRock",
+   "hires": 9,
+   "recent": 2,
+   "majors": {
+    "Electrical Engineering": 2,
+    "Mechanical Engineering": 4,
+    "Industrial and Systems Engineering": 3
+   },
+   "source": "fantastic",
+   "board": null,
+   "domains": [
+    "smurfitwestrock.com",
+    "westrock.com"
+   ]
+  },
+  {
+   "name": "srcLogic",
+   "hires": 9,
+   "recent": 2,
+   "majors": {
+    "Computer Science": 2,
+    "Mechanical Engineering": 1,
+    "Industrial and Systems Engineering": 6
+   },
+   "source": "fantastic",
+   "board": null,
+   "domains": null
+  },
+  {
+   "name": "YHB (Yount, Hyde & Barbour, P.C.)",
+   "hires": 9,
+   "recent": 4,
+   "majors": {
+    "Finance": 1,
+    "Accounting and Information Systems": 8
+   },
+   "source": "fantastic",
+   "board": null,
+   "domains": [
+    "yhbcpa.com"
+   ]
+  },
+  {
+   "name": "CliftonLarsonAllen",
+   "hires": 8,
+   "recent": 1,
+   "majors": {
+    "Finance": 1,
+    "Accounting and Information Systems": 7
+   },
+   "source": "fantastic",
+   "board": null,
+   "domains": [
+    "claconnect.com"
+   ]
+  },
+  {
+   "name": "Ferguson Enterprises, Inc.",
+   "hires": 8,
+   "recent": 0,
+   "majors": {
+    "Business Information Technology": 2,
+    "Finance": 6
+   },
+   "source": "fantastic",
+   "board": null,
+   "domains": [
+    "ferguson.com"
+   ]
+  },
+  {
+   "name": "Whiting-Turner",
+   "hires": 8,
+   "recent": 62,
+   "majors": {
+    "Mechanical Engineering": 4,
+    "Aerospace Engineering": 1,
+    "Industrial and Systems Engineering": 1,
+    "Business Information Technology": 1,
+    "Finance": 1
+   },
+   "source": "fantastic",
+   "board": null,
+   "domains": [
+    "whiting-turner.com"
+   ]
+  },
+  {
+   "name": "Truist",
+   "hires": 8,
+   "recent": 7,
+   "majors": {
+    "Computer Science": 1,
+    "Business Information Technology": 3,
+    "Finance": 4
+   },
+   "source": "fantastic",
+   "board": null,
+   "domains": [
+    "truist.com"
+   ]
+  },
+  {
+   "name": "G3 Technologies, Inc.",
+   "hires": 8,
+   "recent": 3,
+   "majors": {
+    "Computer Science": 4,
+    "Electrical Engineering": 3,
+    "Business Information Technology": 1
+   },
+   "source": "fantastic",
+   "board": null,
+   "domains": null
+  },
+  {
+   "name": "Target",
+   "hires": 8,
+   "recent": 12,
+   "majors": {
+    "Industrial and Systems Engineering": 3,
+    "Business Information Technology": 5
+   },
+   "source": "fantastic",
+   "board": null,
+   "domains": [
+    "target.com"
+   ]
+  },
+  {
+   "name": "International Paper",
+   "hires": 8,
+   "recent": 3,
+   "majors": {
+    "Electrical Engineering": 2,
+    "Mechanical Engineering": 5,
+    "Industrial and Systems Engineering": 1
+   },
+   "source": "fantastic",
+   "board": null,
+   "domains": [
+    "internationalpaper.com"
+   ]
+  },
+  {
+   "name": "Micron",
+   "hires": 8,
+   "recent": 4,
+   "majors": {
+    "Computer Science": 2,
+    "Computer Engineering": 1,
+    "Mechanical Engineering": 4,
+    "Industrial and Systems Engineering": 1
+   },
+   "source": "direct",
+   "board": "Micron",
+   "domains": null
+  },
+  {
+   "name": "Walmart",
+   "hires": 8,
+   "recent": 5,
+   "majors": {
+    "Computer Science": 4,
+    "Computer Engineering": 1,
+    "Industrial and Systems Engineering": 3
+   },
+   "source": "fantastic",
+   "board": null,
+   "domains": [
+    "walmart.com"
+   ]
+  },
+  {
+   "name": "Caterpillar Inc.",
+   "hires": 8,
+   "recent": 6,
+   "majors": {
+    "Computer Science": 1,
+    "Mechanical Engineering": 6,
+    "Business Information Technology": 1
+   },
+   "source": "fantastic",
+   "board": null,
+   "domains": [
+    "caterpillar.com"
+   ]
+  },
+  {
+   "name": "RoviSys",
+   "hires": 8,
+   "recent": 11,
+   "majors": {
+    "Computer Engineering": 1,
+    "Electrical Engineering": 1,
+    "Mechanical Engineering": 3,
+    "Industrial and Systems Engineering": 3
+   },
+   "source": "fantastic",
+   "board": null,
+   "domains": [
+    "rovisys.com"
+   ]
+  },
+  {
+   "name": "Apple",
+   "hires": 8,
+   "recent": 5,
+   "majors": {
+    "Computer Science": 6,
+    "Computer Engineering": 1,
+    "Mechanical Engineering": 1
+   },
+   "source": "fantastic",
+   "board": null,
+   "domains": [
+    "apple.com"
+   ]
+  },
+  {
+   "name": "Brown Edwards",
+   "hires": 8,
+   "recent": 5,
+   "majors": {
+    "Finance": 1,
+    "Accounting and Information Systems": 7
+   },
+   "source": "fantastic",
+   "board": null,
+   "domains": [
+    "brownedwards.com"
+   ]
+  },
+  {
+   "name": "Herren Associates",
+   "hires": 8,
+   "recent": 0,
+   "majors": {
+    "Industrial and Systems Engineering": 8
+   },
+   "source": "fantastic",
+   "board": null,
+   "domains": [
+    "herrenassociates.com"
+   ]
+  },
+  {
+   "name": "Fortna Inc.",
+   "hires": 8,
+   "recent": 2,
+   "majors": {
+    "Mechanical Engineering": 1,
+    "Industrial and Systems Engineering": 7
+   },
+   "source": "fantastic",
+   "board": null,
+   "domains": [
+    "fortna.com"
+   ]
+  },
+  {
+   "name": "Trane Technologies",
+   "hires": 8,
+   "recent": 2,
+   "majors": {
+    "Mechanical Engineering": 1,
+    "Industrial and Systems Engineering": 2,
+    "Business Information Technology": 4,
+    "Finance": 1
+   },
+   "source": "fantastic",
+   "board": null,
+   "domains": [
+    "tranetechnologies.com"
+   ]
+  },
+  {
+   "name": "UPS (United Parcel Service)",
+   "hires": 8,
+   "recent": 6,
+   "majors": {
+    "Industrial and Systems Engineering": 6,
+    "Business Information Technology": 2
+   },
+   "source": "fantastic",
+   "board": null,
+   "domains": [
+    "ups.com"
+   ]
+  },
+  {
+   "name": "CohnReznick",
+   "hires": 7,
+   "recent": 3,
+   "majors": {
+    "Accounting and Information Systems": 7
+   },
+   "source": "fantastic",
+   "board": null,
+   "domains": [
+    "cohnreznick.com"
+   ]
+  },
+  {
+   "name": "Eaton",
+   "hires": 7,
+   "recent": 2,
+   "majors": {
+    "Mechanical Engineering": 5,
+    "Aerospace Engineering": 1,
+    "Industrial and Systems Engineering": 1
+   },
+   "source": "fantastic",
+   "board": null,
+   "domains": [
+    "eaton.com"
+   ]
+  },
+  {
+   "name": "Ameriprise Financial",
+   "hires": 7,
+   "recent": 1,
+   "majors": {
+    "Finance": 7
+   },
+   "source": "fantastic",
+   "board": null,
+   "domains": [
+    "ameriprise.com"
+   ]
+  },
+  {
+   "name": "Cvent Inc.",
+   "hires": 7,
+   "recent": 34,
+   "majors": {
+    "Computer Science": 2,
+    "Business Information Technology": 4,
+    "Finance": 1
+   },
+   "source": "fantastic",
+   "board": null,
+   "domains": [
+    "cvent.com"
+   ]
+  },
+  {
+   "name": "Corning Incorporated",
+   "hires": 7,
+   "recent": 9,
+   "majors": {
+    "Mechanical Engineering": 5,
+    "Industrial and Systems Engineering": 2
+   },
+   "source": "fantastic",
+   "board": null,
+   "domains": [
+    "corning.com"
+   ]
+  },
+  {
+   "name": "Wiley|Wilson",
+   "hires": 7,
+   "recent": 4,
+   "majors": {
+    "Electrical Engineering": 3,
+    "Mechanical Engineering": 4
+   },
+   "source": "fantastic",
+   "board": null,
+   "domains": [
+    "wileywilson.com"
+   ]
+  },
+  {
+   "name": "SimonComputing, Inc",
+   "hires": 7,
+   "recent": 2,
+   "majors": {
+    "Computer Science": 7
+   },
+   "source": "fantastic",
+   "board": null,
+   "domains": [
+    "simoncomputing.com"
+   ]
+  },
+  {
+   "name": "Visa",
+   "hires": 7,
+   "recent": 0,
+   "majors": {
+    "Computer Science": 3,
+    "Business Information Technology": 4
+   },
+   "source": "fantastic",
+   "board": null,
+   "domains": [
+    "visa.com"
+   ]
+  },
+  {
+   "name": "BIT Systems, Inc.",
+   "hires": 7,
+   "recent": 0,
+   "majors": {
+    "Computer Engineering": 1,
+    "Electrical Engineering": 6
+   },
+   "source": "fantastic",
+   "board": null,
+   "domains": null
+  },
+  {
+   "name": "Hughes Network Systems",
+   "hires": 7,
+   "recent": 0,
+   "majors": {
+    "Computer Science": 1,
+    "Computer Engineering": 3,
+    "Electrical Engineering": 2,
+    "Mechanical Engineering": 1
+   },
+   "source": "fantastic",
+   "board": null,
+   "domains": [
+    "hughes.com"
+   ]
+  },
+  {
+   "name": "Insight Global",
+   "hires": 7,
+   "recent": 19,
+   "majors": {
+    "Business Information Technology": 3,
+    "Finance": 4
+   },
+   "source": "fantastic",
+   "board": null,
+   "domains": [
+    "insightglobal.com"
+   ]
+  },
+  {
+   "name": "Honda R&D Americas, Inc.",
+   "hires": 7,
+   "recent": 0,
+   "majors": {
+    "Mechanical Engineering": 7
+   },
+   "source": "fantastic",
+   "board": null,
+   "domains": [
+    "honda.com"
+   ]
+  },
+  {
+   "name": "Tate & Tryon",
+   "hires": 7,
+   "recent": 0,
+   "majors": {
+    "Finance": 3,
+    "Accounting and Information Systems": 4
+   },
+   "source": "fantastic",
+   "board": null,
+   "domains": [
+    "tatetryon.com"
+   ]
+  },
+  {
+   "name": "Ingersoll-Rand",
+   "hires": 7,
+   "recent": 0,
+   "majors": {
+    "Mechanical Engineering": 3,
+    "Industrial and Systems Engineering": 3,
+    "Business Information Technology": 1
+   },
+   "source": "fantastic",
+   "board": null,
+   "domains": [
+    "irco.com"
+   ]
+  },
+  {
+   "name": "MPR Associates, Inc",
+   "hires": 7,
+   "recent": 6,
+   "majors": {
+    "Computer Science": 1,
+    "Electrical Engineering": 2,
+    "Mechanical Engineering": 4
+   },
+   "source": "fantastic",
+   "board": null,
+   "domains": [
+    "mpr.com"
+   ]
+  }
+ ]
+}

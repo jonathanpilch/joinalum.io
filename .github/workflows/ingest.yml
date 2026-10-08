@@ -1,10 +1,15 @@
-# Hourly: pull every board, commit data/jobs.json if anything changed.
+# Hourly: pull every board, commit data/ if anything changed.
+# Daily: fantastic.jobs for the target employers we can't pull directly.
+# Weekly: VT's placement report and the target list built from it.
 name: ingest
 on:
   schedule:
     - cron: "7 * * * *"
     # VT's placement report changes once a year; Mondays is plenty.
     - cron: "37 9 * * 1"
+    # fantastic.jobs once a day (7am ET) while on the trial's 50 requests a
+    # week. After upgrading, delete the `if` on that step to run it hourly.
+    - cron: "17 11 * * *"
   workflow_dispatch:
 permissions:
   contents: write
@@ -20,9 +25,15 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 22
-      - run: node ingest/run.mjs
       - if: github.event.schedule == '37 9 * * 1' || github.event_name == 'workflow_dispatch'
-        run: node ingest/placements.mjs
+        run: node ingest/placements.mjs && node ingest/targets.mjs
+      - if: github.event.schedule == '17 11 * * *' || github.event_name == 'workflow_dispatch'
+        env:
+          FANTASTIC_KEY: ${{ secrets.FANTASTIC_KEY }}
+        run: |
+          if [ -z "$FANTASTIC_KEY" ]; then echo "No FANTASTIC_KEY secret; skipping"; exit 0; fi
+          node ingest/fantastic.mjs
+      - run: node ingest/run.mjs
       - name: Commit data
         run: |
           git config user.name "alum-ingest"

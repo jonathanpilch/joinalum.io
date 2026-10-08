@@ -6,6 +6,9 @@
   "scripts": {
     "ingest": "node ingest/run.mjs",
     "placements": "node ingest/placements.mjs",
+    "targets": "node ingest/targets.mjs",
+    "fantastic": "node --env-file=.env ingest/fantastic.mjs",
+    "fantastic:probe": "node --env-file=.env ingest/fantastic.mjs --probe",
     "dev": "python3 -m http.server 5178"
   },
   "engines": {

@@ -55,6 +55,13 @@ const FN = [
   ["Engineering", /\b(engineer|engineering|robotics|gnc|mechatronics)\b/i],
   ["Research", /\b(research (?:scientist|engineer|intern|assistant|associate)|scientist|physicist|quantum)\b/i],
   ["Tech Consulting", /\b(technology (?:consult\w*|analyst|associate|transformation|strategy|controls|advisory|risk|solutions)|tech (?:consult\w*|strategy)|enterprise tech|digital (?:consult\w*|transformation)|solutions analyst|business analyst|systems analyst|cyber consult\w*|it audit|it advisory)\b/i],
+  // Business tracks, for the Finance, Accounting and BIT majors in v1.
+  ["Audit & Assurance", /\b(audit\w*|assurance|internal controls?|sox)\b/i],
+  ["Tax", /\btax\b/i],
+  ["Accounting", /\b(accounting|accountant|controllership|financial reporting)\b/i],
+  ["Finance", /\b(financ\w*|investment|banking|banker|treasury|fp&a|valuation|wealth|capital markets|equity research|credit|underwrit\w*|actuar\w*|risk analyst)\b/i],
+  ["Consulting", /\b(consult\w*|advisory|strategy)\b/i],
+  ["Supply Chain & Ops", /\b(supply chain|logistics|procurement|operations analyst|operations research)\b/i],
 ];
 
 export function fn(title) {
@@ -137,6 +144,16 @@ function stateIn(s) {
 const clean = (c) => c.replace(/\s*\(.*?\)\s*/g, "").trim();
 const titleCase = (s) => s.replace(/\b\w/g, (c) => c.toUpperCase());
 export const stateName = (a) => STATES[a] || a;
+
+/* One display line for a posting's locations: "McLean, VA", "Remote (US)",
+ * "Atlanta, GA + 15 more", or Workday's "3 Locations". */
+export function locationLabel(locs) {
+  const one = (l) => (l.remote ? (l.state ? `Remote (${l.state})` : "Remote (US)") : l.city && l.state ? `${l.city}, ${l.state}` : l.city || (l.state ? stateName(l.state) : "United States"));
+  const shown = locs.filter((l) => !l.multi);
+  if (!locs.length) return "United States";
+  if (locs[0].multi) return locs[0].city;
+  return shown.length > 1 ? `${one(shown[0])} + ${shown.length - 1} more` : one(shown[0]);
+}
 
 export function places(list) {
   const out = [];
