@@ -159,7 +159,7 @@ svg { width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width:
   -webkit-backdrop-filter: var(--frost);
 }
 .brand { display: flex; align-items: center; gap: 9px; color: var(--ink); }
-.brand-mark { width: 26px; height: 26px; filter: invert(1) brightness(1.05); }
+.brand-mark { width: 26px; height: 27px; }
 .brand-name { font-size: 21px; font-weight: 800; letter-spacing: -0.03em; }
 
 .school-chip {
