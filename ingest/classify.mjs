@@ -99,7 +99,7 @@ export function place(raw) {
   if (s.includes("~")) {
     const segs = s.split(/[~,]/).map((x) => x.trim()).filter((x) => !/^(us|usa|united states)$/i.test(x));
     const st = segs.map(abbr).filter(Boolean).pop();
-    if (st) return { city: titleCase(segs[0].replace(/[-\s]+[A-Z0-9]*\d[A-Z0-9]*$/i, "").toLowerCase()), state: st };
+    if (st) return { city: clean(segs[0]), state: st };
   }
 
   // Workday "United States-Virginia-Herndon" / "USA-VA-Herndon" / "US-CA-San Diego"
@@ -141,7 +141,12 @@ function stateIn(s) {
   for (const [n, a] of Object.entries(NAME_TO_ABBR)) if (new RegExp(`\\b${n}\\b`, "i").test(s)) return { abbr: a };
   return null;
 }
-const clean = (c) => c.replace(/\s*\(.*?\)\s*/g, "").trim();
+// "ANNAPOLIS JUNCTION-339 ~ 306 Sentinel Dr ~ 339 BLDG" -> "Annapolis Junction"
+const clean = (c) => {
+  let x = c.split("~")[0].trim().replace(/\s*\(.*?\)\s*/g, "").replace(/-\d[\w-]*$/, "").replace(/[-\s]+(?:[A-Z]*\d[A-Z0-9]*|ETC)$/i, "").trim();
+  if (x === x.toUpperCase()) x = titleCase(x.toLowerCase());
+  return x;
+};
 const titleCase = (s) => s.replace(/\b\w/g, (c) => c.toUpperCase());
 export const stateName = (a) => STATES[a] || a;
 

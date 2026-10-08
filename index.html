@@ -4,8 +4,8 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
     <title>Alum</title>
-    <meta name="description" content="Fresh internships and early career roles at the companies your school's alumni already work at." />
-    <meta name="theme-color" content="#16171b" />
+    <meta name="description" content="Fresh internships at the companies that hire Hokies." />
+    <meta name="theme-color" content="#ffffff" />
     <link rel="icon" type="image/svg+xml" href="assets/brand/alum.svg" />
     <link rel="icon" type="image/png" href="assets/brand/alum.png" />
     <link rel="apple-touch-icon" href="assets/brand/alum.png" />
@@ -17,101 +17,107 @@
     <link rel="stylesheet" href="styles.css" />
   </head>
   <body>
-    <header class="topbar">
+    <header class="top">
       <a class="brand" href="./" aria-label="Alum home">
-        <img class="brand-mark" src="assets/brand/alum-mark.svg" alt="" />
-        <span class="brand-name">alum</span>
+        <img src="assets/brand/alum-mark-dark.svg" alt="" />
+        <span>alum</span>
       </a>
-      <span class="school-chip" id="school-chip">
-        <img id="school-mark" alt="" />
-        <span id="school-name"></span>
-      </span>
-      <span class="spacer"></span>
-      <span class="updated" id="updated"></span>
+
+      <nav class="switch" role="tablist" aria-label="Sections">
+        <span class="switch-pill" aria-hidden="true"></span>
+        <button role="tab" data-tab="internships" aria-selected="true"><i data-lucide="briefcase"></i>Internships</button>
+        <button role="tab" data-tab="profile" aria-selected="false"><i data-lucide="user"></i>Profile</button>
+      </nav>
+
+      <span class="top-right" id="updated"></span>
     </header>
 
-    <main class="main">
-      <section class="hero">
-        <p class="eyebrow" id="hero-eyebrow"></p>
-        <h1 id="hero-title"></h1>
-        <p class="lede" id="hero-lede"></p>
-        <a class="btn" href="#board">Browse roles</a>
-        <p class="proof" id="hero-proof"></p>
-      </section>
+    <!-- Internships -->
+    <main id="internships" class="view">
+      <div class="search">
+        <i data-lucide="search"></i>
+        <input id="q" type="search" placeholder="Search internships, companies, cities" autocomplete="off" />
+        <button class="round dark" id="open-filters" aria-label="Filters">
+          <i data-lucide="sliders-horizontal"></i>
+          <span class="dot" id="filter-dot" hidden></span>
+        </button>
+      </div>
 
-      <section class="board" id="board">
-        <div class="searchbar glass-card">
-          <label class="search">
-            <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7" /><path d="m20 20-3.5-3.5" /></svg>
-            <input id="q" type="search" placeholder="Search roles, companies, cities" autocomplete="off" />
-          </label>
-          <div class="chips" id="chips">
-            <button class="btn soft sm filter-btn" id="open-filters">
-              <span class="count" id="filter-count" hidden></span>
-              Edit filters
-            </button>
-            <span class="divider"></span>
-            <span id="active-chips" class="chips"></span>
-          </div>
+      <div class="cats" id="cats" aria-label="Categories"></div>
+
+      <div class="bar">
+        <p id="tally"></p>
+        <div class="sort" role="group" aria-label="Sort">
+          <button data-sort="new" aria-pressed="true">Newest</button>
+          <button data-sort="hokies" aria-pressed="false">Most Hokies</button>
         </div>
+      </div>
 
-        <p class="tally" id="tally"></p>
-
-        <div class="table glass-card" role="table" aria-label="Roles">
-          <div class="row head" role="row">
-            <span role="columnheader">Role</span>
-            <span role="columnheader">Location</span>
-            <span role="columnheader">Posted</span>
-            <span role="columnheader">Pay</span>
-            <span role="columnheader">Level</span>
-            <span role="columnheader" class="right">Apply</span>
-          </div>
-          <div id="rows"></div>
-          <div class="empty" id="empty" hidden>
-            <p>No roles match these filters.</p>
-            <button class="btn soft sm" id="reset-empty">Reset filters</button>
-          </div>
-        </div>
-        <div class="more"><button class="btn soft" id="more">Load more roles</button></div>
-      </section>
-
-      <footer class="foot">
-        <span>alum · a <strong>nublock</strong> product, alongside Ndex</span>
-        <span id="foot-note"></span>
-      </footer>
+      <div class="grid" id="grid"></div>
+      <div class="empty" id="empty" hidden>
+        <i data-lucide="search-x"></i>
+        <p>No internships match.</p>
+        <button class="link" id="clear-empty">Clear filters</button>
+      </div>
+      <div class="more"><button class="ghost" id="more">Show more</button></div>
     </main>
 
-    <!-- Filters drawer -->
-    <div class="scrim" id="scrim" hidden></div>
-    <aside class="drawer" id="filters" aria-label="Filters" hidden>
-      <header class="drawer-head">
-        <button class="icon-btn" data-close aria-label="Close">
-          <svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6 6 18" /></svg>
-        </button>
-        <h2>Filters</h2>
-        <span class="spacer"></span>
-        <button class="btn soft sm" id="reset">Reset</button>
-        <button class="btn sm" id="apply">Show roles</button>
-      </header>
-      <div class="drawer-body" id="filter-body"></div>
-    </aside>
+    <!-- Profile -->
+    <main id="profile" class="view" hidden>
+      <section class="card">
+        <div class="card-head">
+          <h2>About you</h2>
+          <span class="saved-note" id="saved-note"></span>
+        </div>
+        <p class="sub">Picks your internships and shows how many Hokies from your major got hired. Stays on this device for now.</p>
+        <div class="fields">
+          <label class="field"><span>Name</span><input id="p-name" placeholder="First name" autocomplete="given-name" /></label>
+          <label class="field"><span>Major</span><select id="p-major"></select></label>
+          <label class="field"><span>Class year</span><select id="p-year"></select></label>
+          <label class="field"><span>Looking for</span><select id="p-term"></select></label>
+        </div>
+        <h3>Interested in</h3>
+        <div class="chips" id="p-interests"></div>
+        <h3>Where</h3>
+        <div class="chips" id="p-places"></div>
+      </section>
 
-    <!-- Role detail -->
-    <aside class="drawer wide" id="detail" aria-label="Role" hidden>
-      <header class="drawer-head">
-        <button class="icon-btn" data-close aria-label="Close">
-          <svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6 6 18" /></svg>
-        </button>
-        <span class="spacer"></span>
-        <a class="btn sm" id="detail-apply" href="#" target="_blank" rel="noopener">Apply
-          <svg viewBox="0 0 24 24"><path d="M7 17 17 7M9 7h8v8" /></svg>
-        </a>
-      </header>
-      <div class="drawer-body" id="detail-body"></div>
-    </aside>
+      <section class="card">
+        <div class="card-head">
+          <h2>Saved internships</h2>
+          <span class="count" id="saved-count"></span>
+        </div>
+        <div id="saved-list"></div>
+      </section>
+    </main>
+
+    <!-- Internship detail -->
+    <div class="modal" id="detail" hidden>
+      <div class="sheet" role="dialog" aria-modal="true" aria-labelledby="d-title">
+        <button class="round close" data-close aria-label="Close"><i data-lucide="x"></i></button>
+        <div class="sheet-body" id="detail-body"></div>
+      </div>
+    </div>
+
+    <!-- Filters -->
+    <div class="modal" id="filters" hidden>
+      <div class="sheet" role="dialog" aria-modal="true" aria-label="Filters">
+        <div class="sheet-head">
+          <button class="round" data-close aria-label="Close"><i data-lucide="x"></i></button>
+          <h2>Filters</h2>
+          <span></span>
+        </div>
+        <div class="sheet-body" id="filter-body"></div>
+        <div class="sheet-foot">
+          <button class="link" id="clear">Clear all</button>
+          <button class="primary" id="apply">Show internships</button>
+        </div>
+      </div>
+    </div>
 
     <div class="toast" id="toast" role="status" hidden></div>
 
+    <script src="https://unpkg.com/lucide@1.53.0/dist/umd/lucide.min.js"></script>
     <script src="schools.js"></script>
     <script src="app.js"></script>
   </body>
