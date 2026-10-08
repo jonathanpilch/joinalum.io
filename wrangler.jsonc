@@ -1,0 +1,11 @@
+// Cloudflare Workers static site. The build command (`npm run build`) writes
+// dist/; `npx wrangler deploy` uploads only that folder.
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "joinalum-io",
+  "compatibility_date": "2026-10-06",
+  "observability": { "enabled": true },
+  "assets": {
+    "directory": "./dist"
+  }
+}
