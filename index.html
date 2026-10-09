@@ -23,6 +23,8 @@
     <link rel="stylesheet" href="landing.css" />
   </head>
   <body class="landing">
+    <!-- The wash: blurred Hokie-orange and maroon light drifting behind the hero. -->
+    <div class="l-aura" aria-hidden="true"><span></span><span></span><span></span><span></span></div>
     <header class="top">
       <a class="brand" href="./" aria-label="Alum home">
         <img src="assets/brand/alum-mark-dark.svg" alt="" />
@@ -40,7 +42,7 @@
       <!-- Hero ------------------------------------------------------------------>
       <section class="l-hero">
         <div class="l-hero-text">
-          <span class="hokie l-badge"><i data-lucide="graduation-cap"></i>Built by Hokies, for Hokies</span>
+          <span class="l-badge"><i data-lucide="graduation-cap"></i>Built by Hokies, for Hokies</span>
           <h1>Find the internship <u>before the line forms.</u></h1>
           <p class="l-lede">
             Alum checks the career sites of the companies that hire Virginia Tech students every hour, and shows you each new
@@ -149,12 +151,12 @@
       </section>
 
       <!-- Where Hokies land (Runway's timing bars, with our data) ---------------->
-      <section class="l-section l-center" id="employers">
+      <section class="l-section l-center l-dark" id="employers">
         <p class="l-eyebrow">Where Hokies land</p>
         <h2>The companies that hire Tech, <u>ranked by Tech.</u></h2>
         <p class="l-sub" id="employers-sub">First jobs reported by Virginia Tech graduates, at employers on Alum.</p>
         <div class="card l-bars" id="bars"></div>
-        <a class="primary" href="app" data-count-cta>Browse internships<i data-lucide="arrow-right"></i></a>
+        <a class="primary l-light" href="app" data-count-cta>Browse internships<i data-lucide="arrow-right"></i></a>
       </section>
 
       <!-- FAQ ------------------------------------------------------------------>
@@ -198,7 +200,7 @@
         <div class="card l-final">
           <h2>New internships went up today.</h2>
           <p id="final-sub">See them before everyone else does.</p>
-          <a class="primary" href="app" data-count-cta>Browse internships<i data-lucide="arrow-right"></i></a>
+          <a class="primary l-light" href="app" data-count-cta>Browse internships<i data-lucide="arrow-right"></i></a>
         </div>
       </section>
     </main>

@@ -1,15 +1,32 @@
 /* The landing page: Runway's layout (hero with product shots, logo strip,
  * the problem, three steps, a ranked chart, FAQ, closing call) in Alum's own
- * look. Colours, type, buttons, cards, job cards and badges all come from
- * styles.css; this file only lays them out. */
+ * look: warm paper under a drifting Hokie-orange wash, white cards that sit
+ * on soft shadows, black keys, and two ink sections (the rankings and the
+ * closing call) lit from inside. Tokens, buttons, cards and job cards come
+ * from styles.css. */
 
 .landing { --maroon: #861f41; --orange: #e5751f; }
 .landing main { overflow-x: clip; }
+.landing { position: relative; }
+
+/* The wash: four blurred lights that drift on slow, offset loops. */
+.l-aura { position: absolute; inset: 0 0 auto; z-index: -1; height: 1100px; overflow: hidden; pointer-events: none; }
+.l-aura span { position: absolute; border-radius: 50%; filter: blur(70px); animation: aura 22s ease-in-out infinite alternate; }
+.l-aura span:nth-child(1) { width: 620px; height: 520px; left: -120px; top: -140px; background: rgba(229, 117, 31, 0.55); }
+.l-aura span:nth-child(2) { width: 560px; height: 480px; right: -80px; top: -60px; background: rgba(134, 31, 65, 0.32); animation-duration: 26s; animation-delay: -8s; }
+.l-aura span:nth-child(3) { width: 520px; height: 420px; left: 34%; top: 220px; background: rgba(255, 186, 110, 0.45); animation-duration: 30s; animation-delay: -14s; }
+.l-aura span:nth-child(4) { width: 460px; height: 380px; right: 8%; top: 560px; background: rgba(229, 117, 31, 0.28); animation-duration: 24s; animation-delay: -4s; }
+@keyframes aura {
+  0% { transform: translate(0, 0) scale(1); }
+  50% { transform: translate(60px, 40px) scale(1.12); }
+  100% { transform: translate(-40px, 70px) scale(0.94); }
+}
 html { scroll-behavior: smooth; scroll-padding-top: 88px; }
 
 /* Header: brand left, section links centred, one call to action right. */
-.l-nav { display: flex; gap: 28px; font-size: 15px; color: var(--muted); }
-.l-nav a:hover { color: var(--ink); }
+.l-nav { display: flex; gap: 4px; padding: 4px; border-radius: 999px; background: rgba(255, 255, 255, 0.6); box-shadow: 0 0 0 1px rgba(22, 22, 29, 0.05); font-size: 15px; color: #4a4a52; }
+.l-nav a { padding: 7px 16px; border-radius: 999px; transition: background 200ms ease, color 200ms ease; }
+.l-nav a:hover { background: #fff; color: var(--ink); box-shadow: 0 1px 2px rgba(22, 22, 29, 0.08); }
 .top-cta { justify-self: end; }
 .primary.small, .secondary.small { height: 40px; padding: 0 18px; font-size: 14px; border-radius: 999px; gap: 6px; }
 .primary .lucide, .secondary .lucide { width: 16px; height: 16px; }
@@ -18,15 +35,16 @@ html { scroll-behavior: smooth; scroll-padding-top: 88px; }
  * left to right once their section is on screen (.drawn, set by landing.js). */
 .landing u {
   text-decoration: none;
-  background: linear-gradient(var(--orange), var(--orange)) no-repeat 0 100% / 0% 3px;
+  background: linear-gradient(90deg, var(--orange), #c2410c 60%, var(--maroon)) no-repeat 0 100% / 0% 4px;
   padding-bottom: 4px;
   -webkit-box-decoration-break: clone;
   box-decoration-break: clone;
   transition: background-size 1100ms var(--ease) 250ms;
 }
-.landing u.drawn { background-size: 100% 3px; }
+.landing u.drawn { background-size: 100% 4px; }
 
-.l-eyebrow { margin: 0 0 12px; font-size: 13px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: var(--maroon); }
+/* Eyebrows are tinted pills, like the status pills on the board. */
+.l-eyebrow { display: inline-block; margin: 0 0 16px; padding: 5px 12px; border-radius: 999px; border: 1px solid #f6c9a0; background: #fff3e8; font-size: 12px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: var(--hokie); }
 .l-center { text-align: center; }
 .l-sub { max-width: 640px; margin: 16px auto 0; color: var(--muted); font-size: 17px; line-height: 1.55; }
 .l-section { max-width: var(--page); margin: 0 auto; padding: 96px 20px; }
@@ -43,29 +61,34 @@ html { scroll-behavior: smooth; scroll-padding-top: 88px; }
   margin: 0 auto;
   padding: 72px 20px 56px;
 }
-.l-badge { font-size: 13px; padding: 6px 12px; }
-.l-hero h1 { margin: 20px 0 0; font-size: clamp(40px, 5.6vw, 66px); line-height: 1.04; letter-spacing: -0.03em; font-weight: 600; }
-.l-lede { margin: 22px 0 0; max-width: 520px; font-size: 18px; line-height: 1.55; color: var(--muted); }
+.l-badge { display: inline-flex; align-items: center; gap: 7px; padding: 6px 14px 6px 6px; border-radius: 999px; background: rgba(255, 255, 255, 0.75); box-shadow: 0 0 0 1px rgba(22, 22, 29, 0.06), 0 4px 14px rgba(134, 31, 65, 0.08); font-size: 13px; font-weight: 600; }
+.l-badge .lucide { box-sizing: content-box; width: 14px; height: 14px; padding: 5px; border-radius: 999px; background: var(--press); color: #fff; }
+.l-hero h1 { margin: 22px 0 0; font-size: clamp(42px, 6vw, 74px); line-height: 1.02; letter-spacing: -0.035em; font-weight: 600; }
+.l-lede { margin: 22px 0 0; max-width: 520px; font-size: 18px; line-height: 1.55; color: #55555c; }
 .l-ctas { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 30px; }
-.l-ctas .primary, .l-ctas .secondary { height: 52px; padding: 0 24px; border-radius: 999px; }
+.l-ctas .primary, .l-ctas .secondary { height: 54px; padding: 0 26px; border-radius: 999px; }
+.l-ctas .secondary { border: 0; box-shadow: 0 0 0 1px rgba(22, 22, 29, 0.06), 0 4px 14px rgba(22, 22, 29, 0.06); }
 .l-proof { margin: 20px 0 0; font-size: 14px; color: var(--muted); }
 .l-proof b { color: var(--ink); }
 
 /* Product shots: a browser window holding real job cards, with two floating
  * panels over it. */
 .l-shots { position: relative; padding: 0 0 48px 28px; }
-.l-window { border: 1px solid var(--line); border-radius: 18px; background: #fff; box-shadow: var(--shadow-lift); overflow: hidden; }
-.l-window-bar { display: flex; align-items: center; gap: 6px; padding: 10px 14px; border-bottom: 1px solid var(--line); background: var(--soft); }
-.l-window-bar span { width: 10px; height: 10px; border-radius: 999px; background: var(--line); }
+.l-window { border: 1px solid rgba(255, 255, 255, 0.8); border-radius: 22px; background: var(--bg); box-shadow: 0 2px 6px rgba(22, 22, 29, 0.05), 0 30px 70px rgba(134, 31, 65, 0.16); overflow: hidden; }
+.l-window-bar { display: flex; align-items: center; gap: 6px; padding: 11px 14px; background: rgba(255, 255, 255, 0.7); }
+.l-window-bar span { width: 10px; height: 10px; border-radius: 999px; background: #e2e1dc; }
+.l-window-bar span:nth-child(1) { background: #ff6b5f; }
+.l-window-bar span:nth-child(2) { background: #ffbd2e; }
+.l-window-bar span:nth-child(3) { background: #28c840; }
 .l-window-bar b { margin: 0 auto; padding-right: 36px; font-size: 12px; font-weight: 500; color: var(--muted); }
 .l-window-body { padding: 16px; }
-.l-mini-search { height: 44px; padding: 0 14px; gap: 10px; font-size: 14px; color: var(--muted); box-shadow: none; }
+.l-mini-search { height: 44px; padding: 0 14px; gap: 10px; font-size: 14px; color: var(--muted); background: #fff; box-shadow: 0 1px 2px rgba(22, 22, 29, 0.05); }
 .l-mini-tally { margin: 14px 2px 10px; font-size: 13px; color: var(--muted); }
 .l-mini-tally b { color: var(--ink); }
 .l-mini-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px 12px; padding-top: 6px; }
 .l-hero > *, .l-window { min-width: 0; }
-.l-mini-grid .job { padding: 14px; gap: 8px; min-height: 0; cursor: default; box-shadow: none; }
-.l-mini-grid .job:hover { transform: none; border-color: var(--line); box-shadow: none; }
+.l-mini-grid .job { padding: 14px; gap: 8px; min-height: 0; cursor: default; }
+.l-mini-grid .job:hover { transform: none; box-shadow: var(--rest); }
 .l-mini-grid .job:hover .logo { transform: none; }
 .l-mini-grid .job-foot { padding-top: 10px; }
 .l-mini-grid .job h3 { font-size: 15px; }
@@ -75,7 +98,7 @@ html { scroll-behavior: smooth; scroll-padding-top: 88px; }
 .l-mini-grid .hokie b { font-size: 15px; }
 .l-mini-grid .save { pointer-events: none; }
 
-.l-float { position: absolute; padding: 18px; border: 1px solid var(--line); border-radius: 16px; background: #fff; box-shadow: var(--shadow-lift); }
+.l-float { position: absolute; padding: 18px; border-radius: 20px; background: rgba(255, 255, 255, 0.92); backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px); box-shadow: 0 0 0 1px rgba(22, 22, 29, 0.04), 0 20px 50px rgba(22, 22, 29, 0.16); }
 .l-float h4 { display: flex; align-items: center; gap: 8px; margin: 0 0 4px; font-size: 15px; font-weight: 600; }
 .l-float .asks li { padding: 7px 0; font-size: 13px; }
 .l-float-fit { left: -8px; bottom: -6px; width: min(340px, 72%); animation: rise 600ms var(--ease) 200ms both; }
@@ -88,8 +111,8 @@ html { scroll-behavior: smooth; scroll-padding-top: 88px; }
 
 /* Employer strip ---------------------------------------------------------------- */
 
-.l-strip { padding: 40px 0 16px; text-align: center; border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); }
-.l-strip > p { margin: 0 20px 28px; font-size: 13px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); }
+.l-strip { padding: 40px 0 16px; text-align: center; }
+.l-strip > p { margin: 0 20px 28px; font-size: 12px; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); }
 
 /* Logo slider: the track holds the list twice and slides left by half its
  * width, forever. Edges fade out. */
@@ -105,21 +128,23 @@ html { scroll-behavior: smooth; scroll-padding-top: 88px; }
 /* The problem ------------------------------------------------------------------- */
 
 .l-pains { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin: 48px 0 0; text-align: left; }
-.l-pain { padding: 22px; border: 1px solid var(--line); border-radius: 16px; background: var(--soft); }
-.l-pain .lucide { width: 24px; height: 24px; color: var(--maroon); }
+.l-pain { padding: 24px; border-radius: 20px; background: var(--card); box-shadow: var(--rest); }
+.l-pain .lucide { box-sizing: content-box; width: 22px; height: 22px; padding: 12px; border-radius: 14px; background: var(--press); color: #fff; box-shadow: var(--press-shadow); }
 .l-pain p { margin: 14px 0 0; color: var(--muted); line-height: 1.5; }
 .l-pain b { color: var(--ink); font-weight: 600; }
 .l-punch { margin: 56px 0 0; font-size: clamp(24px, 3vw, 32px); font-weight: 600; letter-spacing: -0.01em; }
 
 /* How it works ------------------------------------------------------------------ */
 
-.l-how { border-top: 1px solid var(--line); }
+.l-how { position: relative; }
+/* A second, quieter light behind the steps. */
+.l-how::before { content: ""; position: absolute; z-index: -1; left: -10%; top: 30%; width: 60%; height: 40%; border-radius: 50%; background: rgba(229, 117, 31, 0.14); filter: blur(90px); pointer-events: none; }
 .l-step { display: grid; grid-template-columns: 1fr 1fr; gap: 64px; align-items: center; margin-top: 88px; }
 .l-step.flip .l-step-text { order: 2; }
 .l-step h3 { font-size: clamp(26px, 3vw, 34px); line-height: 1.15; letter-spacing: -0.02em; }
 .l-step-text > p:not(.l-eyebrow) { margin: 16px 0 24px; color: var(--muted); font-size: 17px; line-height: 1.6; }
 .l-step-text b { color: var(--ink); font-weight: 600; }
-.l-step-shot .card { margin: 0; box-shadow: var(--shadow-lift); }
+.l-step-shot .card { margin: 0; border-radius: 24px; box-shadow: 0 2px 6px rgba(22, 22, 29, 0.04), 0 24px 60px rgba(22, 22, 29, 0.1); }
 
 .l-sync-head { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 8px; }
 .l-sync-head span { font-size: 13px; color: var(--good); font-weight: 500; }
@@ -136,21 +161,38 @@ html { scroll-behavior: smooth; scroll-padding-top: 88px; }
 .l-filtered b { color: var(--ink); font-weight: 600; }
 
 .l-employer .pills { margin: 18px 0 8px; }
-.l-radar { display: flex; align-items: center; gap: 12px; margin-top: 16px; padding: 12px 14px; border: 1px solid var(--line); border-radius: 14px; }
+.l-radar { display: flex; align-items: center; gap: 12px; margin-top: 16px; padding: 12px 14px; border-radius: 16px; background: var(--soft); }
 .l-radar b { display: block; font-size: 14px; font-weight: 600; }
 .l-radar span:not(.logo) { font-size: 13px; color: var(--muted); }
 
-/* Where Hokies land: ranked bars ------------------------------------------------- */
+/* Where Hokies land: ranked bars, on an ink band lit from below ------------------ */
 
-.l-bars { max-width: 820px; margin: 40px auto 32px; text-align: left; }
+.l-dark {
+  position: relative;
+  max-width: none;
+  padding-inline: max(20px, calc((100vw - var(--page)) / 2 + 20px));
+  background: radial-gradient(60% 70% at 50% 110%, rgba(229, 117, 31, 0.32), transparent 70%), radial-gradient(40% 50% at 90% 0%, rgba(134, 31, 65, 0.4), transparent 70%), #0f0f14;
+  color: #fff;
+}
+.l-dark .l-eyebrow { border-color: rgba(255, 179, 92, 0.35); background: rgba(229, 117, 31, 0.14); color: #ffb35c; }
+.l-dark .l-sub, .l-dark .fine-inline { color: rgba(255, 255, 255, 0.6); }
+.l-dark .card { background: rgba(255, 255, 255, 0.04); box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.08); }
+.l-dark .l-bar-track { background: rgba(255, 255, 255, 0.08); }
+.l-dark .l-bar-n { color: #fff; }
+.l-dark .logo { border-color: transparent; }
+/* On ink, the main button turns white. */
+.primary.l-light { background: #fff; color: var(--ink); box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.2), 0 10px 30px rgba(229, 117, 31, 0.35); }
+.primary.l-light:hover { filter: none; background: #fff3e8; }
+
+.l-bars { max-width: 820px; margin: 40px auto 32px; padding: 20px 28px; text-align: left; }
 .l-bar { display: grid; grid-template-columns: 220px 1fr 48px; align-items: center; gap: 16px; padding: 10px 0; }
 .l-bar-name { display: flex; align-items: center; gap: 10px; min-width: 0; }
 .l-bar-name b { font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .l-bar-name .logo { width: 30px; height: 30px; font-size: 11px; }
-.l-bar-track { height: 12px; border-radius: 999px; background: var(--soft); overflow: hidden; }
-.l-bar-fill { display: block; height: 100%; width: 0; border-radius: 999px; background: var(--maroon); transition: width 900ms var(--ease) var(--d); }
+.l-bar-track { height: 12px; border-radius: 999px; background: var(--soft); }
+.l-bar-fill { display: block; height: 100%; width: 0; border-radius: 999px; background: linear-gradient(90deg, var(--maroon), #c2410c); box-shadow: 0 0 14px rgba(229, 117, 31, 0.35); transition: width 900ms var(--ease) var(--d); }
 .l-bars.in .l-bar-fill { width: var(--w); }
-.l-bar:first-child .l-bar-fill { background: var(--orange); }
+.l-bar:first-child .l-bar-fill { background: linear-gradient(90deg, #c2410c, #ffb35c); box-shadow: 0 0 22px rgba(255, 179, 92, 0.6); }
 .l-bar-n { text-align: right; font-weight: 600; font-variant-numeric: tabular-nums; }
 .l-bars .fine-inline { margin-top: 14px; }
 
@@ -158,19 +200,20 @@ html { scroll-behavior: smooth; scroll-padding-top: 88px; }
 
 .l-faq { max-width: 760px; }
 .l-faq .l-center { margin-bottom: 32px; }
-.l-faq details { border-bottom: 1px solid var(--line); }
-.l-faq summary { display: flex; justify-content: space-between; align-items: center; gap: 16px; padding: 20px 0; font-size: 18px; font-weight: 500; cursor: pointer; list-style: none; }
+.l-faq details { margin-bottom: 10px; padding: 0 22px; border-radius: 18px; background: var(--card); box-shadow: var(--rest); }
+.l-faq summary { display: flex; justify-content: space-between; align-items: center; gap: 16px; padding: 18px 0; font-size: 18px; font-weight: 500; cursor: pointer; list-style: none; }
 .l-faq summary::-webkit-details-marker { display: none; }
-.l-faq summary::after { content: "+"; font-size: 24px; font-weight: 300; color: var(--muted); transition: transform 200ms var(--ease); }
-.l-faq details[open] summary::after { transform: rotate(45deg); }
-.l-faq details p { margin: -4px 0 22px; color: var(--muted); line-height: 1.6; }
+.l-faq summary::after { content: "+"; display: grid; place-items: center; flex: none; width: 32px; height: 32px; border-radius: 999px; background: var(--soft); font-size: 20px; font-weight: 400; color: var(--ink); transition: transform 250ms var(--ease), background 200ms ease, color 200ms ease; }
+.l-faq details[open] summary::after { transform: rotate(45deg); background: var(--press); color: #fff; }
+.l-faq details p { margin: -4px 0 20px; color: var(--muted); line-height: 1.6; }
 
 /* Closing + footer -------------------------------------------------------------------- */
 
-.l-final { margin: 0; padding: 64px 24px; text-align: center; background: var(--soft); }
-.l-final p { margin: 12px 0 28px; color: var(--muted); font-size: 17px; }
-.l-final .primary { height: 52px; border-radius: 999px; }
-.l-foot { display: grid; grid-template-columns: auto 1fr auto; gap: 24px; align-items: center; max-width: var(--page); margin: 0 auto; padding: 32px 20px 48px; border-top: 1px solid var(--line); font-size: 13px; color: var(--muted); }
+.l-final { position: relative; overflow: hidden; margin: 0; padding: 88px 24px; border-radius: 32px; text-align: center; color: #fff; background: radial-gradient(50% 80% at 20% 0%, rgba(229, 117, 31, 0.55), transparent 70%), radial-gradient(45% 70% at 85% 100%, rgba(134, 31, 65, 0.6), transparent 70%), #0f0f14; box-shadow: 0 30px 80px rgba(134, 31, 65, 0.25); }
+.l-final h2 { font-size: clamp(32px, 4.6vw, 54px); }
+.l-final p { margin: 14px 0 32px; color: rgba(255, 255, 255, 0.7); font-size: 18px; }
+.l-final .primary { height: 56px; padding: 0 28px; border-radius: 999px; }
+.l-foot { display: grid; grid-template-columns: auto 1fr auto; gap: 24px; align-items: center; max-width: var(--page); margin: 0 auto; padding: 32px 20px 48px; font-size: 13px; color: var(--muted); }
 .l-foot .brand img { width: 26px; height: 27px; }
 .l-foot .brand span { font-size: 20px; }
 .l-foot p { margin: 0; }
@@ -250,6 +293,11 @@ html { scroll-behavior: smooth; scroll-padding-top: 88px; }
 @media (max-width: 720px) {
   .top { grid-template-columns: 1fr auto; }
   .l-nav { display: none; }
+  .l-aura span:nth-child(1) { width: 360px; height: 320px; }
+  .l-aura span:nth-child(2) { width: 320px; height: 300px; }
+  .l-aura span:nth-child(3), .l-aura span:nth-child(4) { width: 280px; height: 260px; }
+  .l-final { padding: 64px 20px; border-radius: 24px; }
+  .l-bars { padding: 12px 16px; }
   .landing .brand img { width: 30px; height: 31px; }
   .landing .brand span { font-size: 24px; }
   .l-section { padding: 64px 16px; }
@@ -273,6 +321,7 @@ html { scroll-behavior: smooth; scroll-padding-top: 88px; }
   .reveal, .l-step-shot .asks li { opacity: 1; transform: none; transition: none; }
   .l-window, .l-float-fit, .l-float-hokies { transform: none; }
   .landing u { transition: none; background-size: 100% 3px; }
+  .l-aura span { animation: none; }
   .l-marquee-track { animation: none; flex-wrap: wrap; justify-content: center; width: auto; row-gap: 16px; }
   .l-dup { display: none; }
   .l-bar-fill { transition: none; }
