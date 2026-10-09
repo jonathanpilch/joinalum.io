@@ -93,75 +93,57 @@
       </section>
     </main>
 
-    <!-- Profile: who you are and how complete that is, your numbers, then
-         the tracker and radars beside what Alum knows about you. -->
+    <!-- Profile: one column. Who you are, your applications, your radars,
+         then what Alum knows about you. -->
     <main id="profile" class="view" hidden>
-      <section class="me">
-        <div class="me-id" id="me-id"></div>
-        <div class="me-ring" id="me-ring"></div>
+      <header class="me" id="me"></header>
+
+      <!-- Filled by renderAccount(); hidden when the site has no Supabase config. -->
+      <section class="card account" id="account" hidden></section>
+
+      <section class="card" id="tracker">
+        <div class="card-head">
+          <h2>Applications</h2>
+        </div>
+        <div class="seg" id="track-tabs" role="group" aria-label="Filter by status"></div>
+        <div id="saved-list"></div>
       </section>
 
-      <div class="me-stats" id="me-stats" role="group" aria-label="Your applications"></div>
-
-      <div class="me-cols">
-        <div class="me-main">
-          <section class="card" id="tracker">
-            <div class="card-head">
-              <h2>Applications</h2>
-              <span class="count" id="saved-count"></span>
-            </div>
-            <div id="saved-list"></div>
-          </section>
-
-          <section class="card" id="radars">
-            <div class="card-head">
-              <h2>Radars</h2>
-              <span class="count" id="radar-count"></span>
-            </div>
-            <p class="sub" id="radar-sub">Save any search with <b>Alert me</b> and Alum tells you when something new lands in it.</p>
-            <div id="radar-list"></div>
-          </section>
+      <section class="card" id="radars">
+        <div class="card-head">
+          <h2>Radars</h2>
+          <span class="count" id="radar-count"></span>
         </div>
+        <p class="sub" id="radar-sub">Save any search with <b>Alert me</b> and Alum tells you when something new lands in it.</p>
+        <div id="radar-list"></div>
+      </section>
 
-        <aside class="me-side">
-          <!-- Filled by renderAccount(); hidden when the site has no Supabase config. -->
-          <section class="card account" id="account" hidden></section>
-
-          <section class="card" id="about">
-            <div class="card-head">
-              <h2>About you</h2>
-              <span class="saved-note" id="saved-note"></span>
-            </div>
-            <p class="sub" id="about-sub">Picks your internships, checks who can apply against you, and shows how many Hokies from your major got hired.</p>
-            <button class="secondary small me-resume" id="resume-btn" hidden><i data-lucide="file-up"></i>Fill from resume</button>
-            <input type="file" id="resume-file" accept="application/pdf" hidden />
-            <div class="review" id="resume-review" hidden></div>
-            <div class="fields">
-              <label class="field wide"><span>Name</span><input id="p-name" placeholder="First name" autocomplete="given-name" /></label>
-              <label class="field wide"><span>Major</span><select id="p-major"></select></label>
-              <label class="field"><span>Graduating (May)</span><select id="p-year"></select></label>
-              <label class="field"><span>Looking for</span><select id="p-term"></select></label>
-              <label class="field"><span>Degree</span><select id="p-degree"></select></label>
-              <label class="field"><span>GPA</span><input id="p-gpa" type="number" inputmode="decimal" min="0" max="4" step="0.01" placeholder="Optional" /></label>
-              <label class="field wide"><span>Work status</span><select id="p-work"></select></label>
-            </div>
-            <p class="sub small"><i data-lucide="lock"></i>Work status decides citizenship, clearance and sponsorship rules. It never leaves this device.</p>
-
-            <details class="fold" id="fold-interests" open>
-              <summary><span>Interested in</span><em id="n-interests"></em></summary>
-              <div class="chips" id="p-interests"></div>
-            </details>
-            <details class="fold" id="fold-places" open>
-              <summary><span>Where</span><em id="n-places"></em></summary>
-              <div class="chips" id="p-places"></div>
-            </details>
-            <details class="fold" id="fold-skills">
-              <summary><span>Tools you know</span><em id="n-skills"></em></summary>
-              <div class="chips" id="p-skills"></div>
-            </details>
-          </section>
-        </aside>
-      </div>
+      <section class="card" id="about">
+        <div class="card-head">
+          <h2>About you</h2>
+          <span class="saved-note" id="saved-note"></span>
+          <button class="ghost small" id="resume-btn" hidden><i data-lucide="file-up"></i>Fill from resume</button>
+          <input type="file" id="resume-file" accept="application/pdf" hidden />
+        </div>
+        <p class="sub" id="about-sub">Picks your internships, checks who can apply against you, and shows how many Hokies from your major got hired.</p>
+        <div class="review" id="resume-review" hidden></div>
+        <div class="fields">
+          <label class="field"><span>Name</span><input id="p-name" placeholder="First name" autocomplete="given-name" /></label>
+          <label class="field"><span>Major</span><select id="p-major"></select></label>
+          <label class="field"><span>Graduating (May)</span><select id="p-year"></select></label>
+          <label class="field"><span>Looking for</span><select id="p-term"></select></label>
+          <label class="field"><span>Degree</span><select id="p-degree"></select></label>
+          <label class="field"><span>GPA</span><input id="p-gpa" type="number" inputmode="decimal" min="0" max="4" step="0.01" placeholder="Optional" /></label>
+          <label class="field wide"><span>Work status</span><select id="p-work"></select></label>
+        </div>
+        <p class="sub small">Work status decides citizenship, clearance and sponsorship rules. It never leaves this device.</p>
+        <h3>Interested in</h3>
+        <div class="chips" id="p-interests"></div>
+        <h3>Where</h3>
+        <div class="chips" id="p-places"></div>
+        <h3>Tools you know</h3>
+        <div class="chips" id="p-skills"></div>
+      </section>
     </main>
 
     <!-- Internship detail -->

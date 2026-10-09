@@ -535,102 +535,24 @@ svg.lucide { width: 18px; height: 18px; stroke-width: 1.75; flex: none; }
 
 /* Profile ------------------------------------------------------------ */
 
-#profile { max-width: 1120px; }
+#profile { max-width: 760px; }
 
-/* The top card: avatar and who you are, then a ring for how complete the
- * profile is, with the next thing to add. */
-.me {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 24px;
-  padding: 28px;
-  border-radius: 28px;
-  background: rgba(255, 255, 255, 0.78);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
-  box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.8), 0 20px 50px rgba(134, 31, 65, 0.1);
-}
-.me-id { display: flex; align-items: center; gap: 20px; min-width: 0; }
-.me-avatar {
-  display: grid;
-  place-items: center;
-  flex: none;
-  width: 76px;
-  height: 76px;
-  border-radius: 999px;
-  background: radial-gradient(circle at 30% 25%, #ffc27a, var(--orange) 55%, var(--maroon));
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.4), 0 10px 24px rgba(229, 117, 31, 0.35);
-  color: #fff;
-  font-size: 32px;
-  font-weight: 700;
-}
-.me-avatar .lucide { width: 32px; height: 32px; }
-.me-who { min-width: 0; }
-.me-who h1 { font-size: clamp(26px, 3.4vw, 36px); line-height: 1.1; letter-spacing: -0.025em; }
-.me-who p { margin: 6px 0 10px; color: var(--muted); }
-.me-sync { display: inline-flex; align-items: center; gap: 6px; padding: 4px 10px 4px 8px; border-radius: 999px; border: 1px solid #a9e8c6; background: #ebfbf2; color: #0a7a43; font-size: 12px; font-weight: 600; }
-.me-sync.off { border-color: #e2e1dc; background: var(--soft); color: #4a4a52; }
-.me-sync .lucide { width: 14px; height: 14px; }
+/* Profile header: avatar, name, one line about you. */
+.me { display: flex; align-items: center; gap: 18px; margin: 12px 0 28px; }
+.me-avatar { display: grid; place-items: center; flex: none; width: 64px; height: 64px; border-radius: 999px; background: var(--ink); color: #fff; font-size: 26px; font-weight: 600; }
+.me-avatar .lucide { width: 28px; height: 28px; }
+.me h1 { font-size: 30px; line-height: 1.15; letter-spacing: -0.02em; }
+.me p { margin: 4px 0 0; color: var(--muted); font-size: 14px; }
+.me .link { font-size: inherit; color: var(--ink); }
 
-.me-ring { display: flex; align-items: center; gap: 16px; flex: none; }
-.ring { position: relative; display: grid; place-items: center; width: 84px; height: 84px; }
-.ring svg { position: absolute; inset: 0; width: 100%; height: 100%; transform: rotate(-90deg); }
-.ring circle { fill: none; stroke-width: 7; }
-.ring-track { stroke: var(--soft); }
-.ring-fill { stroke: url(#pro-ink); stroke-linecap: round; filter: drop-shadow(0 0 5px rgba(229, 117, 31, 0.45)); transition: stroke-dashoffset 700ms var(--ease); }
-.ring b { font-size: 24px; font-weight: 700; letter-spacing: -0.03em; }
-.ring b small { font-size: 13px; color: var(--muted); }
-.me-next-wrap { display: grid; justify-items: start; gap: 6px; max-width: 220px; }
-.me-next-wrap > small { font-size: 11px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); }
-.me-next-wrap p { margin: 0; font-size: 14px; }
-.me-next { display: inline-flex; align-items: center; gap: 6px; height: 36px; padding: 0 14px; border-radius: 999px; background: var(--press); color: #fff; box-shadow: var(--press-shadow); font-size: 13px; font-weight: 600; text-align: left; }
-.me-next .lucide { width: 14px; height: 14px; transition: transform 200ms var(--ease); }
-.me-next:hover .lucide { transform: translateX(3px); }
+/* Tracker tabs: quiet text tabs with a count; the active one is the black key. */
+.seg { display: flex; flex-wrap: wrap; gap: 4px; margin: 14px 0 6px; }
+.seg button { display: inline-flex; align-items: center; gap: 6px; height: 32px; padding: 0 12px; border-radius: 999px; font-size: 13px; font-weight: 500; color: var(--muted); }
+.seg button span { font-size: 12px; color: var(--faint); }
+.seg button:hover { background: var(--hover); color: var(--ink); }
+.seg button[aria-pressed="true"] { background: var(--press); color: #fff; box-shadow: var(--press-shadow); }
+.seg button[aria-pressed="true"] span { color: rgba(255, 255, 255, 0.6); }
 
-/* Your numbers. The active one is the black key and filters the tracker. */
-.me-stats { display: grid; grid-template-columns: repeat(5, 1fr); gap: 12px; margin: 16px 0 24px; }
-.me-stat {
-  display: grid;
-  justify-items: start;
-  gap: 2px;
-  padding: 16px 18px;
-  border-radius: 20px;
-  background: var(--card);
-  box-shadow: var(--rest);
-  text-align: left;
-  transition: transform 200ms var(--ease), box-shadow 200ms ease, background 200ms ease;
-}
-.me-stat:hover { transform: translateY(-2px); box-shadow: 0 4px 8px rgba(0, 0, 0, 0.04), 0 14px 30px rgba(0, 0, 0, 0.08); }
-.me-stat b { font-size: 34px; font-weight: 700; line-height: 1.05; letter-spacing: -0.03em; }
-.me-stat small { font-size: 11px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); }
-.me-stat[data-v="Applied"] b { color: #3b3fa8; }
-.me-stat[data-v="Interviewing"] b { color: #946200; }
-.me-stat[data-v="Offer"] b { color: #0a7a43; }
-.me-stat[data-v="radar"] b { color: var(--hokie); }
-.me-stat[aria-pressed="true"] { background: var(--press); box-shadow: var(--press-shadow); transform: none; }
-.me-stat[aria-pressed="true"] b, .me-stat[aria-pressed="true"] small { color: #fff; }
-
-/* Tracker and radars on the left; you, and your account, on the right. */
-.me-cols { display: grid; grid-template-columns: minmax(0, 1fr) 380px; gap: 20px; align-items: start; }
-.me-side .card { padding: 24px; }
-.me-side .fields { grid-template-columns: 1fr 1fr; }
-.me-side .signin { flex-direction: column; }
-.me-side .signin .primary { height: 48px; }
-.me-resume { width: 100%; margin: -6px 0 16px; }
-.sub.small .lucide { width: 13px; height: 13px; margin: 0 4px -2px 0; }
-
-/* Long chip lists fold away, with a count of what's picked. */
-.fold { border-top: 1px solid var(--line); }
-.fold:first-of-type { margin-top: 18px; }
-.fold summary { display: flex; align-items: center; gap: 10px; padding: 14px 0; font-size: 15px; font-weight: 600; cursor: pointer; list-style: none; }
-.fold summary::-webkit-details-marker { display: none; }
-.fold summary em { font-style: normal; font-size: 12px; font-weight: 600; color: var(--hokie); }
-.fold summary::after { content: ""; width: 8px; height: 8px; margin: -4px 4px 0 auto; border-right: 2px solid var(--muted); border-bottom: 2px solid var(--muted); transform: rotate(45deg); transition: transform 200ms var(--ease); }
-.fold[open] summary::after { margin-top: 4px; transform: rotate(-135deg); }
-.fold .chips { gap: 6px; padding-bottom: 16px; }
-.fold .chip { height: 34px; padding: 0 12px; font-size: 13px; }
-.fold .chip .lucide { width: 14px; height: 14px; }
 .card { padding: 28px; margin-bottom: 20px; border-radius: 24px; background: var(--card); box-shadow: var(--rest); }
 .card-head { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; }
 .card-head h2 { font-size: 22px; }
@@ -713,22 +635,10 @@ svg.lucide { width: 18px; height: 18px; stroke-width: 1.75; flex: none; }
   .sheet-body { padding: 20px; }
   .fields { grid-template-columns: 1fr; }
   .card { padding: 20px; }
-  .me { flex-direction: column; align-items: stretch; padding: 20px; border-radius: 24px; }
-  .me-id { gap: 14px; }
-  .me-avatar { width: 60px; height: 60px; font-size: 26px; }
-  .me-ring { padding-top: 16px; border-top: 1px solid var(--line); }
-  .me-stats { grid-template-columns: repeat(5, minmax(96px, 1fr)); margin: 12px -16px 20px; padding: 4px 16px 8px; overflow-x: auto; scrollbar-width: none; }
-  .me-stats::-webkit-scrollbar { display: none; }
-  .me-stat { padding: 14px; }
-  .me-stat b { font-size: 28px; }
-  .me-side .fields { grid-template-columns: 1fr; }
   /* Tracker rows: the status pill drops under the title so the title has room. */
   .saved { display: grid; grid-template-columns: auto minmax(0, 1fr) auto; row-gap: 8px; }
   .saved .status { grid-column: 2; grid-row: 2; justify-self: start; }
   .saved .remove { grid-column: 3; grid-row: 1; }
-}
-@media (max-width: 980px) {
-  .me-cols { grid-template-columns: minmax(0, 1fr); }
 }
 @media (max-width: 420px) {
   .switch button .lucide { display: none; }
