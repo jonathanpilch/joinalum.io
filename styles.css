@@ -272,6 +272,51 @@ svg.lucide { width: 18px; height: 18px; stroke-width: 1.75; flex: none; }
 .job.out:hover { opacity: 1; }
 .bar .link { font-size: inherit; color: var(--ink); }
 
+/* Small pill buttons: "Alert me", "Fill from resume". */
+.ghost.small, .secondary.small { height: 34px; padding: 0 14px; font-size: 13px; border-radius: 999px; gap: 6px; }
+.ghost.small .lucide { width: 15px; height: 15px; }
+.bar #save-search { margin-left: auto; }
+
+/* Account, radars, tracker details, resume review. */
+.card-head .ghost.small { margin-left: auto; }
+.signin { display: flex; gap: 12px; align-items: stretch; }
+.signin .field { flex: 1; }
+.signin .primary { height: auto; }
+.sent { display: flex; align-items: center; gap: 8px; margin: 4px 0 0; font-weight: 600; }
+.sent.bad { color: var(--bad); }
+.spin { animation: spin 900ms linear infinite; }
+@keyframes spin { to { transform: rotate(360deg); } }
+.review { margin: 0 0 20px; padding: 16px 18px; border: 1px solid var(--line); border-radius: var(--radius); background: var(--soft); }
+.review h3 { margin: 0 0 6px; font-size: 15px; }
+.pick { display: flex; gap: 10px; align-items: flex-start; cursor: pointer; }
+.pick input { margin-top: 3px; accent-color: var(--ink); }
+.fine-inline { margin: 8px 0 0; font-size: 12px; color: var(--muted); }
+.saved-wrap { border-bottom: 1px solid var(--line); }
+.saved-wrap:last-child { border-bottom: 0; }
+.saved-wrap .saved { border-bottom: 0; }
+.saved-text em { font-style: normal; color: var(--warn); font-weight: 600; }
+.saved-text em.new { color: var(--good); }
+.saved-more { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; padding: 0 0 16px 56px; }
+.saved-more .fine-inline, .saved-more .row-actions { grid-column: 1 / -1; margin: 0; }
+.field textarea { width: 100%; border: 0; outline: 0; background: none; padding: 0; font: inherit; font-size: 15px; resize: vertical; }
+.remove[aria-expanded="true"] .lucide { transform: rotate(180deg); }
+.logo.radar { display: grid; place-items: center; background: var(--soft); color: var(--ink); }
+.logo.radar .lucide { width: 20px; height: 20px; }
+.sheet.small { width: min(480px, 100%); }
+.sheet .sub { margin-top: 0; }
+
+/* Interview notes in a job's detail. */
+.stat-row { display: flex; flex-wrap: wrap; gap: 28px; margin: 6px 0 12px; }
+.stat-row small { color: var(--muted); font-size: 13px; }
+.stat span { font-size: 15px; font-weight: 600; color: var(--muted); margin-left: 2px; }
+.notes { margin: 0 0 8px; padding: 0; list-style: none; }
+.notes li { padding: 12px 0; border-bottom: 1px solid var(--line); font-size: 14px; }
+.notes li:last-child { border-bottom: 0; }
+.notes p { margin: 4px 0 0; color: var(--ink); }
+.notes em { font-style: normal; color: var(--muted); font-weight: 600; }
+.note-head { display: flex; flex-wrap: wrap; gap: 4px 10px; align-items: baseline; }
+.note-head span { font-size: 13px; color: var(--muted); }
+
 /* Who can apply, marked against the profile. */
 .asks { margin: 0; padding: 0; list-style: none; }
 .asks li { display: flex; align-items: flex-start; gap: 10px; padding: 9px 0; border-bottom: 1px solid var(--line); font-size: 14px; color: var(--ink); }
@@ -459,6 +504,10 @@ svg.lucide { width: 18px; height: 18px; stroke-width: 1.75; flex: none; }
 @media (max-width: 720px) {
   .lag { display: none; }
   .bar { flex-wrap: wrap; }
+  .bar #save-search { margin-left: 0; }
+  .signin { flex-direction: column; }
+  .signin .primary { height: 48px; }
+  .saved-more { grid-template-columns: 1fr; padding-left: 0; }
   .top { grid-template-columns: auto 1fr; padding: 12px 16px; }
   .top-right { display: none; }
   .switch { justify-self: end; }

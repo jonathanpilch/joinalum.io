@@ -47,6 +47,7 @@
 
       <div class="bar">
         <p id="tally"></p>
+        <button class="ghost small" id="save-search"><i data-lucide="bell-plus"></i>Alert me</button>
         <div class="sort" role="group" aria-label="Sort">
           <button data-sort="new" aria-pressed="true">Newest</button>
           <button data-sort="hokies" aria-pressed="false">Most Hokies</button>
@@ -65,12 +66,18 @@
 
     <!-- Profile -->
     <main id="profile" class="view" hidden>
+      <!-- Filled by renderAccount(); hidden when the site has no Supabase config. -->
+      <section class="card account" id="account" hidden></section>
+
       <section class="card">
         <div class="card-head">
           <h2>About you</h2>
           <span class="saved-note" id="saved-note"></span>
+          <button class="ghost small" id="resume-btn" hidden><i data-lucide="file-up"></i>Fill from resume</button>
+          <input type="file" id="resume-file" accept="application/pdf" hidden />
         </div>
-        <p class="sub">Picks your internships, checks who can apply against you, and shows how many Hokies from your major got hired. Stays on this device for now.</p>
+        <p class="sub" id="about-sub">Picks your internships, checks who can apply against you, and shows how many Hokies from your major got hired.</p>
+        <div class="review" id="resume-review" hidden></div>
         <div class="fields">
           <label class="field"><span>Name</span><input id="p-name" placeholder="First name" autocomplete="given-name" /></label>
           <label class="field"><span>Major</span><select id="p-major"></select></label>
@@ -87,6 +94,15 @@
         <div class="chips" id="p-interests"></div>
         <h3>Where</h3>
         <div class="chips" id="p-places"></div>
+      </section>
+
+      <section class="card" id="radars">
+        <div class="card-head">
+          <h2>Radars</h2>
+          <span class="count" id="radar-count"></span>
+        </div>
+        <p class="sub" id="radar-sub">Save any search with <b>Alert me</b> and Alum tells you when something new lands in it.</p>
+        <div id="radar-list"></div>
       </section>
 
       <section class="card">
@@ -122,10 +138,43 @@
       </div>
     </div>
 
+    <!-- New radar -->
+    <div class="modal" id="radar-new" hidden>
+      <div class="sheet small" role="dialog" aria-modal="true" aria-labelledby="rn-title">
+        <div class="sheet-head">
+          <button class="round" data-close aria-label="Close"><i data-lucide="x"></i></button>
+          <h2 id="rn-title">New radar</h2>
+          <span></span>
+        </div>
+        <div class="sheet-body" id="radar-new-body"></div>
+        <div class="sheet-foot">
+          <span></span>
+          <button class="primary" id="radar-create">Create radar</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Interview notes -->
+    <div class="modal" id="report" hidden>
+      <div class="sheet" role="dialog" aria-modal="true" aria-labelledby="r-title">
+        <div class="sheet-head">
+          <button class="round" data-close aria-label="Close"><i data-lucide="x"></i></button>
+          <h2 id="r-title">How did it go?</h2>
+          <span></span>
+        </div>
+        <div class="sheet-body" id="report-body"></div>
+        <div class="sheet-foot">
+          <span class="fine-inline">Shown to signed-in Hokies, never with your name.</span>
+          <button class="primary" id="report-send">Share with Hokies</button>
+        </div>
+      </div>
+    </div>
+
     <div class="toast" id="toast" role="status" hidden></div>
 
     <script src="https://unpkg.com/lucide@1.53.0/dist/umd/lucide.min.js"></script>
     <script src="schools.js"></script>
-    <script src="app.js"></script>
+    <script src="config.js"></script>
+    <script type="module" src="app.js"></script>
   </body>
 </html>

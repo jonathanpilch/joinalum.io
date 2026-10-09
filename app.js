@@ -8,16 +8,19 @@
  *
  * Fit is explained, never a bare percentage: each thing a posting asks for
  * (graduation window, degree, citizenship, clearance, sponsorship, GPA,
- * tools) becomes a row that the profile marks ok, a gap, or a dealbreaker. */
+ * tools) becomes a row that the profile marks ok, a gap, or a dealbreaker.
+ * That logic lives in lib/core.js so the radar emails judge jobs the same
+ * way; lib/account.js is sign-in and sync (Supabase), absent when the site
+ * isn't configured, in which case everything stays on this device. */
+import * as core from "./lib/core.js";
+import { LEVELS, PIPELINE, PLACES, DEGREES, WORK, PROFILE, esc, gradSpan } from "./lib/core.js";
+import { account } from "./lib/account.js";
+
 (async function () {
   const $ = (s, el = document) => el.querySelector(s);
   const $$ = (s, el = document) => [...el.querySelectorAll(s)];
   const school = SCHOOLS[new URLSearchParams(location.search).get("school")] || SCHOOLS.vt;
   const PAGE = 24;
-  const LEVELS = ["Internship", "Co-op"]; // v1: internships only (co-ops count)
-  const PIPELINE = 5; // recent hires that make a "proven" Hokie employer
-
-  const esc = (s) => String(s ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]);
   const fmt = (n) => n.toLocaleString("en-US");
   const icons = () => window.lucide?.createIcons();
   const store = {
@@ -33,13 +36,6 @@
     "Audit & Assurance": "clipboard-check", Tax: "receipt", Accounting: "calculator", Finance: "landmark",
     Consulting: "briefcase", "Supply Chain & Ops": "truck",
   };
-  const PLACES = {
-    "DC area": (j) => j.states.some((s) => ["DC", "MD", "VA"].includes(s)),
-    Richmond: (j) => /richmond|glen allen|henrico|midlothian/i.test(j.location),
-    "New York": (j) => j.states.includes("NY"),
-    Remote: (j) => /remote/i.test(j.arrangement),
-  };
-
   // Data ------------------------------------------------------------------
 
   let data;
@@ -65,7 +61,7 @@
     const xs = data.jobs.filter((j) => now - Date.parse(j.postedAt) < 14 * 864e5).map(lagMin).filter((m) => m != null && m >= 0).sort((a, b) => a - b);
     return xs.length >= 10 ? xs[Math.floor(xs.length / 2)] : null;
   })();
-  const hires = (j) => (P && P.employers[P.boardIndex?.[j.company]]) || null;
+  const hires = (j) => core.hiresOf(P, j);
   const since = P ? P.cohorts[0].slice(5) : "";
   const recentSpan = P ? `${P.recentCohorts[0].slice(5)}–${P.recentCohorts.at(-1).slice(5)}` : "";
 
@@ -74,11 +70,20 @@
 
   // Profile + saved ---------------------------------------------------------
 
-  const PROFILE = { name: "", major: "", year: "", term: "Summer 2027", degree: "Bachelor's", work: "", gpa: "", skills: [], interests: [], places: [] };
   let profile = { ...PROFILE, ...store.get("alum.profile", {}) };
-  let saved = store.get("alum.saved", {}); // id -> { status, at, job: {snapshot} }
-  const saveProfile = () => { store.set("alum.profile", profile); flash($("#saved-note"), "Saved"); };
+  // id -> { status, at, updatedAt, job: {snapshot}, deadline, remindOn, notes, history }
+  let saved = store.get("alum.saved", {});
+  // [{ id, name, search: {q, cat, filters}, cadence, last_seen_at, remote }]
+  let radars = store.get("alum.radars", []);
+  const saveProfile = () => { store.set("alum.profile", profile); account.saveProfile(profile); flash($("#saved-note"), "Saved"); };
   const saveSaved = () => { store.set("alum.saved", saved); renderSavedCount(); };
+  const saveRadars = () => store.set("alum.radars", radars);
+  // One saved role changed: keep it here, and in the account when signed in.
+  function touch(id) {
+    saved[id].updatedAt = Date.now();
+    saveSaved();
+    account.putSaved(id, saved[id])?.catch(() => toast("Couldn't sync that change. It's saved on this device."));
+  }
   const hasPrefs = () => profile.interests.length || profile.places.filter((p) => p !== "Anywhere").length;
 
   function majorHires(j) {
@@ -88,113 +93,22 @@
     return mine ? { n: mine, label: `${fmt(mine)} ${short(profile.major)} Hokies hired` } : { n: h.n, label: `${fmt(h.n)} Hokies hired` };
   }
 
-  // Fit ---------------------------------------------------------------------
-
-  const DEGREES = ["Bachelor's", "Master's", "PhD"];
-  const WORK = { citizen: "US citizen", cleared: "US citizen, holds a clearance", pr: "Permanent resident", visa: "Need visa sponsorship" };
-  const citizen = () => profile.work === "citizen" || profile.work === "cleared";
-  const gradYM = () => (profile.year ? `${profile.year}-05` : null); // a May graduation
-  const knowsFit = () => !!(profile.year || profile.work || profile.gpa || profile.skills.length);
-
-  const MON = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
-  const mon = (ym) => `${MON[Number(ym.slice(5)) - 1]} '${ym.slice(2, 4)}`;
-  function gradSpan([from, to]) {
-    if (from && to && from.slice(0, 4) === to.slice(0, 4) && from.endsWith("-01") && to.endsWith("-12")) return `class of ${from.slice(0, 4)}`;
-    if (!from) return `by ${mon(to)}`;
-    return from === to ? mon(from) : `${mon(from)}–${mon(to)}`;
-  }
-  // "Summer 2027" -> when it starts and ends, roughly.
-  const SEASON = { Winter: ["01", "03"], Spring: ["01", "05"], Summer: ["05", "08"], Fall: ["08", "12"] };
-  function termSpan(t) {
-    const m = /^(\w+) (20\d\d)$/.exec(t || "");
-    return m && SEASON[m[1]] ? [`${m[2]}-${SEASON[m[1]][0]}`, `${m[2]}-${SEASON[m[1]][1]}`] : null;
-  }
-
-  /* What a posting asks for, one row each, marked against the profile:
-   * "ok", "warn" (a gap you can live with), "no" (rules you out), or null
-   * (the profile doesn't say). */
-  function asks(j) {
-    const e = j.elig || {};
-    const g = gradYM();
-    const rows = [];
-    // `tag` is the two-word version a card shows when this row rules you out.
-    const row = (icon, text, state = null, tag = text) => rows.push({ icon, text, state, tag });
-
-    if (e.grad) {
-      const [from, to] = e.grad;
-      const inside = g && !((from && g < from) || (to && g > to));
-      row("graduation-cap", `Graduating ${gradSpan(e.grad)}${g && !inside ? ` · you're May '${String(profile.year).slice(2)}` : ""}`, g ? (inside ? "ok" : "no") : null, `Grads ${gradSpan(e.grad)}`);
-    }
-    const span = termSpan(j.term);
-    if (e.returning) row("rotate-ccw", "Must return to school afterward", g && span ? (g <= span[1] ? "no" : "ok") : null, "Must return to school");
-    if (span && profile.term && profile.term !== "Any time") row("calendar", j.term === profile.term ? `${j.term}, when you want` : `${j.term} · you want ${profile.term}`, j.term === profile.term ? "ok" : "warn");
-    else if (span && g && !e.grad && !e.returning && span[0] > g) row("calendar", `${j.term} · starts after you graduate`, "warn");
-
-    if (e.degree) {
-      const need = e.degree === "PhD" ? 2 : 1;
-      row("school", e.degree === "PhD" ? "PhD students only" : "Grad students only (Master's, MBA, PhD)", profile.degree ? (DEGREES.indexOf(profile.degree) >= need ? "ok" : "no") : null, e.degree === "PhD" ? "PhD only" : "Grad students only");
-    }
-    if (e.clearance) {
-      const lvl = e.clearanceLevel ? `${e.clearanceLevel} ` : "";
-      const active = e.clearance === "active";
-      const state = !profile.work ? null : !citizen() ? "no" : active && profile.work !== "cleared" ? "warn" : "ok";
-      row("shield-check", active ? `Active ${lvl}clearance required` : `Must be able to get a ${lvl || "security "}clearance (US citizens)`, state, "US citizens only");
-    } else if (e.citizen) row("flag", "US citizens only", profile.work ? (citizen() ? "ok" : "no") : null);
-    if (e.noSponsor) row("stamp", "No visa sponsorship", profile.work ? (profile.work === "visa" ? "no" : "ok") : null, "No sponsorship");
-    if (e.gpa) row("award", `GPA ${e.gpa.toFixed(1)}+`, profile.gpa ? (Number(profile.gpa) >= e.gpa ? "ok" : "no") : null);
-    if (j.skills?.length) {
-      const have = j.skills.filter((s) => profile.skills.includes(s));
-      row("wrench", "Tools: " + j.skills.map((s) => (have.includes(s) ? `<b>${esc(s)}</b>` : esc(s))).join(", "), profile.skills.length ? (have.length ? "ok" : "warn") : null);
-      rows.at(-1).html = true;
-    }
-    return rows;
-  }
-
-  const blocked = (j) => asks(j).find((r) => r.state === "no") || null;
-
-  // For the "Best fit" sort: dealbreakers sink, then what lines up, then
-  // where Hokies from your major already landed.
-  function fitScore(j) {
-    const rows = asks(j);
-    if (rows.some((r) => r.state === "no")) return -1e6;
-    const have = (j.skills || []).filter((s) => profile.skills.includes(s)).length;
-    const h = majorHires(j)?.n || 0;
-    return rows.filter((r) => r.state === "ok").length * 2 - rows.filter((r) => r.state === "warn").length * 2 + have * 2 + Math.min(6, Math.log2(1 + h));
-  }
+  // Fit: the profile against what a posting asks for (lib/core.js).
+  const asks = (j) => core.asks(j, profile);
+  const blocked = (j) => core.blocked(j, profile);
+  const knowsFit = () => core.knowsFit(profile);
+  const fitScore = (j) => core.fitScore(j, profile, P);
 
   // Internships: state, filtering ----------------------------------------------
 
-  const blank = () => ({ posted: "all", levels: new Set(), places: new Set(), clearance: new Set(), pipeline: false, pay: false, eligible: true });
+  const blank = core.blankFilters;
   let filters = blank();
   let cat = hasPrefs() ? "for-you" : "all";
   let sort = "new";
   let q = "";
   let shown = PAGE;
 
-  function forYou(j) {
-    if (profile.interests.length && !profile.interests.includes(j.fn)) return false;
-    const places = profile.places.filter((p) => p !== "Anywhere");
-    return !places.length || places.some((p) => PLACES[p]?.(j));
-  }
-
-  const clearanceOf = (j) => j.elig?.clearance || "none";
-
-  function matches(j, f = filters, c = cat) {
-    if (c === "for-you" && !forYou(j)) return false;
-    if (f.eligible && blocked(j)) return false;
-    if (f.clearance.size && !f.clearance.has(clearanceOf(j))) return false;
-    if (c !== "all" && c !== "for-you" && j.fn !== c) return false;
-    if (f.posted !== "all" && j.minutesAgo > Number(f.posted) * 1440) return false;
-    if (f.levels.size && !f.levels.has(j.level)) return false;
-    if (f.places.size && ![...f.places].some((p) => PLACES[p]?.(j))) return false;
-    if (f.pipeline && (hires(j)?.recent || 0) < PIPELINE) return false;
-    if (f.pay && !j.pay) return false;
-    if (q) {
-      const hay = `${j.title} ${j.company} ${j.location} ${j.fn} ${j.term || ""}`.toLowerCase();
-      if (!q.toLowerCase().split(/\s+/).every((w) => hay.includes(w))) return false;
-    }
-    return true;
-  }
+  const matches = (j, f = filters, c = cat) => core.matches(j, { q, cat: c, filters: f }, { profile, P, now });
 
   const activeFilters = () => (filters.posted !== "all") + filters.levels.size + filters.places.size + filters.clearance.size + filters.pipeline + filters.pay + !filters.eligible;
 
@@ -346,8 +260,14 @@
         </div>
       </div>
 
+      ${account.enabled ? `<div class="section">
+        <h3><i data-lucide="messages-square"></i>${esc(school.demonym)} on interviewing here</h3>
+        <div id="notes" data-job="${esc(j.id)}"><p>Loading…</p></div>
+      </div>` : ""}
+
       <p class="fine">${h ? `Hiring numbers from <a href="${esc(P.sourceUrl)}" target="_blank" rel="noopener">VT's First Destination Report</a>, self-reported first jobs. ` : ""}Not affiliated with Virginia Tech.</p>`;
     open("#detail");
+    if (account.enabled) renderNotes(j);
   }
 
   // "Posted 3h ago · on Alum 12 min later", or as much of it as we know.
@@ -406,22 +326,39 @@
     const fns = [...new Set(JOBS.map((j) => j.fn))].sort();
     $("#p-interests").innerHTML = fns.map((f) => `<button class="chip" data-i="${esc(f)}" aria-pressed="${profile.interests.includes(f)}"><i data-lucide="${FN_ICON[f] || "briefcase"}"></i>${esc(f)}</button>`).join("");
     $("#p-places").innerHTML = [...Object.keys(PLACES), "Anywhere"].map((p) => `<button class="chip" data-p="${esc(p)}" aria-pressed="${profile.places.includes(p)}">${esc(p)}</button>`).join("");
+    renderAccount();
+    renderRadars();
     renderSaved();
     icons();
   }
 
   const STATUSES = ["Saved", "Applied", "Interviewing", "Offer", "Rejected"];
+  let openRow = null;
+  const dateLabel = (d) => new Date(`${d}T12:00:00`).toLocaleDateString("en-US", { month: "short", day: "numeric" });
   function renderSaved() {
     const rows = Object.entries(saved).sort((a, b) => b[1].at - a[1].at);
     renderSavedCount();
     $("#saved-list").innerHTML = rows.length
       ? rows.map(([id, s]) => {
           const j = byId.get(id) || s.job;
-          return `<div class="saved">
-            ${logo(j)}
-            <div class="saved-text" data-open="${esc(id)}"><b>${esc(j.title)}</b><span>${esc(j.company)} · ${esc(j.location)}${byId.has(id) ? "" : " · no longer listed"}</span></div>
-            <select class="status" data-status="${esc(id)}" data-v="${s.status}">${STATUSES.map((x) => `<option ${x === s.status ? "selected" : ""}>${x}</option>`).join("")}</select>
-            <button class="remove" data-unsave="${esc(id)}" aria-label="Remove"><i data-lucide="x"></i></button>
+          const due = s.deadline ? `Due ${dateLabel(s.deadline)}` : s.remindOn ? `Reminder ${dateLabel(s.remindOn)}` : "";
+          return `<div class="saved-wrap">
+            <div class="saved">
+              ${logo(j)}
+              <div class="saved-text" data-open="${esc(id)}"><b>${esc(j.title)}</b><span>${esc(j.company)} · ${esc(j.location)}${byId.has(id) ? "" : " · no longer listed"}${due ? ` · <em>${due}</em>` : ""}</span></div>
+              <select class="status" data-status="${esc(id)}" data-v="${s.status}">${STATUSES.map((x) => `<option ${x === s.status ? "selected" : ""}>${x}</option>`).join("")}</select>
+              <button class="remove" data-more="${esc(id)}" aria-label="Details" aria-expanded="${openRow === id}"><i data-lucide="chevron-down"></i></button>
+            </div>
+            ${openRow === id ? `<div class="saved-more">
+              <label class="field"><span>Application deadline</span><input type="date" data-track="${esc(id)}" data-field="deadline" value="${esc(s.deadline || "")}" /></label>
+              <label class="field"><span>Remind me on</span><input type="date" data-track="${esc(id)}" data-field="remindOn" value="${esc(s.remindOn || "")}" /></label>
+              <label class="field wide"><span>Notes</span><textarea data-track="${esc(id)}" data-field="notes" rows="3" maxlength="4000" placeholder="Referral from…, recruiter's name, what to follow up on">${esc(s.notes || "")}</textarea></label>
+              ${account.enabled ? `<p class="fine-inline">${account.user ? "We'll email you on the reminder date." : "Sign in above to get the reminder by email."}</p>` : ""}
+              <div class="row-actions">
+                ${account.user && s.status !== "Saved" ? `<button class="secondary" data-report="${esc(id)}"><i data-lucide="message-square-plus"></i>Share how it went</button>` : ""}
+                <button class="secondary" data-unsave="${esc(id)}"><i data-lucide="trash-2"></i>Remove</button>
+              </div>
+            </div>` : ""}
           </div>`;
         }).join("")
       : `<div class="none"><i data-lucide="heart"></i><p>Tap the heart on an internship to keep it here.</p></div>`;
@@ -429,28 +366,309 @@
   const renderSavedCount = () => { const n = Object.keys(saved).length; $("#saved-count").textContent = n ? `${n}` : ""; };
 
   function toggleSave(id) {
-    if (saved[id]) delete saved[id];
+    if (saved[id]) unsave(id);
     else {
       const j = byId.get(id);
-      saved[id] = { status: "Saved", at: Date.now(), job: { id, title: j.title, company: j.company, domain: j.domain, location: j.location, url: j.url } };
+      saved[id] = { status: "Saved", at: Date.now(), history: [{ status: "Saved", at: new Date().toISOString() }], job: { id, title: j.title, company: j.company, domain: j.domain, location: j.location, url: j.url, term: j.term } };
+      touch(id);
       toast("Saved to your profile");
     }
-    saveSaved();
     $$(`[data-save="${CSS.escape(id)}"]`).forEach((b) => b.classList.toggle("on", !!saved[id]));
+  }
+  function unsave(id) {
+    delete saved[id];
+    saveSaved();
+    account.dropSaved(id);
+  }
+
+  // A tracked role moves along. Past the application, ask how it went: the
+  // notes are what make the next Hokie's interview easier.
+  function setStatus(id, status) {
+    const s = saved[id];
+    if (!s || s.status === status) return;
+    s.status = status;
+    s.history = [...(s.history || []), { status, at: new Date().toISOString() }];
+    touch(id);
+    if (["Interviewing", "Offer", "Rejected"].includes(status) && account.user) {
+      toast(`Help the next Hokie: <button class="link" data-report="${esc(id)}" style="color:#fff;margin-left:6px">share how ${esc(s.job.company)} went</button>`, 9000);
+    }
+  }
+
+  // Radars ----------------------------------------------------------------------
+  //
+  // A radar is a saved search. Signed out it lives here and counts what's new
+  // since you last opened it; signed in it also emails you (ingest/notify.mjs).
+
+  const CADENCES = { instant: "Within the hour", daily: "Daily", weekly: "Weekly", off: "Email off" };
+  const currentSearch = () => ({ q, cat, filters: core.filtersToJSON(filters) });
+  const fresh = (r) => JOBS.filter((j) => Date.parse(j.firstSeenAt) > Date.parse(r.last_seen_at) && core.matches(j, { ...r.search, filters: core.filtersFromJSON(r.search.filters) }, { profile, P, now })).length;
+
+  function newRadar() {
+    const search = currentSearch();
+    const name = core.describe({ ...search, filters });
+    $("#radar-new-body").innerHTML = `
+      <label class="field"><span>Name</span><input id="rn-name" maxlength="80" value="${esc(name)}" /></label>
+      <p class="sub small">${fmt(list().length)} internships match today. ${account.user ? "How often should we email you new ones?" : `Your Profile will count new matches.${account.enabled ? " Sign in there to get them by email." : ""}`}</p>
+      ${account.user ? `<div class="chips" id="rn-cadence">${Object.entries(CADENCES).map(([k, l]) => `<button class="chip" data-rn="${k}" aria-pressed="${k === "daily"}">${l}</button>`).join("")}</div>` : ""}`;
+    open("#radar-new");
+    $("#rn-name").select();
+  }
+
+  async function createRadar() {
+    const cadence = $("#rn-cadence [aria-pressed=true]")?.dataset.rn || "daily";
+    const r = { name: $("#rn-name").value.trim() || core.describe({ q, cat, filters }), search: currentSearch(), cadence, last_seen_at: new Date().toISOString() };
+    try {
+      radars.push(account.user ? await account.addRadar(r) : { ...r, id: `local-${Date.now()}` });
+    } catch {
+      return toast("Couldn't save that radar. Try again.");
+    }
+    saveRadars();
+    close();
+    toast(account.user && cadence !== "off" ? `Radar on. New matches come to your inbox ${cadence === "instant" ? "within the hour" : cadence}.` : "Radar saved to your Profile.");
+  }
+
+  function renderRadars() {
+    $("#radar-count").textContent = radars.length ? `${radars.length}` : "";
+    $("#radar-list").innerHTML = radars.length
+      ? radars.map((r) => {
+          const n = fresh(r);
+          return `<div class="saved">
+            <span class="logo radar"><i data-lucide="radar"></i></span>
+            <div class="saved-text" data-radar="${esc(r.id)}"><b>${esc(r.name)}</b><span>${n ? `<em class="new">${fmt(n)} new</em> since you looked` : "Nothing new since you looked"}</span></div>
+            ${account.user && r.remote ? `<select class="status" data-cadence="${esc(r.id)}">${Object.entries(CADENCES).map(([k, l]) => `<option value="${k}" ${k === r.cadence ? "selected" : ""}>${l}</option>`).join("")}</select>` : ""}
+            <button class="remove" data-unradar="${esc(r.id)}" aria-label="Delete radar"><i data-lucide="x"></i></button>
+          </div>`;
+        }).join("")
+      : `<div class="none"><i data-lucide="radar"></i><p>No radars yet. Set up a search on Internships, then tap <b>Alert me</b>.</p></div>`;
+  }
+
+  // Open a radar: run its search, and reset its "new" count.
+  function openRadar(id) {
+    const r = radars.find((x) => x.id === id);
+    if (!r) return;
+    q = r.search.q || "";
+    $("#q").value = q;
+    cat = r.search.cat || "all";
+    filters = core.filtersFromJSON(r.search.filters);
+    sort = "new";
+    r.last_seen_at = new Date().toISOString();
+    saveRadars();
+    if (r.remote) account.updateRadar(r.id, { last_seen_at: r.last_seen_at });
+    tab("internships");
+  }
+
+  function setCadence(id, cadence) {
+    const r = radars.find((x) => x.id === id);
+    r.cadence = cadence;
+    saveRadars();
+    account.updateRadar(id, { cadence });
+  }
+
+  function dropRadar(id) {
+    const r = radars.find((x) => x.id === id);
+    radars = radars.filter((x) => x.id !== id);
+    saveRadars();
+    if (r?.remote) account.dropRadar(id);
+    renderRadars();
+    icons();
+  }
+
+  // Account -------------------------------------------------------------------
+
+  function renderAccount() {
+    const box = $("#account");
+    box.hidden = !account.enabled;
+    $("#resume-btn").hidden = !account.enabled;
+    $("#about-sub").textContent = `Picks your internships, checks who can apply against you, and shows how many ${school.demonym} from your major got hired.${account.user ? "" : " Stays on this device until you sign in."}`;
+    if (!account.enabled) return;
+    const u = account.user;
+    box.innerHTML = u
+      ? `<div class="card-head"><h2>Signed in</h2><button class="link" id="sign-out">Sign out</button></div>
+         <p class="sub">${esc(u.email)} · your profile, saved internships and radars sync to every device you sign in on.</p>`
+      : `<div class="card-head"><h2>Sign in with your ${esc(school.domain)} email</h2></div>
+         <p class="sub">Sync across devices, get radar alerts and reminders by email, fill your profile from your resume, and read interview notes from other ${esc(school.demonym)}.</p>
+         <form class="signin" id="signin">
+           <label class="field"><span>School email</span><input id="signin-email" type="email" autocomplete="email" placeholder="you@${esc(school.domain)}" required /></label>
+           <button class="primary" type="submit">Email me a link</button>
+         </form>`;
+  }
+
+  async function signIn(email) {
+    if (!email.toLowerCase().endsWith(`@${school.domain}`)) return toast(`Use your @${esc(school.domain)} address.`);
+    try {
+      await account.signIn(email);
+      $("#signin").outerHTML = `<p class="sent"><i data-lucide="mail-check"></i>We emailed ${esc(email)}. Type the code from it here.</p>
+        <form class="signin" id="code-form" data-email="${esc(email)}">
+          <label class="field"><span>Code</span><input id="signin-code" inputmode="numeric" autocomplete="one-time-code" pattern="[0-9]{6,10}" maxlength="10" placeholder="12345678" required /></label>
+          <button class="primary" type="submit">Sign in</button>
+        </form>
+        <p class="fine-inline">Can't find it? Check junk and quarantine: school mail filters sometimes hold new senders.</p>`;
+      icons();
+      $("#signin-code").focus();
+    } catch (e) {
+      toast(esc(e.message || "Couldn't send the link."));
+    }
+  }
+
+  // Pull the account down, push this device's changes up, redraw.
+  async function sync() {
+    try {
+      const r = await account.sync({ profile, saved, radars });
+      profile = { ...PROFILE, ...r.profile };
+      saved = r.saved;
+      radars = r.radars;
+      store.set("alum.profile", profile);
+      saveSaved();
+      saveRadars();
+    } catch (e) {
+      console.warn(e);
+      toast("Couldn't reach your account. Showing what's on this device.");
+    }
+    tab($("#profile").hidden ? "internships" : "profile", true);
+  }
+
+  // Resume -> profile --------------------------------------------------------------
+  //
+  // Claude reads the PDF (supabase/functions/parse-resume) and suggests
+  // fields; nothing changes until the student says yes. Work status is never
+  // guessed from a resume.
+
+  let suggestion = null;
+  const majorsList = () => (P?.majors || []).filter(([, n]) => n >= 20).map(([m]) => m).sort();
+  const toolsList = () => [...new Set(JOBS.flatMap((j) => j.skills || []))].sort();
+
+  async function readResume(file) {
+    $("#resume-file").value = "";
+    if (!account.user) return toast("Sign in first: resume reading runs on your account.");
+    if (file.size > 5 * 1024 * 1024) return toast("That PDF is over 5 MB. Try exporting a smaller one.");
+    const box = $("#resume-review");
+    box.hidden = false;
+    box.innerHTML = `<p class="sent"><i data-lucide="loader-circle" class="spin"></i>Reading ${esc(file.name)}…</p>`;
+    icons();
+    try {
+      suggestion = await account.parseResume(file, { majors: majorsList(), skills: toolsList(), functions: [...new Set(JOBS.map((j) => j.fn))].sort(), school: school.name });
+    } catch (e) {
+      box.innerHTML = `<p class="sent bad"><i data-lucide="circle-x"></i>${esc(e.message || "Couldn't read that resume.")}</p>`;
+      return icons();
+    }
+    const rows = [
+      ["name", "Name", suggestion.name],
+      ["major", "Major", suggestion.major],
+      ["year", "Graduating", suggestion.grad_year && `May ${suggestion.grad_year}`],
+      ["degree", "Degree", suggestion.degree],
+      ["gpa", "GPA", suggestion.gpa && suggestion.gpa.toFixed(2)],
+      ["skills", "Tools", suggestion.skills?.length && suggestion.skills.join(", ")],
+      ["interests", "Interested in", suggestion.interests?.length && suggestion.interests.join(", ")],
+    ].filter(([, , v]) => v);
+    box.innerHTML = rows.length
+      ? `<h3>From your resume</h3>
+         <ul class="asks">${rows.map(([k, l, v]) => `<li><label class="pick"><input type="checkbox" data-pick="${k}" checked /><span><b>${l}:</b> ${esc(v)}</span></label></li>`).join("")}</ul>
+         <p class="fine-inline">Your resume isn't stored. Check these over before you use them.</p>
+         <div class="row-actions"><button class="primary" id="resume-apply">Use these</button><button class="secondary" id="resume-discard">Discard</button></div>`
+      : `<p class="sent"><i data-lucide="circle-alert"></i>Couldn't find profile details in that file.</p>`;
+    icons();
+  }
+
+  function applyResume() {
+    const pick = (k) => $(`[data-pick="${k}"]`)?.checked;
+    const x = suggestion;
+    if (pick("name")) profile.name = x.name.split(/\s+/)[0];
+    if (pick("major")) profile.major = x.major;
+    if (pick("year")) profile.year = String(x.grad_year);
+    if (pick("degree")) profile.degree = x.degree;
+    if (pick("gpa")) profile.gpa = String(x.gpa);
+    if (pick("skills")) profile.skills = [...new Set([...profile.skills, ...x.skills])];
+    if (pick("interests")) profile.interests = [...new Set([...profile.interests, ...x.interests])];
+    suggestion = null;
+    $("#resume-review").hidden = true;
+    saveProfile();
+    renderProfile();
+    toast("Profile updated from your resume.");
+  }
+
+  // Interview notes ----------------------------------------------------------------
+
+  const STAGES = { applied: "Applied, no interview", assessment: "Online assessment", phone: "Phone / recruiter screen", technical: "Technical interview", final: "Final round / superday", offer: "Offer" };
+  const OUTCOMES = { offer: "Got an offer", rejected: "Rejected", ghosted: "Never heard back", pending: "Still waiting", withdrew: "I withdrew" };
+
+  async function renderNotes(j) {
+    const box = $("#notes");
+    if (!box) return;
+    if (!account.user) {
+      box.innerHTML = `<p>Sign in with your ${esc(school.domain)} email on <button class="link" data-tab="profile">Profile</button> to read what ${esc(school.demonym)} say about interviewing at ${esc(j.company)}.</p>`;
+      return;
+    }
+    let rs;
+    try { rs = await account.reports(j.company); } catch { box.innerHTML = "<p>Couldn't load notes right now.</p>"; return; }
+    if (!$("#notes") || box.dataset.job !== j.id) return; // the sheet moved on
+    const add = `<div class="row-actions"><button class="secondary" data-report-job="${esc(j.id)}"><i data-lucide="message-square-plus"></i>Add your notes</button></div>`;
+    if (!rs.length) { box.innerHTML = `<p>No ${esc(school.demonym)} have shared notes on ${esc(j.company)} yet. Been through it? Be the first.</p>${add}`; return icons(); }
+    const n = rs.length;
+    const offers = rs.filter((r) => r.outcome === "offer").length;
+    const diff = rs.filter((r) => r.difficulty).map((r) => r.difficulty);
+    const avg = diff.length ? (diff.reduce((a, b) => a + b, 0) / diff.length).toFixed(1) : null;
+    const weeks = rs.filter((r) => r.weeks != null).map((r) => r.weeks).sort((a, b) => a - b);
+    box.innerHTML = `
+      <div class="stat-row">
+        <div><div class="stat">${n}</div><small>note${n === 1 ? "" : "s"}</small></div>
+        <div><div class="stat">${offers}</div><small>offer${offers === 1 ? "" : "s"}</small></div>
+        ${avg ? `<div><div class="stat">${avg}<span>/5</span></div><small>difficulty</small></div>` : ""}
+        ${weeks.length ? `<div><div class="stat">${weeks[Math.floor(weeks.length / 2)]}<span>wk</span></div><small>to hear back</small></div>` : ""}
+      </div>
+      <ul class="notes">${rs.slice(0, 6).map((r) => `<li>
+        <div class="note-head"><b>${esc(r.job_title || "Intern")}</b><span>${esc([r.term, STAGES[r.stage], OUTCOMES[r.outcome]].filter(Boolean).join(" · "))}</span></div>
+        ${r.questions ? `<p><em>Asked:</em> ${esc(r.questions)}</p>` : ""}
+        ${r.tips ? `<p><em>Tip:</em> ${esc(r.tips)}</p>` : ""}
+      </li>`).join("")}</ul>
+      ${add}`;
+    icons();
+  }
+
+  let reportFor = null;
+  function openReport({ company, title, term, jobId }) {
+    reportFor = { company, title, term, jobId };
+    const sel = (id, opts) => `<select id="${id}">${Object.entries(opts).map(([k, l]) => `<option value="${k}">${l}</option>`).join("")}</select>`;
+    $("#report-body").innerHTML = `
+      <p class="sub"><b>${esc(company)}</b>${title ? ` · ${esc(title)}` : ""}</p>
+      <div class="fields">
+        <label class="field"><span>How far you got</span>${sel("r-stage", STAGES)}</label>
+        <label class="field"><span>Outcome</span>${sel("r-outcome", OUTCOMES)}</label>
+        <label class="field"><span>Weeks from applying to hearing back</span><input id="r-weeks" type="number" min="0" max="52" inputmode="numeric" placeholder="Optional" /></label>
+        <label class="field"><span>Difficulty (1 easy – 5 brutal)</span><input id="r-diff" type="number" min="1" max="5" inputmode="numeric" placeholder="Optional" /></label>
+        <label class="field wide"><span>What they asked</span><textarea id="r-questions" rows="3" maxlength="2000" placeholder="Leetcode medium on graphs, a behavioral about a team conflict…"></textarea></label>
+        <label class="field wide"><span>Advice for the next ${esc(school.demonym.replace(/s$/, ""))}</span><textarea id="r-tips" rows="3" maxlength="2000" placeholder="What you'd do differently, who to talk to, what mattered"></textarea></label>
+      </div>`;
+    open("#report");
+  }
+
+  async function sendReport() {
+    const num = (id, lo, hi) => { const v = Number($(id).value); return $(id).value !== "" && v >= lo && v <= hi ? Math.round(v) : null; };
+    const r = {
+      company: reportFor.company, job_title: reportFor.title || null, job_id: reportFor.jobId || null, term: reportFor.term || null, school: school.slug,
+      stage: $("#r-stage").value, outcome: $("#r-outcome").value, weeks: num("#r-weeks", 0, 52), difficulty: num("#r-diff", 1, 5),
+      questions: $("#r-questions").value.trim(), tips: $("#r-tips").value.trim(),
+    };
+    try { await account.addReport(r); } catch (e) { return toast(esc(e.message || "Couldn't share that.")); }
+    close();
+    toast(`Thanks. That helps every ${esc(school.demonym.replace(/s$/, ""))} after you.`);
   }
 
   // Tabs, modals, toasts ---------------------------------------------------------
 
-  function tab(name) {
-    close();
+  function tab(name, keepScroll = false) {
+    if (!keepScroll) close();
     $(".switch").dataset.on = name;
     $$(".switch [role=tab]").forEach((b) => b.setAttribute("aria-selected", b.dataset.tab === name));
     $("#internships").hidden = name !== "internships";
     $("#profile").hidden = name !== "profile";
     if (name === "profile") renderProfile();
     else { renderCats(); render(); }
-    history.replaceState(null, "", name === "profile" ? "#profile" : location.pathname + location.search);
-    scrollTo({ top: 0 });
+    // Drop one-shot email links (?job, ?radar) from the address; keep ?school.
+    const keep = new URLSearchParams(location.search);
+    keep.delete("job"); keep.delete("radar");
+    const path = location.pathname + (keep.size ? `?${keep}` : "");
+    history.replaceState(null, "", name === "profile" ? `${path}#profile` : path);
+    if (!keepScroll) scrollTo({ top: 0 });
   }
 
   let current = null;
@@ -483,13 +701,12 @@
     const t = e.target.closest("button, a, article, [data-open]") || e.target;
     if (t.dataset?.tab) return tab(t.dataset.tab);
     if (t.dataset?.save) { e.stopPropagation(); return toggleSave(t.dataset.save); }
-    if (t.dataset?.unsave) { delete saved[t.dataset.unsave]; saveSaved(); renderSaved(); icons(); return; }
+    if (t.dataset?.unsave) { unsave(t.dataset.unsave); renderSaved(); icons(); return; }
     if (t.dataset?.apply) { pendingApply = t.dataset.apply; return; }
     if (t.dataset?.applied) {
       const id = t.dataset.applied;
       if (!saved[id]) toggleSave(id);
-      saved[id].status = "Applied";
-      saveSaved();
+      setStatus(id, "Applied");
       return toast("Moved to Applied");
     }
     if (t.dataset?.draft) {
@@ -517,6 +734,22 @@
       t.setAttribute("aria-pressed", profile.skills.includes(v));
       return saveProfile();
     }
+    if (t.id === "save-search") return newRadar();
+    if (t.id === "radar-create") return createRadar();
+    if (t.dataset?.rn) { $$("#rn-cadence .chip").forEach((b) => b.setAttribute("aria-pressed", b === t)); return; }
+    if (t.dataset?.radar) return openRadar(t.dataset.radar);
+    if (t.dataset?.unradar) return dropRadar(t.dataset.unradar);
+    if (t.dataset?.more) { openRow = openRow === t.dataset.more ? null : t.dataset.more; renderSaved(); return icons(); }
+    if (t.id === "sign-out") { account.signOut(); return; }
+    if (t.id === "resume-btn") {
+      if (!account.user) return toast("Sign in first: resume reading runs on your account.");
+      return $("#resume-file").click();
+    }
+    if (t.id === "resume-apply") return applyResume();
+    if (t.id === "resume-discard") { suggestion = null; $("#resume-review").hidden = true; return; }
+    if (t.dataset?.report) { const s = saved[t.dataset.report]; return openReport({ company: s.job.company, title: s.job.title, term: s.job.term, jobId: t.dataset.report }); }
+    if (t.dataset?.reportJob) { const j = byId.get(t.dataset.reportJob); return openReport({ company: j.company, title: j.title, term: j.term, jobId: j.id }); }
+    if (t.id === "report-send") return sendReport();
     if (t.id === "show-out" || t.id === "hide-out") { filters.eligible = t.id === "hide-out"; return render(); }
     if (t.dataset?.p) {
       const v = t.dataset.p;
@@ -533,12 +766,38 @@
   document.addEventListener("change", (e) => {
     const t = e.target;
     if (t.dataset.t) { draftF[t.dataset.t] = t.checked; return renderFilters(); }
-    if (t.dataset.status) { saved[t.dataset.status].status = t.value; t.dataset.v = t.value; saveSaved(); return; }
+    if (t.dataset.status) { setStatus(t.dataset.status, t.value); t.dataset.v = t.value; return; }
+    if (t.dataset.track) {
+      const [id, field] = [t.dataset.track, t.dataset.field];
+      saved[id][field] = t.value || null;
+      return touch(id);
+    }
+    if (t.dataset.cadence) return setCadence(t.dataset.cadence, t.value);
+    if (t.id === "resume-file" && t.files[0]) return readResume(t.files[0]);
     if (t.id === "p-major") { profile.major = t.value; saveProfile(); }
     if (t.id === "p-year") { profile.year = t.value; saveProfile(); }
     if (t.id === "p-term") { profile.term = t.value; saveProfile(); }
     if (t.id === "p-degree") { profile.degree = t.value; saveProfile(); }
     if (t.id === "p-work") { profile.work = t.value; saveProfile(); }
+  });
+  document.addEventListener("submit", async (e) => {
+    if (e.target.id === "signin") {
+      e.preventDefault();
+      return signIn($("#signin-email").value.trim());
+    }
+    if (e.target.id === "code-form") {
+      e.preventDefault();
+      const btn = e.target.querySelector("button");
+      btn.disabled = true;
+      try {
+        // The sign-in listener (account.init) runs sync() and redraws.
+        await account.verifyCode(e.target.dataset.email, $("#signin-code").value.trim());
+        toast("Signed in.");
+      } catch (err) {
+        btn.disabled = false;
+        toast(/expired|invalid/i.test(err.message) ? "That code didn't work or has expired. Request a new one." : esc(err.message));
+      }
+    }
   });
   $("#p-name").addEventListener("input", (e) => { profile.name = e.target.value.trim(); saveProfile(); });
   $("#p-gpa").addEventListener("input", (e) => { const g = Number(e.target.value); profile.gpa = g > 0 && g <= 4 ? String(g) : ""; saveProfile(); });
@@ -566,6 +825,21 @@
   const updated = minutes(data.generatedAt);
   $("#updated").textContent = `Updated ${ago(updated).toLowerCase()}`;
   if (medianLag != null) $("#updated").title = `New postings reach Alum a median ${medianLag < 2 ? "1 minute" : ago(medianLag).replace(" ago", "")} after the employer posts them (last 14 days).`;
+  // Links from emails: ?job=<id> opens that internship, ?radar=<id> its search.
+  const params = new URLSearchParams(location.search);
   renderSavedCount();
-  tab(location.hash === "#profile" ? "profile" : "internships");
+  tab(location.hash === "#profile" || location.hash === "#radars" ? "profile" : "internships");
+
+  const deep = () => {
+    if (params.get("radar")) openRadar(params.get("radar"));
+    const j = byId.get(params.get("job"));
+    if (j) detail(j);
+    else if (params.get("job")) toast("That internship isn't listed anymore.");
+  };
+
+  if (account.enabled) {
+    await account.init((u) => (u ? sync() : tab($("#profile").hidden ? "internships" : "profile", true)));
+    if (account.user) await sync();
+  }
+  deep();
 })();

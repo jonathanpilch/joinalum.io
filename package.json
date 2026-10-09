@@ -9,8 +9,9 @@
     "targets": "node ingest/targets.mjs",
     "fantastic": "node --env-file=.env ingest/fantastic.mjs",
     "fantastic:probe": "node --env-file=.env ingest/fantastic.mjs --probe",
-    "dev": "python3 -m http.server 5178",
-    "build": "node scripts/build.mjs"
+    "dev": "node scripts/dev.mjs",
+    "build": "node scripts/build.mjs",
+    "notify": "node --env-file-if-exists=.env ingest/notify.mjs"
   },
   "engines": {
     "node": ">=20"

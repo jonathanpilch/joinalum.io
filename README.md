@@ -19,6 +19,36 @@ data/placements.json             ~25k anonymous VT placements, 2014-2025, rolled
 .github/workflows/ingest.yml     runs the ingest hourly and commits data/
 ```
 
+## Accounts (optional)
+
+Without Supabase config the site runs signed-out, everything on the device. With it, students sign in with their school email (`allowed_domains` in the migration; anything else is refused at sign-up) and get:
+
+- profile, saved internships (status history, deadline, reminder date, notes) and radars synced across devices
+- **radars**: any search saved with *Alert me*, emailed within the hour, daily or weekly (`ingest/notify.mjs`, after each ingest), never repeating a posting, never showing one their profile rules out
+- **reminders** by email on the date they set on a saved internship
+- **resume to profile**: Claude reads the PDF (`supabase/functions/parse-resume`), the student reviews the suggestions; the file isn't stored, work status is never guessed, 10 reads per student per day
+- **interview notes** from other students at each company, readable signed-in only and never with the author's name
+
+```
+lib/core.js                          fit + matching, shared by the page and the notifier
+lib/account.js                       sign-in and sync (supabase-js, loaded only when configured)
+supabase/migrations/…_accounts.sql   tables, row-level security, notifier functions
+supabase/functions/parse-resume/     resume PDF -> profile fields (Claude)
+ingest/notify.mjs                    radar + reminder emails (Resend)
+scripts/config.mjs                   writes config.js (URL + publishable key) from the environment
+```
+
+### Accounts setup
+
+1. **Keys** go in `.env` (see `.env.example`; never committed): `SUPABASE_URL`, `SUPABASE_PUBLISHABLE_KEY`, `SUPABASE_SERVICE_ROLE_KEY` (the secret key), `RESEND_API_KEY`, `ANTHROPIC_API_KEY`.
+2. **Database**: run `supabase/migrations/20261009000000_alum_accounts.sql` once, in the Supabase dashboard's SQL editor, or `npx supabase link --project-ref <ref>` then `npx supabase db push`.
+3. **Auth** (dashboard > Authentication): Site URL `https://joinalum.io`; add `http://localhost:5178/**` to redirect URLs for local dev. Under SMTP, send through Resend (`smtp.resend.com`, port 465, user `resend`, password = the Resend key, sender on your verified domain). Supabase's built-in mailer only sends a few sign-in emails an hour.
+4. **Resume reading**: `npx supabase functions deploy parse-resume --project-ref <ref>`, then `npx supabase secrets set ANTHROPIC_API_KEY=<key> --project-ref <ref>`.
+5. **Emails**: verify `joinalum.io` in Resend. GitHub repo > Settings > Secrets and variables > Actions: secrets `SUPABASE_URL`, `SUPABASE_SERVICE_ROLE_KEY`, `RESEND_API_KEY`; variable `ALUM_FROM` (e.g. `Alum <alerts@joinalum.io>`).
+6. **Site**: in the Cloudflare build's variables, `SUPABASE_URL` and `SUPABASE_PUBLISHABLE_KEY`. Only those two ever reach the browser.
+
+`npm run notify -- --dry` prints the emails that are due without sending them.
+
 ## Run it
 
 ```
@@ -44,4 +74,4 @@ Find its board: `boards-api.greenhouse.io/v1/boards/{slug}/jobs`, `api.lever.co/
 
 ## Not built yet
 
-Alumni on each team, resume parsing, accounts and alerts.
+Alumni on each team (opt-in), a career-services view.

@@ -1,6 +1,7 @@
 # Hourly: pull every board, commit data/ if anything changed. Each commit
 # rebuilds the site on Cloudflare (Workers Builds, ~20-40s a build).
 # Daily: fantastic.jobs for the target employers we can't pull directly.
+# Every run: radar and reminder emails (ingest/notify.mjs).
 # Weekly: VT's placement report and the target list built from it.
 name: ingest
 on:
@@ -41,3 +42,14 @@ jobs:
           git config user.email "actions@users.noreply.github.com"
           git add data/
           git diff --cached --quiet || git commit -m "data: $(node -e "const d=require('./data/jobs.json');console.log(d.jobs.length+' roles')")" && git push
+      # Radar alerts and tracker reminders. After the commit, so a mail
+      # problem never holds up the data; skips itself without the secrets.
+      - name: Email radars and reminders
+        continue-on-error: true
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+          RESEND_API_KEY: ${{ secrets.RESEND_API_KEY }}
+          ALUM_FROM: ${{ vars.ALUM_FROM }}
+          SITE_URL: ${{ vars.SITE_URL }}
+        run: node ingest/notify.mjs
