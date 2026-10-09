@@ -1,5 +1,6 @@
-/* Alum -- white and quiet, in the spirit of Airbnb: one ink colour, hairline
- * borders, soft shadows only where something lifts, pill controls, big tap
+/* Alum -- white cards on warm paper, one deep ink colour, a soft Hokie-orange
+ * wash at the top of the page, inky controls with a little depth when they're
+ * on, tinted status pills, big numbers over small-caps labels, big tap
  * targets. Icons are Lucide (stroke 1.75). Phones first; the grid widens to
  * three or four columns on bigger screens. */
 
@@ -20,21 +21,29 @@
 }
 
 :root {
-  --bg: #ffffff;
-  --ink: #222222;
+  --bg: #f6f5f2;
+  --card: #ffffff;
+  --ink: #16161d;
   --muted: #6a6a6a;
   --faint: #b0b0b0;
   --line: #ebebeb;
-  --soft: #f7f7f7;
-  --hover: #f2f2f2;
-  --accent: #222222;
-  --good: #008a05;
+  --soft: #f1f0ec;
+  --hover: #ecebe6;
+  --accent: #16161d;
+  --good: #0a8f4e;
   --warn: #b26b00;
-  --bad: #c13515;
+  --bad: #c2185b;
+  --orange: #e5751f;
+  --maroon: #861f41;
+  --hokie: #b8530c;
   --badge: #f5f0e6;
   --badge-ink: #6b5418;
   --shadow: 0 6px 16px rgba(0, 0, 0, 0.12);
   --shadow-lift: 0 2px 4px rgba(0, 0, 0, 0.06), 0 10px 28px rgba(0, 0, 0, 0.1);
+  --rest: 0 1px 2px rgba(22, 22, 29, 0.04), 0 6px 20px rgba(22, 22, 29, 0.05);
+  /* "On": a black key with a lit top edge, sitting on a soft shadow. */
+  --press: linear-gradient(180deg, #34343e, #0e0e13);
+  --press-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.16), 0 1px 2px rgba(0, 0, 0, 0.3), 0 6px 14px rgba(22, 22, 29, 0.24);
   --radius: 12px;
   --radius-lg: 16px;
   --ease: cubic-bezier(0.2, 0.7, 0.2, 1);
@@ -55,6 +64,22 @@ body {
   background: var(--bg);
   -webkit-font-smoothing: antialiased;
 }
+html { overflow-x: clip; }
+/* The wash: Hokie orange and maroon, blurred out behind the search bar. */
+body:not(.landing) { position: relative; }
+body:not(.landing)::before {
+  content: "";
+  position: absolute;
+  inset: 0 0 auto;
+  z-index: -1;
+  height: 460px;
+  background:
+    radial-gradient(38% 60% at 22% 18%, rgba(229, 117, 31, 0.5), transparent 70%),
+    radial-gradient(34% 52% at 78% 8%, rgba(134, 31, 65, 0.3), transparent 70%),
+    radial-gradient(30% 50% at 55% 40%, rgba(255, 186, 110, 0.32), transparent 70%);
+  filter: blur(30px);
+  pointer-events: none;
+}
 button, input, select { font: inherit; color: inherit; }
 button { cursor: pointer; background: none; border: 0; padding: 0; }
 a { color: inherit; text-decoration: none; }
@@ -72,17 +97,17 @@ svg.lucide { width: 18px; height: 18px; stroke-width: 1.75; flex: none; }
   align-items: center;
   gap: 16px;
   padding: 14px max(20px, calc((100vw - var(--page)) / 2));
-  background: rgba(255, 255, 255, 0.92);
+  background: rgba(246, 245, 242, 0.72);
   backdrop-filter: saturate(180%) blur(12px);
   -webkit-backdrop-filter: saturate(180%) blur(12px);
-  border-bottom: 1px solid var(--line);
+  border-bottom: 1px solid rgba(22, 22, 29, 0.06);
 }
 .brand { display: flex; align-items: center; gap: 10px; justify-self: start; }
 .brand img { width: 38px; height: 39px; }
 .brand span { font-size: 31px; font-weight: 700; letter-spacing: -0.02em; }
 .top-right { justify-self: end; font-size: 13px; color: var(--muted); }
 
-/* The sliding switch: a light track with a white pill that glides between
+/* The sliding switch: an ink track with a white pill that glides between
  * the two buttons. */
 .switch {
   position: relative;
@@ -90,8 +115,8 @@ svg.lucide { width: 18px; height: 18px; stroke-width: 1.75; flex: none; }
   grid-template-columns: 1fr 1fr;
   padding: 4px;
   border-radius: 999px;
-  background: var(--soft);
-  border: 1px solid var(--line);
+  background: var(--ink);
+  box-shadow: 0 6px 18px rgba(22, 22, 29, 0.18);
 }
 .switch button {
   position: relative;
@@ -103,10 +128,11 @@ svg.lucide { width: 18px; height: 18px; stroke-width: 1.75; flex: none; }
   height: 38px;
   padding: 0 20px;
   border-radius: 999px;
-  font-weight: 500;
-  color: var(--muted);
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.55);
   transition: color 200ms ease;
 }
+.switch button:hover { color: #fff; }
 .switch button[aria-selected="true"] { color: var(--ink); }
 .switch-pill {
   position: absolute;
@@ -116,7 +142,7 @@ svg.lucide { width: 18px; height: 18px; stroke-width: 1.75; flex: none; }
   width: calc(50% - 4px);
   border-radius: 999px;
   background: #fff;
-  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.08), 0 3px 10px rgba(0, 0, 0, 0.08);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
   transition: transform 320ms var(--ease);
 }
 .switch[data-on="profile"] .switch-pill { transform: translateX(100%); }
@@ -132,9 +158,12 @@ svg.lucide { width: 18px; height: 18px; stroke-width: 1.75; flex: none; }
   max-width: 720px;
   margin: 8px auto 0;
   padding: 8px 8px 8px 22px;
-  border: 1px solid var(--line);
+  border: 1px solid rgba(255, 255, 255, 0.7);
   border-radius: 999px;
-  box-shadow: var(--shadow);
+  background: rgba(255, 255, 255, 0.86);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  box-shadow: 0 8px 28px rgba(134, 31, 65, 0.1), 0 1px 2px rgba(0, 0, 0, 0.05);
 }
 .search > .lucide { color: var(--muted); }
 .search input { flex: 1; min-width: 0; height: 40px; border: 0; outline: 0; background: none; font-size: 16px; }
@@ -152,36 +181,46 @@ svg.lucide { width: 18px; height: 18px; stroke-width: 1.75; flex: none; }
   transition: box-shadow 160ms ease, transform 160ms ease;
 }
 .round:hover { box-shadow: var(--shadow); }
-.round.dark { background: var(--accent); border-color: var(--accent); color: #fff; }
+.round.dark { background: var(--press); border: 0; color: #fff; box-shadow: var(--press-shadow); }
 .round .dot { position: absolute; top: 6px; right: 6px; width: 9px; height: 9px; border-radius: 999px; background: #ff385c; border: 2px solid #fff; }
 
-/* Category row: icon over label, underline on the active one. */
+/* Category row: an icon tile over a label; the active tile is the black key. */
 .cats {
   display: flex;
-  gap: 28px;
+  gap: 18px;
   margin: 24px -20px 0;
-  padding: 0 20px;
+  padding: 4px 20px 6px;
   overflow-x: auto;
   scrollbar-width: none;
-  border-bottom: 1px solid var(--line);
 }
 .cats::-webkit-scrollbar { display: none; }
 .cat {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 6px;
-  padding: 6px 2px 12px;
-  border-bottom: 2px solid transparent;
+  gap: 7px;
+  padding: 2px 0 6px;
   color: var(--muted);
   font-size: 12px;
   font-weight: 500;
   white-space: nowrap;
-  transition: color 160ms ease, border-color 160ms ease;
+  transition: color 160ms ease;
 }
-.cat .lucide { width: 22px; height: 22px; }
-.cat:hover { color: var(--ink); border-bottom-color: var(--line); }
-.cat[aria-pressed="true"] { color: var(--ink); border-bottom-color: var(--ink); }
+.cat .lucide {
+  box-sizing: content-box;
+  width: 20px;
+  height: 20px;
+  padding: 12px;
+  border-radius: 14px;
+  background: var(--card);
+  color: var(--ink);
+  box-shadow: 0 1px 2px rgba(22, 22, 29, 0.06);
+  transition: background 200ms ease, box-shadow 200ms ease, transform 200ms var(--ease);
+}
+.cat:hover { color: var(--ink); }
+.cat:hover .lucide { transform: translateY(-2px); }
+.cat[aria-pressed="true"] { color: var(--ink); font-weight: 600; }
+.cat[aria-pressed="true"] .lucide { background: var(--press); color: #fff; box-shadow: var(--press-shadow); }
 
 .bar { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin: 20px 0 16px; }
 .bar p { margin: 0; color: var(--muted); font-size: 14px; }
@@ -189,7 +228,7 @@ svg.lucide { width: 18px; height: 18px; stroke-width: 1.75; flex: none; }
 .sort { display: flex; gap: 4px; }
 .sort button { white-space: nowrap; height: 32px; padding: 0 12px; border-radius: 999px; font-size: 13px; font-weight: 500; color: var(--muted); }
 .sort button:hover { background: var(--hover); }
-.sort button[aria-pressed="true"] { background: var(--ink); color: #fff; }
+.sort button[aria-pressed="true"] { background: var(--press); color: #fff; box-shadow: var(--press-shadow); }
 
 /* Cards -------------------------------------------------------------- */
 
@@ -201,24 +240,35 @@ svg.lucide { width: 18px; height: 18px; stroke-width: 1.75; flex: none; }
   flex-direction: column;
   gap: 14px;
   padding: 20px;
-  border: 1px solid var(--line);
+  border: 1px solid transparent;
   border-radius: 20px;
-  background: #fff;
-  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
+  background: var(--card);
+  box-shadow: var(--rest);
   cursor: pointer;
   transition: box-shadow 240ms var(--ease), transform 240ms var(--ease), border-color 240ms ease;
 }
-.job:hover { transform: translateY(-4px); border-color: transparent; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.04), 0 18px 40px rgba(0, 0, 0, 0.12); }
+.job:hover { transform: translateY(-4px); box-shadow: 0 4px 8px rgba(0, 0, 0, 0.04), 0 18px 40px rgba(0, 0, 0, 0.12); }
 .job:hover .logo { transform: scale(1.06); }
 .job-top { display: flex; align-items: center; gap: 12px; padding-right: 36px; }
 .job-co { min-width: 0; }
 .job-co b { display: block; font-size: 15px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .job-co span { display: block; font-size: 13px; color: var(--muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .job-co em { font-style: normal; }
+/* Posted in the last day: a green dot that glows. */
 .job-co em.new { color: var(--good); font-weight: 600; }
+.job-co em.new::before {
+  content: "";
+  display: inline-block;
+  width: 7px;
+  height: 7px;
+  margin: 0 5px 1px 1px;
+  border-radius: 999px;
+  background: #2bd47d;
+  box-shadow: 0 0 0 3px rgba(43, 212, 125, 0.18), 0 0 8px rgba(43, 212, 125, 0.8);
+}
 .job h3 { font-size: 19px; font-weight: 600; line-height: 1.25; letter-spacing: -0.01em; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
 .job-foot { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-top: auto; padding-top: 14px; border-top: 1px solid var(--line); }
-.pay { font-size: 14px; font-weight: 600; white-space: nowrap; }
+.pay { padding: 4px 10px; border-radius: 999px; background: var(--soft); font-size: 13px; font-weight: 600; white-space: nowrap; }
 
 .save {
   position: absolute;
@@ -256,15 +306,16 @@ svg.lucide { width: 18px; height: 18px; stroke-width: 1.75; flex: none; }
 .logo.has-img img { opacity: 1; }
 .logo.lg { width: 56px; height: 56px; border-radius: 14px; font-size: 19px; }
 
-.hokie { min-width: 0; font-size: 13px; color: var(--muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.hokie b { margin-right: 2px; font-size: 20px; font-weight: 700; color: var(--badge-ink); letter-spacing: -0.02em; }
+/* Big number, small-caps label. */
+.hokie { min-width: 0; font-size: 11px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.hokie b { margin-right: 4px; font-size: 22px; font-weight: 700; letter-spacing: -0.02em; text-transform: none; color: var(--hokie); }
 
 /* What a posting asks for, on the card: clearance, citizens, grad window. */
 .tags { display: flex; flex-wrap: wrap; gap: 6px; margin-top: -4px; }
-.tag { max-width: 100%; overflow: hidden; text-overflow: ellipsis; display: inline-flex; align-items: center; gap: 4px; padding: 3px 8px; border-radius: 999px; border: 1px solid var(--line); font-size: 12px; font-weight: 600; color: var(--muted); white-space: nowrap; }
-.tag .lucide { flex: none; width: 13px; height: 13px; }
-.tag.clear { border-color: #c9d6ea; background: #eef3fa; color: #24456e; }
-.tag.no { border-color: #f1c7c4; background: #fdf1f0; color: var(--bad); }
+.tag { max-width: 100%; overflow: hidden; text-overflow: ellipsis; display: inline-flex; align-items: center; gap: 5px; padding: 4px 10px; border-radius: 999px; border: 1px solid #e2e1dc; background: var(--soft); font-size: 12px; font-weight: 600; color: #4a4a52; white-space: nowrap; }
+.tag .lucide { flex: none; width: 14px; height: 14px; }
+.tag.clear { border-color: #c7cbf5; background: #eef0ff; color: #3b3fa8; }
+.tag.no { border-color: #f6c1d6; background: #fff0f6; color: var(--bad); }
 .job.out { opacity: 0.6; }
 .job.out:hover { opacity: 1; }
 .bar .link { font-size: inherit; color: var(--ink); }
@@ -304,7 +355,7 @@ svg.lucide { width: 18px; height: 18px; stroke-width: 1.75; flex: none; }
 
 /* Interview notes in a job's detail. */
 .stat-row { display: flex; flex-wrap: wrap; gap: 28px; margin: 6px 0 12px; }
-.stat-row small { color: var(--muted); font-size: 13px; }
+.stat-row small { display: block; color: var(--muted); font-size: 11px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; }
 .stat span { font-size: 15px; font-weight: 600; color: var(--muted); margin-left: 2px; }
 .notes { margin: 0 0 8px; padding: 0; list-style: none; }
 .notes li { padding: 12px 0; border-bottom: 1px solid var(--line); font-size: 14px; }
@@ -344,12 +395,12 @@ svg.lucide { width: 18px; height: 18px; stroke-width: 1.75; flex: none; }
   font-size: 15px;
   transition: background 160ms ease, transform 120ms ease;
 }
-.primary { background: var(--accent); color: #fff; }
-.primary:hover { background: #000; }
+.primary { background: var(--press); color: #fff; box-shadow: var(--press-shadow); }
+.primary:hover { filter: brightness(1.25); }
 .primary:active, .secondary:active { transform: scale(0.98); }
-.ghost { border: 1px solid var(--ink); background: #fff; }
+.ghost { border: 1px solid var(--ink); background: var(--card); }
 .ghost:hover { background: var(--soft); }
-.secondary { border: 1px solid var(--line); background: #fff; }
+.secondary { border: 1px solid var(--line); background: var(--card); }
 .secondary:hover { background: var(--soft); }
 .link { font-weight: 600; text-decoration: underline; text-underline-offset: 3px; }
 
@@ -399,7 +450,7 @@ svg.lucide { width: 18px; height: 18px; stroke-width: 1.75; flex: none; }
 .section h3 { display: flex; align-items: center; gap: 8px; font-size: 17px; margin-bottom: 6px; }
 .section > p { margin: 0 0 12px; color: var(--muted); }
 .section .lucide { width: 20px; height: 20px; }
-.stat { font-size: 30px; font-weight: 300; letter-spacing: -0.02em; }
+.stat { font-size: 32px; font-weight: 700; letter-spacing: -0.03em; color: var(--hokie); }
 .pills { display: flex; flex-wrap: wrap; gap: 8px; margin: 12px 0; }
 .pill { padding: 6px 12px; border-radius: 999px; border: 1px solid var(--line); font-size: 13px; }
 .pill b { margin-left: 4px; color: var(--muted); font-weight: 500; }
@@ -433,18 +484,18 @@ svg.lucide { width: 18px; height: 18px; stroke-width: 1.75; flex: none; }
 }
 .chip .lucide { width: 16px; height: 16px; }
 .chip:hover { border-color: var(--ink); }
-.chip[aria-pressed="true"] { border-color: var(--ink); background: var(--ink); color: #fff; }
+.chip[aria-pressed="true"] { border-color: transparent; background: var(--press); color: #fff; box-shadow: var(--press-shadow); }
 .toggle { display: flex; align-items: center; justify-content: space-between; gap: 16px; padding: 6px 0; cursor: pointer; }
 .toggle small { display: block; color: var(--muted); font-size: 13px; font-weight: 400; }
 .toggle input { appearance: none; flex: none; width: 48px; height: 30px; border-radius: 999px; background: var(--faint); position: relative; cursor: pointer; transition: background 200ms ease; }
 .toggle input::after { content: ""; position: absolute; top: 3px; left: 3px; width: 24px; height: 24px; border-radius: 999px; background: #fff; box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2); transition: transform 200ms var(--ease); }
-.toggle input:checked { background: var(--ink); }
+.toggle input:checked { background: var(--good); }
 .toggle input:checked::after { transform: translateX(18px); }
 
 /* Profile ------------------------------------------------------------ */
 
 #profile { max-width: 760px; }
-.card { padding: 28px; margin-bottom: 20px; border: 1px solid var(--line); border-radius: 20px; }
+.card { padding: 28px; margin-bottom: 20px; border-radius: 20px; background: var(--card); box-shadow: var(--rest); }
 .card-head { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; }
 .card-head h2 { font-size: 22px; }
 .card h3 { margin: 24px 0 12px; font-size: 15px; }
@@ -465,9 +516,10 @@ svg.lucide { width: 18px; height: 18px; stroke-width: 1.75; flex: none; }
 .saved-text b { display: block; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .saved-text span { font-size: 13px; color: var(--muted); }
 .status { height: 36px; padding: 0 10px; border: 1px solid var(--line); border-radius: 999px; background: #fff; font-size: 13px; font-weight: 500; }
-.status[data-v="Applied"] { border-color: #b7d7ff; background: #f0f7ff; }
-.status[data-v="Interviewing"] { border-color: #ffd9a8; background: #fff6eb; }
-.status[data-v="Offer"] { border-color: #a7e3ad; background: #effaf0; }
+.status { font-weight: 600; }
+.status[data-v="Applied"] { border-color: #c7cbf5; background: #eef0ff; color: #3b3fa8; }
+.status[data-v="Interviewing"] { border-color: #f7d79a; background: #fff7e6; color: #946200; }
+.status[data-v="Offer"] { border-color: #a9e8c6; background: #ebfbf2; color: #0a7a43; }
 .status[data-v="Rejected"] { color: var(--muted); }
 .remove { display: grid; place-items: center; width: 34px; height: 34px; border-radius: 999px; color: var(--muted); }
 .remove:hover { background: var(--hover); color: var(--ink); }
@@ -483,11 +535,11 @@ svg.lucide { width: 18px; height: 18px; stroke-width: 1.75; flex: none; }
   transform: translateX(-50%);
   padding: 12px 18px;
   border-radius: var(--radius);
-  background: var(--ink);
+  background: var(--press);
   color: #fff;
   font-weight: 500;
   font-size: 14px;
-  box-shadow: var(--shadow);
+  box-shadow: var(--press-shadow);
   animation: rise 240ms var(--ease) both;
 }
 
