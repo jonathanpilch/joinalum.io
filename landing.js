@@ -54,22 +54,24 @@ $("#n-companies").textContent = `${fmt(companies)} employers`;
 if (P) $("#n-placed").textContent = `${fmt(P.placed)}`;
 if (P?.sourceUrl) $("#source").href = P.sourceUrl;
 document.querySelectorAll("[data-count-cta]").forEach((a) => (a.firstChild.textContent = `Browse ${fmt(JOBS.length)} internships`));
-$("#proof").innerHTML = [P && `<b>${fmt(P.placed)}</b> Hokie first jobs tracked`, today && `<b>${fmt(today)}</b> new internships today`, "free, no sign-up to browse"].filter(Boolean).join(" · ");
+$("#proof").innerHTML = [P && `<b data-count="${P.placed}">${fmt(P.placed)}</b> Hokie first jobs tracked`, today && `<b data-count="${today}">${fmt(today)}</b> new internships today`, "free, no sign-up to browse"].filter(Boolean).join(" · ");
 if (today) $("#final-sub").textContent = `${fmt(today)} new internships in the last 24 hours. See them before everyone else does.`;
 
 // Hero shots -----------------------------------------------------------------------
 
 $("#shot-tally").innerHTML = `<b>${fmt(JOBS.length)}</b> internships · ${fmt(today)} new today`;
-$("#shot-jobs").innerHTML = JOBS.slice(0, 4).map((j) => {
+const jobCard = (j, incoming = false) => {
   const h = hokieLine(j.company);
-  return `<article class="job">
+  return `<article class="job${incoming ? " incoming" : ""}">
+    ${incoming ? `<span class="just-in">New today</span>` : ""}
     <span class="save"><i data-lucide="heart"></i></span>
     <div class="job-top">${logo(j.company)}<div class="job-co"><b>${esc(j.company)}</b><span>${esc(j.level === "Co-op" ? "Co-op" : j.term || "Internship")}</span></div></div>
     <h3>${esc(j.title)}</h3>
     <div class="job-meta"><span><i data-lucide="map-pin"></i>${esc(j.location)}</span><span class="new"><i data-lucide="clock"></i>${ago(Math.round((now - Date.parse(j.postedAt)) / 6e4))}</span></div>
     ${h ? `<div class="job-foot"><span class="hokie"><i data-lucide="users"></i>${esc(h)}</span></div>` : ""}
   </article>`;
-}).join("");
+};
+$("#shot-jobs").innerHTML = JOBS.slice(0, 4).map((j) => jobCard(j)).join("");
 
 // "Who can apply", for a real posting with rules in it (or a stand-in until
 // the data carries them).
@@ -96,7 +98,7 @@ const ranked = onBoard.map((c) => [c, hires(c)]).filter(([, h]) => h).sort((a, b
 if (ranked.length) {
   const [c, h] = ranked[0];
   $("#shot-hokies").innerHTML = `<div class="l-emp-head">${logo(c)}<div><b>${esc(c)}</b><span>${fmt(JOBS.filter((j) => j.company === c).length)} open internships</span></div></div>
-    <div class="stat">${fmt(h.n)}</div><p>Hokies hired, ${fmt(h.recent)} from the classes of ${span}</p>`;
+    <div class="stat" data-count="${h.n}">${fmt(h.n)}</div><p>Hokies hired, ${fmt(h.recent)} from the classes of ${span}</p>`;
 
   const [c2, h2] = ranked[1] || ranked[0];
   $("#employer").innerHTML = `<div class="l-emp-head">${logo(c2, "lg")}<div><b>${esc(c2)}</b><span>${esc(hokieLine(c2))}</span></div></div>
@@ -124,7 +126,7 @@ if (ranked.length) {
   $("#bars").innerHTML = top.map(([name, h], i) => `<div class="l-bar">
       <span class="l-bar-name">${logo(name)}<b>${esc(name)}</b></span>
       <span class="l-bar-track"><span class="l-bar-fill" style="--w:${Math.max(4, (h.recent / max) * 100)}%;--d:${i * 60}ms"></span></span>
-      <span class="l-bar-n">${fmt(h.recent)}</span>
+      <span class="l-bar-n" data-count="${h.recent}">${fmt(h.recent)}</span>
     </div>`).join("") + `<p class="fine-inline">Hokies hired, classes of ${span}. Source: VT's First Destination Report (self-reported).</p>`;
 }
 
@@ -139,17 +141,117 @@ for (const j of JOBS) {
   latest.set(j.company, x);
 }
 const recent = [...latest.entries()].sort((a, b) => b[1].t - a[1].t).slice(0, 6);
-const trackedSince = Math.min(...data.jobs.map((j) => Date.parse(j.firstSeenAt))) + 36e5;
-const lags = data.jobs
-  .filter((j) => !j.postedApprox && j.postedAt !== j.firstSeenAt && Date.parse(j.postedAt) > trackedSince && now - Date.parse(j.postedAt) < 14 * 864e5)
-  .map((j) => (Date.parse(j.firstSeenAt) - Date.parse(j.postedAt)) / 6e4).filter((m) => m >= 0).sort((a, b) => a - b);
-const median = lags.length >= 10 ? Math.round(lags[Math.floor(lags.length / 2)]) : null;
 $("#sync").innerHTML = `<div class="l-sync-head"><b>Career sites</b><span>Updated ${ago(Math.round((now - Date.parse(data.generatedAt)) / 6e4))}</span></div>
-  ${recent.map(([c, x]) => `<div class="l-sync-row">${logo(c)}<b>${esc(c)}</b><span>${x.n} internship${x.n === 1 ? "" : "s"}</span><i data-lucide="circle-check"></i></div>`).join("")}
-  ${median != null ? `<p class="fine-inline">Median time from a company posting to Alum, last 14 days: <b>${median < 60 ? `${median} min` : `${(median / 60).toFixed(1)} h`}</b></p>` : ""}`;
+  ${recent.map(([c, x]) => `<div class="l-sync-row">${logo(c)}<b>${esc(c)}</b><span>${x.n} internship${x.n === 1 ? "" : "s"}</span><i data-lucide="circle-check"></i></div>`).join("")}`;
 
 icons();
 
-// Bars grow in when they scroll into view.
-const bars = $("#bars");
-new IntersectionObserver((es, o) => es.forEach((e) => { if (e.isIntersecting) { bars.classList.add("in"); o.disconnect(); } }), { threshold: 0.3 }).observe(bars);
+// Motion ---------------------------------------------------------------------------
+//
+// Everything below is decoration. With "reduce motion" on, the page is shown
+// finished: no counting, sliding, tilting or sweeping.
+
+const calm = matchMedia("(prefers-reduced-motion: reduce)").matches;
+const wait = (ms) => new Promise((r) => setTimeout(r, ms));
+
+// Numbers count up from zero.
+function countUp(el) {
+  const to = Number(el.dataset.count);
+  if (calm || !to) return;
+  const t0 = performance.now();
+  const step = (t) => {
+    const p = Math.min(1, (t - t0) / 1400);
+    el.textContent = fmt(Math.round(to * (1 - Math.pow(1 - p, 3))));
+    if (p < 1) requestAnimationFrame(step);
+  };
+  el.textContent = "0";
+  requestAnimationFrame(step);
+}
+
+// When something scrolls in: fade it up, draw its underlines, run its numbers.
+function arrive(el) {
+  el.classList.add("in");
+  (el.matches("u") ? [el] : el.querySelectorAll("u")).forEach((u) => u.classList.add("drawn"));
+  el.querySelectorAll("[data-count]").forEach(countUp);
+  if (el.id === "bars") el.classList.add("in");
+  if (el.classList.contains("l-pain")) setTimeout(() => el.classList.add("settled"), 1100);
+  if (el.querySelector("#sync")) sweep();
+}
+const io = new IntersectionObserver((es) => es.forEach((e) => {
+  if (!e.isIntersecting) return;
+  arrive(e.target);
+  io.unobserve(e.target);
+}), { threshold: 0.18, rootMargin: "0px 0px -6% 0px" });
+
+const targets = [
+  ".l-strip > p", ".l-section .l-eyebrow", ".l-section h2", ".l-sub", ".l-pain", ".l-punch",
+  ".l-step-text", ".l-step-shot", "#bars", ".l-faq details", ".l-final",
+];
+for (const sel of targets) {
+  document.querySelectorAll(sel).forEach((el, i) => {
+    // Siblings in a row arrive a beat apart.
+    if (/l-pain|details/.test(sel)) el.style.setProperty("--rd", `${i * 90}ms`);
+    if (sel === ".l-step-shot") el.style.setProperty("--rd", "120ms");
+    // Already on screen at load: show it as is, no entrance.
+    if (calm || el.getBoundingClientRect().top < innerHeight * 0.9) return arrive(el);
+    el.classList.add("reveal");
+    io.observe(el);
+  });
+}
+document.querySelectorAll("#step-asks li").forEach((li, i) => li.style.setProperty("--rd", `${300 + i * 220}ms`));
+
+// The hero's underline draws once the headline has risen.
+setTimeout(() => document.querySelectorAll(".l-hero u").forEach((u) => u.classList.add("drawn")), calm ? 0 : 650);
+document.querySelectorAll(".l-hero [data-count]").forEach(countUp);
+
+if (!calm) {
+  // Today's internships slide into the mock board, one every few seconds.
+  // A replay, so only postings from the last 24 hours, and the badge says
+  // "New today", not "just now".
+  const queue = JOBS.slice(4).filter((j) => now - Date.parse(j.postedAt) < 864e5);
+  const grid = $("#shot-jobs");
+  let next = 0;
+  setInterval(() => {
+    if (document.hidden || !queue.length || grid.getBoundingClientRect().bottom < 0) return;
+    grid.querySelectorAll(".just-in").forEach((b) => b.remove());
+    grid.querySelectorAll(".incoming").forEach((c) => c.classList.remove("incoming"));
+    grid.insertAdjacentHTML("afterbegin", jobCard(queue[next++ % queue.length], true));
+    grid.lastElementChild.remove();
+    icons();
+  }, 4200);
+
+  // The product window leans toward the cursor.
+  if (matchMedia("(pointer: fine)").matches) {
+    const hero = $(".l-hero"), shots = $(".l-shots");
+    hero.addEventListener("mousemove", (e) => {
+      const r = shots.getBoundingClientRect();
+      const x = Math.max(-1, Math.min(1, (e.clientX - (r.left + r.width / 2)) / (r.width / 1.2)));
+      const y = Math.max(-1, Math.min(1, (e.clientY - (r.top + r.height / 2)) / (r.height / 1.2)));
+      shots.style.setProperty("--ry", (x * 5).toFixed(2));
+      shots.style.setProperty("--rx", (-y * 4).toFixed(2));
+    });
+    hero.addEventListener("mouseleave", () => { shots.style.setProperty("--rx", 0); shots.style.setProperty("--ry", 0); });
+  }
+}
+
+// Step 1: a sweep down the career sites, checking each in turn, while the
+// card is on screen.
+let sweeping = false;
+async function sweep() {
+  if (calm || sweeping) return;
+  sweeping = true;
+  const card = $("#sync");
+  const visible = () => { const r = card.getBoundingClientRect(); return r.bottom > 0 && r.top < innerHeight && !document.hidden; };
+  while (true) {
+    if (!visible()) { await wait(800); continue; }
+    for (const row of card.querySelectorAll(".l-sync-row")) {
+      row.classList.add("checking");
+      await wait(650);
+      row.classList.remove("checking");
+      row.classList.add("done");
+      setTimeout(() => row.classList.remove("done"), 500);
+      await wait(150);
+    }
+    await wait(3500);
+  }
+}

@@ -14,8 +14,17 @@ html { scroll-behavior: smooth; scroll-padding-top: 88px; }
 .primary.small, .secondary.small { height: 40px; padding: 0 18px; font-size: 14px; border-radius: 999px; gap: 6px; }
 .primary .lucide, .secondary .lucide { width: 16px; height: 16px; }
 
-/* Underlined accents, like Runway's, in Hokie orange. */
-.landing u { text-decoration: underline; text-decoration-color: var(--orange); text-decoration-thickness: 3px; text-underline-offset: 6px; }
+/* Underlined accents, like Runway's, in Hokie orange. They draw themselves in
+ * left to right once their section is on screen (.drawn, set by landing.js). */
+.landing u {
+  text-decoration: none;
+  background: linear-gradient(var(--orange), var(--orange)) no-repeat 0 100% / 0% 3px;
+  padding-bottom: 4px;
+  -webkit-box-decoration-break: clone;
+  box-decoration-break: clone;
+  transition: background-size 1100ms var(--ease) 250ms;
+}
+.landing u.drawn { background-size: 100% 3px; }
 
 .l-eyebrow { margin: 0 0 12px; font-size: 13px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: var(--maroon); }
 .l-center { text-align: center; }
@@ -53,7 +62,7 @@ html { scroll-behavior: smooth; scroll-padding-top: 88px; }
 .l-mini-search { height: 44px; padding: 0 14px; gap: 10px; font-size: 14px; color: var(--muted); box-shadow: none; }
 .l-mini-tally { margin: 14px 2px 10px; font-size: 13px; color: var(--muted); }
 .l-mini-tally b { color: var(--ink); }
-.l-mini-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+.l-mini-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px 12px; padding-top: 6px; }
 .l-hero > *, .l-window { min-width: 0; }
 .l-mini-grid .job { padding: 14px; gap: 8px; min-height: 0; cursor: default; box-shadow: none; }
 .l-mini-grid .job:hover { box-shadow: none; }
@@ -80,10 +89,9 @@ html { scroll-behavior: smooth; scroll-padding-top: 88px; }
 .l-strip > p { margin: 0 20px 28px; font-size: 13px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); }
 
 /* Logo slider: the track holds the list twice and slides left by half its
- * width, forever. Edges fade out; hovering pauses it. */
+ * width, forever. Edges fade out. */
 .l-logos { overflow: hidden; padding-bottom: 24px; -webkit-mask-image: linear-gradient(90deg, transparent, #000 8%, #000 92%, transparent); mask-image: linear-gradient(90deg, transparent, #000 8%, #000 92%, transparent); }
 .l-marquee-track { display: flex; width: max-content; animation: marquee 48s linear infinite; }
-.l-logos:hover .l-marquee-track { animation-play-state: paused; }
 .l-dup { display: contents; }
 @keyframes marquee { to { transform: translateX(-50%); } }
 .l-logo { display: inline-flex; align-items: center; height: 96px; padding: 0 44px; white-space: nowrap; }
@@ -167,6 +175,65 @@ html { scroll-behavior: smooth; scroll-padding-top: 88px; }
 .l-foot nav { display: flex; gap: 20px; }
 .l-foot nav a:hover { color: var(--ink); }
 
+/* Motion ------------------------------------------------------------------------------ */
+
+/* Hero: the copy rises in on load, a beat apart. */
+.l-hero-text > * { animation: rise 800ms var(--ease) both; }
+.l-hero-text > :nth-child(2) { animation-delay: 80ms; }
+.l-hero-text > :nth-child(3) { animation-delay: 160ms; }
+.l-hero-text > :nth-child(4) { animation-delay: 240ms; }
+.l-hero-text > :nth-child(5) { animation-delay: 320ms; }
+.l-window { animation: rise 900ms var(--ease) 150ms both; }
+
+/* The floating panels drift, each on its own beat. */
+@keyframes drift { 50% { translate: 0 -10px; } }
+.l-float-fit { animation: rise 600ms var(--ease) 500ms both, drift 7s ease-in-out 1.2s infinite; }
+.l-float-hokies { animation: rise 600ms var(--ease) 700ms both, drift 8s ease-in-out 2s infinite; }
+
+/* The product window leans toward the cursor (desktop; --rx/--ry from landing.js). */
+.l-shots { perspective: 1400px; }
+.l-window, .l-float { transition: transform 600ms var(--ease); }
+.l-window { transform: rotateX(calc(var(--rx, 0) * 1deg)) rotateY(calc(var(--ry, 0) * 1deg)); }
+.l-float-fit { transform: translate3d(calc(var(--ry, 0) * -3px), calc(var(--rx, 0) * 3px), 0); }
+.l-float-hokies { transform: translate3d(calc(var(--ry, 0) * 4px), calc(var(--rx, 0) * -4px), 0); }
+
+/* A new internship sliding into the mock board. */
+@keyframes slideIn { from { opacity: 0; transform: translateY(-18px) scale(0.97); } }
+@keyframes glow { 0% { box-shadow: 0 0 0 0 rgba(229, 117, 31, 0.45); } 100% { box-shadow: 0 0 0 10px rgba(229, 117, 31, 0); } }
+.l-mini-grid .job.incoming { animation: slideIn 650ms var(--ease) both, glow 1.4s ease-out 300ms; border-color: var(--orange); }
+.l-mini-grid .job .just-in { position: absolute; top: -9px; left: 12px; padding: 2px 8px; border-radius: 999px; background: var(--orange); color: #fff; font-size: 10px; font-weight: 600; letter-spacing: 0.04em; text-transform: uppercase; }
+.l-mini-grid .job { position: relative; transition: border-color 1.2s ease; }
+
+/* Sections fade up as they scroll in; landing.js sets --rd for a stagger. */
+.reveal { opacity: 0; transform: translateY(28px); transition: opacity 800ms var(--ease), transform 800ms var(--ease); transition-delay: var(--rd, 0ms); }
+.reveal.in { opacity: 1; transform: none; }
+
+/* Problem cards lift under the cursor. */
+/* (.settled: added once the fade-in ends, so the quick hover transition
+ * doesn't cut the staggered entrance short.) */
+.l-pain.settled { transition: transform 300ms var(--ease), box-shadow 300ms var(--ease); }
+.l-pain.settled:hover { transform: translateY(-6px); box-shadow: var(--shadow-lift); }
+.l-pain .lucide { transition: transform 400ms var(--ease); }
+.l-pain:hover .lucide { transform: rotate(-12deg) scale(1.12); }
+
+/* Step 1: a sweep down the career sites, one "checking" at a time. */
+.l-sync-row .lucide { transition: transform 300ms var(--ease), opacity 300ms ease; }
+.l-sync-row.checking .lucide { opacity: 0.25; transform: scale(0.7); }
+.l-sync-row.checking span:not(.logo) { color: var(--ink); }
+.l-sync-row.done .lucide { animation: pop 450ms var(--ease); }
+@keyframes pop { 40% { transform: scale(1.35); } }
+.l-sync-row { transition: background 400ms ease; border-radius: 10px; }
+.l-sync-row.checking { background: var(--soft); }
+
+/* Step 2: the fine print checks off row by row. */
+.l-step-shot .asks li { opacity: 0; transform: translateX(-10px); transition: opacity 500ms var(--ease), transform 500ms var(--ease); transition-delay: var(--rd, 0ms); }
+.l-step-shot.in .asks li, .l-step-shot:not(.reveal) .asks li { opacity: 1; transform: none; }
+.l-step-shot.in .asks li .lucide { animation: pop 450ms var(--ease) both; animation-delay: var(--rd, 0ms); }
+
+/* Buttons nudge their arrow. */
+.primary .lucide, .secondary .lucide { transition: transform 250ms var(--ease); }
+.primary:hover .lucide, .secondary:hover .lucide { transform: translateX(3px); }
+
 /* Narrower screens ---------------------------------------------------------------------- */
 
 @media (max-width: 980px) {
@@ -199,6 +266,10 @@ html { scroll-behavior: smooth; scroll-padding-top: 88px; }
   .l-foot { grid-template-columns: 1fr; }
 }
 @media (prefers-reduced-motion: reduce) {
+  .l-hero-text > *, .l-window, .l-float-fit, .l-float-hokies, .l-mini-grid .job.incoming { animation: none; }
+  .reveal, .l-step-shot .asks li { opacity: 1; transform: none; transition: none; }
+  .l-window, .l-float-fit, .l-float-hokies { transform: none; }
+  .landing u { transition: none; background-size: 100% 3px; }
   .l-marquee-track { animation: none; flex-wrap: wrap; justify-content: center; width: auto; row-gap: 16px; }
   .l-dup { display: none; }
   .l-bar-fill { transition: none; }
