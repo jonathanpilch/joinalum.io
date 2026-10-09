@@ -86,12 +86,10 @@ html { scroll-behavior: smooth; scroll-padding-top: 88px; }
 .l-logos:hover .l-marquee-track { animation-play-state: paused; }
 .l-dup { display: contents; }
 @keyframes marquee { to { transform: translateX(-50%); } }
-.l-logo { display: inline-flex; align-items: center; gap: 16px; padding: 0 36px; color: var(--ink); white-space: nowrap; }
-.logo.xl { width: 64px; height: 64px; border-radius: 16px; font-size: 22px; }
-.l-logo .logo { filter: grayscale(1); opacity: 0.8; transition: filter 300ms ease, opacity 300ms ease; }
-.l-logo:hover .logo { filter: none; opacity: 1; }
-.l-logo b { font-size: 30px; font-weight: 600; letter-spacing: -0.02em; color: var(--muted); transition: color 300ms ease; }
-.l-logo:hover b { color: var(--ink); }
+.l-logo { display: inline-flex; align-items: center; height: 96px; padding: 0 44px; white-space: nowrap; }
+.l-logo img { display: block; height: calc(var(--h) * 1px); width: auto; filter: grayscale(1); opacity: 0.6; transition: filter 300ms ease, opacity 300ms ease; }
+.l-logo:hover img { filter: none; opacity: 1; }
+.l-wordmark { font-size: 34px; font-weight: 700; letter-spacing: -0.02em; color: var(--ink); opacity: 0.6; }
 
 /* The problem ------------------------------------------------------------------- */
 
@@ -193,9 +191,9 @@ html { scroll-behavior: smooth; scroll-padding-top: 88px; }
   .l-shots { padding: 0; }
   .l-pains { grid-template-columns: 1fr; }
   .l-bar { grid-template-columns: 130px 1fr 36px; gap: 10px; }
-  .logo.xl { width: 44px; height: 44px; border-radius: 12px; font-size: 16px; }
-  .l-logo { gap: 12px; padding: 0 22px; }
-  .l-logo b { font-size: 22px; }
+  .l-logo { height: 64px; padding: 0 26px; }
+  .l-logo img { height: calc(var(--h) * 0.62px); }
+  .l-wordmark { font-size: 22px; }
   .l-marquee-track { animation-duration: 36s; }
   .l-bar-name .logo { display: none; }
   .l-foot { grid-template-columns: 1fr; }

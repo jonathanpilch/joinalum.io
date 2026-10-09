@@ -20,9 +20,10 @@ try {
   if (localStorage.getItem("alum.saved") || localStorage.getItem("alum.profile")) $("#nav-cta").textContent = "Open your board";
 } catch {}
 
-const [data, P] = await Promise.all([
+const [data, P, LOGOS] = await Promise.all([
   fetch("data/jobs.json").then((r) => r.json()).catch(() => null),
   fetch("data/placements.json").then((r) => r.json()).catch(() => null),
+  fetch("assets/logos/index.json").then((r) => r.json()).catch(() => ({})),
 ]);
 icons();
 if (!data) throw new Error("landing: no jobs data");
@@ -103,8 +104,18 @@ if (ranked.length) {
     <ul class="titles">${h2.titles.slice(0, 4).map(([t, n]) => `<li><span>${esc(t)}</span><b>${n}</b></li>`).join("")}</ul>
     <div class="l-radar"><span class="logo radar"><i data-lucide="radar"></i></span><div><b>Radar: ${esc(c2)} · Summer 2027</b><span>Emails you within the hour when one posts</span></div></div>`;
 
-  // A slider: the list twice in a row, so sliding by half loops seamlessly.
-  const strip = ranked.slice(0, 16).map(([name]) => `<span class="l-logo">${logo(name, "xl")}<b>${esc(name)}</b></span>`).join("");
+  // A slider of the employers' own wordmarks (scripts/logos.mjs), the list
+  // twice in a row so sliding by half loops seamlessly. Marks are sized by
+  // area, so a square mark and a long wordmark look equally big; a company
+  // without a logo file gets its name set in type.
+  const AREA = 13000; // px², about 200 × 66 for a 3:1 wordmark
+  const mark = (name) => {
+    const l = LOGOS[name];
+    if (!l) return `<span class="l-logo"><b class="l-wordmark">${esc(name)}</b></span>`;
+    const h = Math.round(Math.min(84, Math.max(34, Math.sqrt(AREA / (l.aspect || 3)))));
+    return `<span class="l-logo"><img src="assets/logos/${esc(l.file)}" alt="${esc(name)}" style="--h:${h}" decoding="async" /></span>`;
+  };
+  const strip = ranked.slice(0, 16).map(([name]) => mark(name)).join("");
   $("#strip").innerHTML = `<div class="l-marquee-track">${strip}<span class="l-dup" aria-hidden="true">${strip}</span></div>`;
 
   const top = ranked.slice(0, 8);

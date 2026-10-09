@@ -1,0 +1,117 @@
+{
+  "Deloitte": {
+    "file": "deloitte.svg",
+    "aspect": 5.234,
+    "source": "https://commons.wikimedia.org/wiki/File:Logo_of_Deloitte.svg"
+  },
+  "Boeing": {
+    "file": "boeing.svg",
+    "aspect": 4.3,
+    "source": "https://commons.wikimedia.org/wiki/File:Boeing_full_logo.svg"
+  },
+  "Northrop Grumman": {
+    "file": "northrop-grumman.svg",
+    "aspect": 4.372,
+    "source": "https://commons.wikimedia.org/wiki/File:Northrop_Grumman_logo_blue-on-clear_2020.svg"
+  },
+  "Amazon": {
+    "file": "amazon.svg",
+    "aspect": 2.986,
+    "source": "https://commons.wikimedia.org/wiki/File:Amazon_2024.svg"
+  },
+  "Capital One": {
+    "file": "capital-one.svg",
+    "aspect": 2.787,
+    "source": "https://commons.wikimedia.org/wiki/File:Capital_One_logo.svg"
+  },
+  "PwC": {
+    "file": "pwc.svg",
+    "aspect": 2.067,
+    "source": "https://commons.wikimedia.org/wiki/File:PwC_Company_Logo.svg"
+  },
+  "Accenture": {
+    "file": "accenture.svg",
+    "aspect": 3.8,
+    "source": "https://commons.wikimedia.org/wiki/File:Accenture.svg"
+  },
+  "RTX": {
+    "file": "rtx.svg",
+    "aspect": 2.589,
+    "source": "https://commons.wikimedia.org/wiki/File:RTX_Raytheon_Technologies_logo.svg"
+  },
+  "CACI": {
+    "file": "caci.svg",
+    "aspect": 1.76,
+    "source": "https://commons.wikimedia.org/wiki/File:CACI_International_logo.svg"
+  },
+  "Booz Allen Hamilton": {
+    "file": "booz-allen-hamilton.svg",
+    "aspect": 6.212,
+    "source": "https://commons.wikimedia.org/wiki/File:Booz_Allen_Hamilton_logo.svg"
+  },
+  "Wells Fargo": {
+    "file": "wells-fargo.svg",
+    "aspect": 1,
+    "source": "https://commons.wikimedia.org/wiki/File:Wells_Fargo_Logo_(2020).svg"
+  },
+  "Fannie Mae": {
+    "file": "fannie-mae.png",
+    "aspect": 5.027,
+    "source": "https://commons.wikimedia.org/wiki/File:Fannie_Mae_Logo.png"
+  },
+  "Leidos": {
+    "file": "leidos.svg",
+    "aspect": 4.223,
+    "source": "https://commons.wikimedia.org/wiki/File:Leidos_logo_2023.svg"
+  },
+  "Freddie Mac": {
+    "file": "freddie-mac.svg",
+    "aspect": 4.335,
+    "source": "https://commons.wikimedia.org/wiki/File:FreddieMacLogo.svg"
+  },
+  "Disney": {
+    "file": "disney.svg",
+    "aspect": 1.932,
+    "source": "https://commons.wikimedia.org/wiki/File:The_Walt_Disney_company_logo.svg"
+  },
+  "Protiviti": {
+    "file": "protiviti.svg",
+    "aspect": 1.845,
+    "source": "https://commons.wikimedia.org/wiki/File:Protiviti_logo.svg"
+  },
+  "Vanguard": {
+    "file": "vanguard.svg",
+    "aspect": 4.704,
+    "source": "https://commons.wikimedia.org/wiki/File:Vanguard.svg"
+  },
+  "Micron": {
+    "file": "micron.svg",
+    "aspect": 4.667,
+    "source": "https://commons.wikimedia.org/wiki/File:Micron_Technology_logo_2024.svg"
+  },
+  "Cisco": {
+    "file": "cisco.svg",
+    "aspect": 1.895,
+    "source": "https://commons.wikimedia.org/wiki/File:Cisco_logo_blue_2016.svg"
+  },
+  "Salesforce": {
+    "file": "salesforce.svg",
+    "aspect": 1.429,
+    "source": "https://commons.wikimedia.org/wiki/File:Salesforce.com_logo.svg"
+  },
+  "NVIDIA": {
+    "file": "nvidia.svg",
+    "aspect": 5.467,
+    "source": "https://commons.wikimedia.org/wiki/File:NVIDIA_logo.svg"
+  },
+  "General Motors": {
+    "file": "general-motors.svg",
+    "aspect": 3.753,
+    "source": "https://en.wikipedia.org/wiki/File:General_Motors_(logo_with_wordmark,_horizontal).svg"
+  },
+  "Samsara": {
+    "file": "samsara.svg",
+    "aspect": 4.167,
+    "source": "https://en.wikipedia.org/wiki/File:Samsara_(company)_Logo.svg"
+  }
+}
