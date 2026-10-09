@@ -1,0 +1,180 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <title>Alum</title>
+    <meta name="description" content="Fresh internships at the companies that hire Hokies." />
+    <meta name="theme-color" content="#ffffff" />
+    <link rel="icon" type="image/svg+xml" href="assets/brand/alum.svg" />
+    <link rel="icon" type="image/png" href="assets/brand/alum.png" />
+    <link rel="apple-touch-icon" href="assets/brand/alum.png" />
+    <meta property="og:title" content="Alum" />
+    <meta property="og:description" content="Fresh internships at the companies that hire Hokies." />
+    <meta property="og:image" content="https://joinalum.io/assets/brand/alum.png" />
+    <meta property="og:url" content="https://joinalum.io/app" />
+    <meta name="twitter:card" content="summary" />
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <header class="top">
+      <a class="brand" href="./" aria-label="Alum home">
+        <img src="assets/brand/alum-mark-dark.svg" alt="" />
+        <span>Alum</span>
+      </a>
+
+      <nav class="switch" role="tablist" aria-label="Sections">
+        <span class="switch-pill" aria-hidden="true"></span>
+        <button role="tab" data-tab="internships" aria-selected="true"><i data-lucide="briefcase"></i>Internships</button>
+        <button role="tab" data-tab="profile" aria-selected="false"><i data-lucide="user"></i>Profile</button>
+      </nav>
+
+      <span class="top-right" id="updated"></span>
+    </header>
+
+    <!-- Internships -->
+    <main id="internships" class="view">
+      <div class="search">
+        <i data-lucide="search"></i>
+        <input id="q" type="search" placeholder="Search internships, companies, cities" autocomplete="off" />
+        <button class="round dark" id="open-filters" aria-label="Filters">
+          <i data-lucide="sliders-horizontal"></i>
+          <span class="dot" id="filter-dot" hidden></span>
+        </button>
+      </div>
+
+      <div class="cats" id="cats" aria-label="Categories"></div>
+
+      <div class="bar">
+        <p id="tally"></p>
+        <button class="ghost small" id="save-search"><i data-lucide="bell-plus"></i>Alert me</button>
+        <div class="sort" role="group" aria-label="Sort">
+          <button data-sort="new" aria-pressed="true">Newest</button>
+          <button data-sort="hokies" aria-pressed="false">Most Hokies</button>
+          <button data-sort="fit" aria-pressed="false" hidden>Best fit</button>
+        </div>
+      </div>
+
+      <div class="grid" id="grid"></div>
+      <div class="empty" id="empty" hidden>
+        <i data-lucide="search-x"></i>
+        <p>No internships match.</p>
+        <button class="link" id="clear-empty">Clear filters</button>
+      </div>
+      <div class="more"><button class="ghost" id="more">Show more</button></div>
+    </main>
+
+    <!-- Profile -->
+    <main id="profile" class="view" hidden>
+      <!-- Filled by renderAccount(); hidden when the site has no Supabase config. -->
+      <section class="card account" id="account" hidden></section>
+
+      <section class="card">
+        <div class="card-head">
+          <h2>About you</h2>
+          <span class="saved-note" id="saved-note"></span>
+          <button class="ghost small" id="resume-btn" hidden><i data-lucide="file-up"></i>Fill from resume</button>
+          <input type="file" id="resume-file" accept="application/pdf" hidden />
+        </div>
+        <p class="sub" id="about-sub">Picks your internships, checks who can apply against you, and shows how many Hokies from your major got hired.</p>
+        <div class="review" id="resume-review" hidden></div>
+        <div class="fields">
+          <label class="field"><span>Name</span><input id="p-name" placeholder="First name" autocomplete="given-name" /></label>
+          <label class="field"><span>Major</span><select id="p-major"></select></label>
+          <label class="field"><span>Graduating (May)</span><select id="p-year"></select></label>
+          <label class="field"><span>Looking for</span><select id="p-term"></select></label>
+          <label class="field"><span>Degree</span><select id="p-degree"></select></label>
+          <label class="field"><span>GPA</span><input id="p-gpa" type="number" inputmode="decimal" min="0" max="4" step="0.01" placeholder="Optional" /></label>
+          <label class="field wide"><span>Work status</span><select id="p-work"></select></label>
+        </div>
+        <p class="sub small">Work status decides citizenship, clearance and sponsorship rules. It never leaves this device.</p>
+        <h3>Tools you know</h3>
+        <div class="chips" id="p-skills"></div>
+        <h3>Interested in</h3>
+        <div class="chips" id="p-interests"></div>
+        <h3>Where</h3>
+        <div class="chips" id="p-places"></div>
+      </section>
+
+      <section class="card" id="radars">
+        <div class="card-head">
+          <h2>Radars</h2>
+          <span class="count" id="radar-count"></span>
+        </div>
+        <p class="sub" id="radar-sub">Save any search with <b>Alert me</b> and Alum tells you when something new lands in it.</p>
+        <div id="radar-list"></div>
+      </section>
+
+      <section class="card">
+        <div class="card-head">
+          <h2>Saved internships</h2>
+          <span class="count" id="saved-count"></span>
+        </div>
+        <div id="saved-list"></div>
+      </section>
+    </main>
+
+    <!-- Internship detail -->
+    <div class="modal" id="detail" hidden>
+      <div class="sheet" role="dialog" aria-modal="true" aria-labelledby="d-title">
+        <button class="round close" data-close aria-label="Close"><i data-lucide="x"></i></button>
+        <div class="sheet-body" id="detail-body"></div>
+      </div>
+    </div>
+
+    <!-- Filters -->
+    <div class="modal" id="filters" hidden>
+      <div class="sheet" role="dialog" aria-modal="true" aria-label="Filters">
+        <div class="sheet-head">
+          <button class="round" data-close aria-label="Close"><i data-lucide="x"></i></button>
+          <h2>Filters</h2>
+          <span></span>
+        </div>
+        <div class="sheet-body" id="filter-body"></div>
+        <div class="sheet-foot">
+          <button class="link" id="clear">Clear all</button>
+          <button class="primary" id="apply">Show internships</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- New radar -->
+    <div class="modal" id="radar-new" hidden>
+      <div class="sheet small" role="dialog" aria-modal="true" aria-labelledby="rn-title">
+        <div class="sheet-head">
+          <button class="round" data-close aria-label="Close"><i data-lucide="x"></i></button>
+          <h2 id="rn-title">New radar</h2>
+          <span></span>
+        </div>
+        <div class="sheet-body" id="radar-new-body"></div>
+        <div class="sheet-foot">
+          <span></span>
+          <button class="primary" id="radar-create">Create radar</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Interview notes -->
+    <div class="modal" id="report" hidden>
+      <div class="sheet" role="dialog" aria-modal="true" aria-labelledby="r-title">
+        <div class="sheet-head">
+          <button class="round" data-close aria-label="Close"><i data-lucide="x"></i></button>
+          <h2 id="r-title">How did it go?</h2>
+          <span></span>
+        </div>
+        <div class="sheet-body" id="report-body"></div>
+        <div class="sheet-foot">
+          <span class="fine-inline">Shown to signed-in Hokies, never with your name.</span>
+          <button class="primary" id="report-send">Share with Hokies</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="toast" id="toast" role="status" hidden></div>
+
+    <script src="https://unpkg.com/lucide@1.53.0/dist/umd/lucide.min.js"></script>
+    <script src="schools.js"></script>
+    <script src="config.js"></script>
+    <script type="module" src="app.js"></script>
+  </body>
+</html>

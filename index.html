@@ -3,178 +3,213 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-    <title>Alum</title>
-    <meta name="description" content="Fresh internships at the companies that hire Hokies." />
+    <title>Alum · Internships at the companies that hire Hokies</title>
+    <meta name="description" content="Every new internship and co-op from the companies that hire Virginia Tech students, checked hourly at the source, with who can apply and how many Hokies they've hired." />
     <meta name="theme-color" content="#ffffff" />
     <link rel="icon" type="image/svg+xml" href="assets/brand/alum.svg" />
     <link rel="icon" type="image/png" href="assets/brand/alum.png" />
     <link rel="apple-touch-icon" href="assets/brand/alum.png" />
     <meta property="og:title" content="Alum" />
-    <meta property="og:description" content="Fresh internships at the companies that hire Hokies." />
+    <meta property="og:description" content="Internships at the companies that hire Hokies, the hour they're posted." />
     <meta property="og:image" content="https://joinalum.io/assets/brand/alum.png" />
     <meta property="og:url" content="https://joinalum.io/" />
     <meta name="twitter:card" content="summary" />
+    <script>
+      // Links into the board (from emails, or from before the board moved to
+      // /app) land there, not here.
+      if (/[?&](job|radar)=/.test(location.search) || /^#(profile|radars)$/.test(location.hash)) location.replace("app" + location.search + location.hash);
+    </script>
     <link rel="stylesheet" href="styles.css" />
+    <link rel="stylesheet" href="landing.css" />
   </head>
-  <body>
+  <body class="landing">
     <header class="top">
       <a class="brand" href="./" aria-label="Alum home">
         <img src="assets/brand/alum-mark-dark.svg" alt="" />
         <span>Alum</span>
       </a>
-
-      <nav class="switch" role="tablist" aria-label="Sections">
-        <span class="switch-pill" aria-hidden="true"></span>
-        <button role="tab" data-tab="internships" aria-selected="true"><i data-lucide="briefcase"></i>Internships</button>
-        <button role="tab" data-tab="profile" aria-selected="false"><i data-lucide="user"></i>Profile</button>
+      <nav class="l-nav" aria-label="Sections">
+        <a href="#how">How it works</a>
+        <a href="#employers">Where Hokies land</a>
+        <a href="#faq">FAQ</a>
       </nav>
-
-      <span class="top-right" id="updated"></span>
+      <a class="primary small top-cta" href="app" id="nav-cta">Browse internships</a>
     </header>
 
-    <!-- Internships -->
-    <main id="internships" class="view">
-      <div class="search">
-        <i data-lucide="search"></i>
-        <input id="q" type="search" placeholder="Search internships, companies, cities" autocomplete="off" />
-        <button class="round dark" id="open-filters" aria-label="Filters">
-          <i data-lucide="sliders-horizontal"></i>
-          <span class="dot" id="filter-dot" hidden></span>
-        </button>
-      </div>
-
-      <div class="cats" id="cats" aria-label="Categories"></div>
-
-      <div class="bar">
-        <p id="tally"></p>
-        <button class="ghost small" id="save-search"><i data-lucide="bell-plus"></i>Alert me</button>
-        <div class="sort" role="group" aria-label="Sort">
-          <button data-sort="new" aria-pressed="true">Newest</button>
-          <button data-sort="hokies" aria-pressed="false">Most Hokies</button>
-          <button data-sort="fit" aria-pressed="false" hidden>Best fit</button>
+    <main>
+      <!-- Hero ------------------------------------------------------------------>
+      <section class="l-hero">
+        <div class="l-hero-text">
+          <span class="hokie l-badge"><i data-lucide="graduation-cap"></i>Built by Hokies, for Hokies</span>
+          <h1>Find the internship <u>before the line forms.</u></h1>
+          <p class="l-lede">
+            Alum checks the career sites of the companies that hire Virginia Tech students every hour, and shows you each new
+            internship and co-op the day it goes up, whether you can actually apply, and how many Hokies they've already hired.
+          </p>
+          <div class="l-ctas">
+            <a class="primary" href="app" data-count-cta>Browse internships<i data-lucide="arrow-right"></i></a>
+            <a class="secondary" href="#how">How it works</a>
+          </div>
+          <p class="l-proof" id="proof">Free for every Hokie · No sign-up to browse</p>
         </div>
-      </div>
 
-      <div class="grid" id="grid"></div>
-      <div class="empty" id="empty" hidden>
-        <i data-lucide="search-x"></i>
-        <p>No internships match.</p>
-        <button class="link" id="clear-empty">Clear filters</button>
-      </div>
-      <div class="more"><button class="ghost" id="more">Show more</button></div>
+        <!-- The product, built from the board's own components and today's data. -->
+        <div class="l-shots" aria-hidden="true">
+          <div class="l-window">
+            <div class="l-window-bar"><span></span><span></span><span></span><b>joinalum.io</b></div>
+            <div class="l-window-body">
+              <div class="search l-mini-search"><i data-lucide="search"></i><span>Search internships, companies, cities</span></div>
+              <p class="l-mini-tally" id="shot-tally">Today's internships</p>
+              <div class="l-mini-grid" id="shot-jobs"></div>
+            </div>
+          </div>
+          <div class="l-float l-float-fit">
+            <h4><i data-lucide="list-checks"></i>Who can apply</h4>
+            <ul class="asks" id="shot-asks"></ul>
+          </div>
+          <div class="l-float l-float-hokies" id="shot-hokies"></div>
+        </div>
+      </section>
+
+      <!-- Employer strip --------------------------------------------------------->
+      <section class="l-strip">
+        <p>Where Hokies have started their careers</p>
+        <div class="l-logos" id="strip"></div>
+      </section>
+
+      <!-- The problem ------------------------------------------------------------>
+      <section class="l-section l-center">
+        <p class="l-eyebrow">The internship search, as it is</p>
+        <h2>The good ones close early. <u>Finding them is a second job.</u></h2>
+        <p class="l-sub">
+          Internships at the companies that recruit at Tech go up on their own career sites first, a few at a time, all year.
+          By the time one reaches a feed, a GroupMe or a career fair, the first round of interviews is often already set.
+        </p>
+        <div class="l-pains">
+          <div class="l-pain"><i data-lucide="refresh-cw"></i><p><b>Refreshing thirty career sites</b> by hand, hoping something new went up.</p></div>
+          <div class="l-pain"><i data-lucide="shield-alert"></i><p><b>Applying to roles you can't take:</b> PhD only, a clearance you can't get, the wrong graduation year.</p></div>
+          <div class="l-pain"><i data-lucide="circle-help"></i><p><b>Guessing which companies</b> actually hire from Virginia Tech.</p></div>
+          <div class="l-pain"><i data-lucide="message-square-dashed"></i><p><b>Hearing about a posting</b> from a group chat, a week after it went up.</p></div>
+        </div>
+        <p class="l-punch">It's not you. <u>It's the search.</u></p>
+      </section>
+
+      <!-- How it works ----------------------------------------------------------->
+      <section class="l-section l-how" id="how">
+        <div class="l-center">
+          <p class="l-eyebrow">How Alum works</p>
+          <h2>Straight from the source, sorted for you.</h2>
+          <p class="l-sub">No reposts, no scraped job boards, no sponsored listings. Just the companies' own postings, and what you need to decide.</p>
+        </div>
+
+        <div class="l-step">
+          <div class="l-step-text">
+            <p class="l-eyebrow">Step 1</p>
+            <h3>Every hour, we check the career sites <u>directly.</u></h3>
+            <p>Greenhouse, Workday, Lever, Ashby, SmartRecruiters and the big companies' own sites: <b id="n-companies">over a hundred</b> employers, pulled hourly. Every posting shows when the company put it up and how long after that it reached Alum, so you can check us.</p>
+            <a class="secondary small" href="app">See what's new today<i data-lucide="arrow-right"></i></a>
+          </div>
+          <div class="l-step-shot">
+            <div class="card l-sync" id="sync"></div>
+          </div>
+        </div>
+
+        <div class="l-step flip">
+          <div class="l-step-text">
+            <p class="l-eyebrow">Step 2</p>
+            <h3>Only the ones <u>you can apply to.</u></h3>
+            <p>Tell Alum your graduation year, degree and work status once. It reads each posting's fine print, the graduation window, PhD-only, citizenship, security clearance, sponsorship, GPA, and hides what rules you out. What's left shows exactly why it fits.</p>
+            <a class="secondary small" href="app#profile">Set up your profile<i data-lucide="arrow-right"></i></a>
+          </div>
+          <div class="l-step-shot">
+            <div class="card l-profile">
+              <div class="chips">
+                <span class="chip" aria-pressed="true">Class of 2028</span>
+                <span class="chip" aria-pressed="true">Computer Science</span>
+                <span class="chip" aria-pressed="true">US citizen</span>
+                <span class="chip">Python</span><span class="chip" aria-pressed="true">C++</span><span class="chip">MATLAB</span>
+              </div>
+              <div class="l-filtered"><b id="n-filtered">Roles you can't apply to</b>, hidden. One tap shows them again.</div>
+              <ul class="asks" id="step-asks"></ul>
+            </div>
+          </div>
+        </div>
+
+        <div class="l-step">
+          <div class="l-step-text">
+            <p class="l-eyebrow">Step 3</p>
+            <h3>Apply where <u>Hokies already are.</u></h3>
+            <p>Every company shows how many Virginia Tech grads it hired for their first job, and from which majors, from <b id="n-placed">tens of thousands</b> of placements in VT's First Destination Report. Save a search as a radar and Alum tells you when something new lands in it.</p>
+            <a class="secondary small" href="app">Find your Hokie employers<i data-lucide="arrow-right"></i></a>
+          </div>
+          <div class="l-step-shot">
+            <div class="card l-employer" id="employer"></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Where Hokies land (Runway's timing bars, with our data) ---------------->
+      <section class="l-section l-center" id="employers">
+        <p class="l-eyebrow">Where Hokies land</p>
+        <h2>The companies that hire Tech, <u>ranked by Tech.</u></h2>
+        <p class="l-sub" id="employers-sub">First jobs reported by Virginia Tech graduates, at employers on Alum.</p>
+        <div class="card l-bars" id="bars"></div>
+        <a class="primary" href="app" data-count-cta>Browse internships<i data-lucide="arrow-right"></i></a>
+      </section>
+
+      <!-- FAQ ------------------------------------------------------------------>
+      <section class="l-section l-faq" id="faq">
+        <div class="l-center">
+          <p class="l-eyebrow">Questions</p>
+          <h2>Good to know</h2>
+        </div>
+        <details>
+          <summary>Is Alum free?</summary>
+          <p>Yes. Browsing, filters, radars, the tracker and interview notes are free. There's no paid tier holding back the useful part.</p>
+        </details>
+        <details>
+          <summary>Where do the internships come from?</summary>
+          <p>From each company's own career site, checked every hour: the boards they post to first (Greenhouse, Workday, Lever, Ashby, SmartRecruiters) and the big companies' own systems. Alum keeps internships, co-ops and new-grad roles in tech, engineering and business tracks, in the US.</p>
+        </details>
+        <details>
+          <summary>How fresh is "fresh"?</summary>
+          <p>Every posting shows the time the company published it and how long after that it showed up on Alum. When a company only publishes the day, not the time, Alum says so instead of guessing.</p>
+        </details>
+        <details>
+          <summary>How does Alum know who can apply?</summary>
+          <p>It reads each posting for the rules that rule people out: graduation window, "must return to school", PhD or grad-only, US citizenship, security clearance, no visa sponsorship, and minimum GPA. When a posting doesn't say, Alum doesn't guess, and it always shows the rule next to the role so you can check.</p>
+        </details>
+        <details>
+          <summary>Where do the "Hokies hired" numbers come from?</summary>
+          <p>Virginia Tech's First Destination Report: graduates' self-reported first jobs, by employer and major. Alum matches those employers to the companies on the board.</p>
+        </details>
+        <details>
+          <summary>What happens to my information?</summary>
+          <p>Without an account, your profile and saved internships never leave your device. If you sign in with your vt.edu email, they sync to your account so you can use them anywhere. A resume you upload to fill in your profile is read once and not stored.</p>
+        </details>
+        <details>
+          <summary>Is this run by Virginia Tech?</summary>
+          <p>No. Alum is built by Hokies, independently. It isn't affiliated with or endorsed by Virginia Tech.</p>
+        </details>
+      </section>
+
+      <!-- Closing ------------------------------------------------------------------>
+      <section class="l-section">
+        <div class="card l-final">
+          <h2>New internships went up today.</h2>
+          <p id="final-sub">See them before everyone else does.</p>
+          <a class="primary" href="app" data-count-cta>Browse internships<i data-lucide="arrow-right"></i></a>
+        </div>
+      </section>
     </main>
 
-    <!-- Profile -->
-    <main id="profile" class="view" hidden>
-      <!-- Filled by renderAccount(); hidden when the site has no Supabase config. -->
-      <section class="card account" id="account" hidden></section>
-
-      <section class="card">
-        <div class="card-head">
-          <h2>About you</h2>
-          <span class="saved-note" id="saved-note"></span>
-          <button class="ghost small" id="resume-btn" hidden><i data-lucide="file-up"></i>Fill from resume</button>
-          <input type="file" id="resume-file" accept="application/pdf" hidden />
-        </div>
-        <p class="sub" id="about-sub">Picks your internships, checks who can apply against you, and shows how many Hokies from your major got hired.</p>
-        <div class="review" id="resume-review" hidden></div>
-        <div class="fields">
-          <label class="field"><span>Name</span><input id="p-name" placeholder="First name" autocomplete="given-name" /></label>
-          <label class="field"><span>Major</span><select id="p-major"></select></label>
-          <label class="field"><span>Graduating (May)</span><select id="p-year"></select></label>
-          <label class="field"><span>Looking for</span><select id="p-term"></select></label>
-          <label class="field"><span>Degree</span><select id="p-degree"></select></label>
-          <label class="field"><span>GPA</span><input id="p-gpa" type="number" inputmode="decimal" min="0" max="4" step="0.01" placeholder="Optional" /></label>
-          <label class="field wide"><span>Work status</span><select id="p-work"></select></label>
-        </div>
-        <p class="sub small">Work status decides citizenship, clearance and sponsorship rules. It never leaves this device.</p>
-        <h3>Tools you know</h3>
-        <div class="chips" id="p-skills"></div>
-        <h3>Interested in</h3>
-        <div class="chips" id="p-interests"></div>
-        <h3>Where</h3>
-        <div class="chips" id="p-places"></div>
-      </section>
-
-      <section class="card" id="radars">
-        <div class="card-head">
-          <h2>Radars</h2>
-          <span class="count" id="radar-count"></span>
-        </div>
-        <p class="sub" id="radar-sub">Save any search with <b>Alert me</b> and Alum tells you when something new lands in it.</p>
-        <div id="radar-list"></div>
-      </section>
-
-      <section class="card">
-        <div class="card-head">
-          <h2>Saved internships</h2>
-          <span class="count" id="saved-count"></span>
-        </div>
-        <div id="saved-list"></div>
-      </section>
-    </main>
-
-    <!-- Internship detail -->
-    <div class="modal" id="detail" hidden>
-      <div class="sheet" role="dialog" aria-modal="true" aria-labelledby="d-title">
-        <button class="round close" data-close aria-label="Close"><i data-lucide="x"></i></button>
-        <div class="sheet-body" id="detail-body"></div>
-      </div>
-    </div>
-
-    <!-- Filters -->
-    <div class="modal" id="filters" hidden>
-      <div class="sheet" role="dialog" aria-modal="true" aria-label="Filters">
-        <div class="sheet-head">
-          <button class="round" data-close aria-label="Close"><i data-lucide="x"></i></button>
-          <h2>Filters</h2>
-          <span></span>
-        </div>
-        <div class="sheet-body" id="filter-body"></div>
-        <div class="sheet-foot">
-          <button class="link" id="clear">Clear all</button>
-          <button class="primary" id="apply">Show internships</button>
-        </div>
-      </div>
-    </div>
-
-    <!-- New radar -->
-    <div class="modal" id="radar-new" hidden>
-      <div class="sheet small" role="dialog" aria-modal="true" aria-labelledby="rn-title">
-        <div class="sheet-head">
-          <button class="round" data-close aria-label="Close"><i data-lucide="x"></i></button>
-          <h2 id="rn-title">New radar</h2>
-          <span></span>
-        </div>
-        <div class="sheet-body" id="radar-new-body"></div>
-        <div class="sheet-foot">
-          <span></span>
-          <button class="primary" id="radar-create">Create radar</button>
-        </div>
-      </div>
-    </div>
-
-    <!-- Interview notes -->
-    <div class="modal" id="report" hidden>
-      <div class="sheet" role="dialog" aria-modal="true" aria-labelledby="r-title">
-        <div class="sheet-head">
-          <button class="round" data-close aria-label="Close"><i data-lucide="x"></i></button>
-          <h2 id="r-title">How did it go?</h2>
-          <span></span>
-        </div>
-        <div class="sheet-body" id="report-body"></div>
-        <div class="sheet-foot">
-          <span class="fine-inline">Shown to signed-in Hokies, never with your name.</span>
-          <button class="primary" id="report-send">Share with Hokies</button>
-        </div>
-      </div>
-    </div>
-
-    <div class="toast" id="toast" role="status" hidden></div>
+    <footer class="l-foot">
+      <a class="brand" href="./"><img src="assets/brand/alum-mark-dark.svg" alt="" /><span>Alum</span></a>
+      <p>Built by Hokies. Not affiliated with Virginia Tech. Hiring numbers from <a id="source" target="_blank" rel="noopener">VT's First Destination Report</a>.</p>
+      <nav><a href="app">Internships</a><a href="app#profile">Profile</a><a href="#faq">FAQ</a></nav>
+    </footer>
 
     <script src="https://unpkg.com/lucide@1.53.0/dist/umd/lucide.min.js"></script>
-    <script src="schools.js"></script>
-    <script src="config.js"></script>
-    <script type="module" src="app.js"></script>
+    <script type="module" src="landing.js"></script>
   </body>
 </html>

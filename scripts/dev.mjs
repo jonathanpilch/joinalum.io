@@ -18,7 +18,8 @@ createServer(async (req, res) => {
   let path = normalize(decodeURIComponent(new URL(req.url, "http://x").pathname));
   if (path.includes("..") || /(^|\/)\.(env|git)/.test(path)) { res.writeHead(404).end(); return; }
   let file = join(ROOT, path);
-  try { if ((await stat(file)).isDirectory()) file = join(file, "index.html"); } catch {}
+  // Like Cloudflare: "/" -> index.html, "/app" -> app.html.
+  try { if ((await stat(file)).isDirectory()) file = join(file, "index.html"); } catch { if (!extname(file)) file += ".html"; }
   try {
     const body = await readFile(file);
     res.writeHead(200, { "content-type": TYPES[extname(file)] || "application/octet-stream", "cache-control": "no-store" });

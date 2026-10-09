@@ -56,7 +56,7 @@ async function send(to, subject, html, text) {
   const r = await fetch("https://api.resend.com/emails", {
     method: "POST",
     headers: { authorization: `Bearer ${RESEND_API_KEY}`, "content-type": "application/json" },
-    body: JSON.stringify({ from: FROM, to: [to], subject, html, text, headers: { "List-Unsubscribe": `<${SITE}/#radars>` } }),
+    body: JSON.stringify({ from: FROM, to: [to], subject, html, text, headers: { "List-Unsubscribe": `<${SITE}/app#radars>` } }),
   });
   if (!r.ok) throw new Error(`resend: HTTP ${r.status} ${(await r.text()).slice(0, 300)}`);
 }
@@ -85,7 +85,7 @@ function jobRow(j, profile, demonym) {
   const mine = h && profile.major ? h.byMajor[profile.major] : 0;
   const hokies = h ? `${h.n} ${demonym} hired${mine ? ` · ${mine} from your major` : ""}` : "";
   const meta = [j.location, j.term, j.pay].filter(Boolean).join(" · ");
-  return `<a href="${SITE}/?job=${encodeURIComponent(j.id)}" style="display:block;text-decoration:none;color:#222;padding:14px 0;border-top:1px solid #ebebeb">
+  return `<a href="${SITE}/app?job=${encodeURIComponent(j.id)}" style="display:block;text-decoration:none;color:#222;padding:14px 0;border-top:1px solid #ebebeb">
     <div style="font-size:13px;color:#6a6a6a">${esc(j.company)}</div>
     <div style="font-weight:700;font-size:16px;margin:2px 0">${esc(j.title)}</div>
     <div style="font-size:13px;color:#6a6a6a">${esc(meta)}</div>
@@ -111,10 +111,10 @@ for (const r of await rpc("due_radars")) {
       const more = fresh.length - shown.length;
       const subject = `${fresh.length} new: ${r.name}`;
       const body = shown.map((j) => jobRow(j, profile, demonym)).join("") +
-        (more ? `<p style="margin:16px 0 0"><a href="${SITE}/?radar=${r.id}" style="color:#222;font-weight:700">See all ${fresh.length} on Alum</a></p>` : "");
-      const text = shown.map((j) => `${j.company} — ${j.title}\n${SITE}/?job=${encodeURIComponent(j.id)}`).join("\n\n");
+        (more ? `<p style="margin:16px 0 0"><a href="${SITE}/app?radar=${r.id}" style="color:#222;font-weight:700">See all ${fresh.length} on Alum</a></p>` : "");
+      const text = shown.map((j) => `${j.company} — ${j.title}\n${SITE}/app?job=${encodeURIComponent(j.id)}`).join("\n\n");
       await send(r.email, subject, shell(esc(`${fresh.length} new in “${r.name}”`), body,
-        `You're getting this because of your Alum radar “${esc(r.name)}” (${r.cadence}). <a href="${SITE}/#radars" style="color:#6a6a6a">Change or turn it off</a>.`), text);
+        `You're getting this because of your Alum radar “${esc(r.name)}” (${r.cadence}). <a href="${SITE}/app#radars" style="color:#6a6a6a">Change or turn it off</a>.`), text);
       sentRadars++;
       sentJobs += shown.length;
     }
@@ -138,7 +138,7 @@ for (const [uid, { email, rows }] of byUser) {
     const body = rows.map((r) => {
       const live = JOBS.find((j) => j.id === r.job_id);
       const due = r.deadline ? ` · due ${new Date(`${r.deadline}T12:00:00Z`).toLocaleDateString("en-US", { month: "short", day: "numeric" })}` : "";
-      return `<a href="${live ? `${SITE}/?job=${encodeURIComponent(r.job_id)}` : esc(r.job.url)}" style="display:block;text-decoration:none;color:#222;padding:14px 0;border-top:1px solid #ebebeb">
+      return `<a href="${live ? `${SITE}/app?job=${encodeURIComponent(r.job_id)}` : esc(r.job.url)}" style="display:block;text-decoration:none;color:#222;padding:14px 0;border-top:1px solid #ebebeb">
         <div style="font-size:13px;color:#6a6a6a">${esc(r.job.company)} · ${esc(r.status)}${due}</div>
         <div style="font-weight:700;font-size:16px;margin:2px 0">${esc(r.job.title)}</div>
         ${r.notes ? `<div style="font-size:13px;color:#6a6a6a">${esc(r.notes.slice(0, 300))}</div>` : ""}
@@ -146,7 +146,7 @@ for (const [uid, { email, rows }] of byUser) {
     }).join("");
     const text = rows.map((r) => `${r.job.company} — ${r.job.title} (${r.status})${r.notes ? `\n${r.notes.slice(0, 300)}` : ""}`).join("\n\n");
     await send(email, rows.length === 1 ? `Reminder: ${rows[0].job.company}` : `${rows.length} reminders from Alum`,
-      shell("Your reminders", body, `You set these on your saved internships. <a href="${SITE}/#profile" style="color:#6a6a6a">Open your tracker</a>.`), text);
+      shell("Your reminders", body, `You set these on your saved internships. <a href="${SITE}/app#profile" style="color:#6a6a6a">Open your tracker</a>.`), text);
     if (!DRY) await rpc("mark_reminded", { uid, job_ids: rows.map((r) => r.job_id) });
     sentReminders++;
   } catch (e) {
