@@ -76,12 +76,22 @@ html { scroll-behavior: smooth; scroll-padding-top: 88px; }
 
 /* Employer strip ---------------------------------------------------------------- */
 
-.l-strip { max-width: var(--page); margin: 0 auto; padding: 24px 20px 8px; text-align: center; }
-.l-strip > p { margin: 0 0 18px; font-size: 13px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); }
-.l-logos { display: flex; flex-wrap: wrap; justify-content: center; gap: 12px 28px; }
-.l-logo { display: inline-flex; align-items: center; gap: 10px; color: var(--muted); }
-.l-logo .logo { width: 32px; height: 32px; font-size: 12px; filter: grayscale(1); opacity: 0.85; }
-.l-logo b { font-size: 15px; font-weight: 600; }
+.l-strip { padding: 40px 0 16px; text-align: center; border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); }
+.l-strip > p { margin: 0 20px 28px; font-size: 13px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); }
+
+/* Logo slider: the track holds the list twice and slides left by half its
+ * width, forever. Edges fade out; hovering pauses it. */
+.l-logos { overflow: hidden; padding-bottom: 24px; -webkit-mask-image: linear-gradient(90deg, transparent, #000 8%, #000 92%, transparent); mask-image: linear-gradient(90deg, transparent, #000 8%, #000 92%, transparent); }
+.l-marquee-track { display: flex; width: max-content; animation: marquee 48s linear infinite; }
+.l-logos:hover .l-marquee-track { animation-play-state: paused; }
+.l-dup { display: contents; }
+@keyframes marquee { to { transform: translateX(-50%); } }
+.l-logo { display: inline-flex; align-items: center; gap: 16px; padding: 0 36px; color: var(--ink); white-space: nowrap; }
+.logo.xl { width: 64px; height: 64px; border-radius: 16px; font-size: 22px; }
+.l-logo .logo { filter: grayscale(1); opacity: 0.8; transition: filter 300ms ease, opacity 300ms ease; }
+.l-logo:hover .logo { filter: none; opacity: 1; }
+.l-logo b { font-size: 30px; font-weight: 600; letter-spacing: -0.02em; color: var(--muted); transition: color 300ms ease; }
+.l-logo:hover b { color: var(--ink); }
 
 /* The problem ------------------------------------------------------------------- */
 
@@ -183,10 +193,16 @@ html { scroll-behavior: smooth; scroll-padding-top: 88px; }
   .l-shots { padding: 0; }
   .l-pains { grid-template-columns: 1fr; }
   .l-bar { grid-template-columns: 130px 1fr 36px; gap: 10px; }
+  .logo.xl { width: 44px; height: 44px; border-radius: 12px; font-size: 16px; }
+  .l-logo { gap: 12px; padding: 0 22px; }
+  .l-logo b { font-size: 22px; }
+  .l-marquee-track { animation-duration: 36s; }
   .l-bar-name .logo { display: none; }
   .l-foot { grid-template-columns: 1fr; }
 }
 @media (prefers-reduced-motion: reduce) {
+  .l-marquee-track { animation: none; flex-wrap: wrap; justify-content: center; width: auto; row-gap: 16px; }
+  .l-dup { display: none; }
   .l-bar-fill { transition: none; }
   .l-float-fit, .l-float-hokies { animation: none; }
 }

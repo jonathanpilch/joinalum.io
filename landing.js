@@ -103,7 +103,9 @@ if (ranked.length) {
     <ul class="titles">${h2.titles.slice(0, 4).map(([t, n]) => `<li><span>${esc(t)}</span><b>${n}</b></li>`).join("")}</ul>
     <div class="l-radar"><span class="logo radar"><i data-lucide="radar"></i></span><div><b>Radar: ${esc(c2)} · Summer 2027</b><span>Emails you within the hour when one posts</span></div></div>`;
 
-  $("#strip").innerHTML = ranked.slice(0, 10).map(([name]) => `<span class="l-logo">${logo(name)}<b>${esc(name)}</b></span>`).join("");
+  // A slider: the list twice in a row, so sliding by half loops seamlessly.
+  const strip = ranked.slice(0, 16).map(([name]) => `<span class="l-logo">${logo(name, "xl")}<b>${esc(name)}</b></span>`).join("");
+  $("#strip").innerHTML = `<div class="l-marquee-track">${strip}<span class="l-dup" aria-hidden="true">${strip}</span></div>`;
 
   const top = ranked.slice(0, 8);
   const max = top[0][1].recent;
