@@ -184,43 +184,39 @@ svg.lucide { width: 18px; height: 18px; stroke-width: 1.75; flex: none; }
 .round.dark { background: var(--press); border: 0; color: #fff; box-shadow: var(--press-shadow); }
 .round .dot { position: absolute; top: 6px; right: 6px; width: 9px; height: 9px; border-radius: 999px; background: #ff385c; border: 2px solid #fff; }
 
-/* Category row: an icon tile over a label; the active tile is the black key. */
+/* Category row: one pill per category, icon beside label, so the gap
+ * between them is the same however long the label. The active one is the
+ * black key. The row scrolls sideways and fades out at the edges. */
 .cats {
   display: flex;
-  gap: 18px;
-  margin: 24px -20px 0;
-  padding: 4px 20px 6px;
+  gap: 8px;
+  margin: 22px -20px 0;
+  padding: 4px 20px 8px;
   overflow-x: auto;
   scrollbar-width: none;
+  -webkit-mask-image: linear-gradient(90deg, transparent, #000 20px, #000 calc(100% - 48px), transparent);
+  mask-image: linear-gradient(90deg, transparent, #000 20px, #000 calc(100% - 48px), transparent);
 }
 .cats::-webkit-scrollbar { display: none; }
 .cat {
-  display: flex;
-  flex-direction: column;
+  display: inline-flex;
   align-items: center;
   gap: 7px;
-  padding: 2px 0 6px;
-  color: var(--muted);
-  font-size: 12px;
+  flex: none;
+  height: 40px;
+  padding: 0 16px 0 13px;
+  border-radius: 999px;
+  background: var(--card);
+  box-shadow: 0 1px 2px rgba(22, 22, 29, 0.06), 0 0 0 1px rgba(22, 22, 29, 0.05);
+  color: #4a4a52;
+  font-size: 14px;
   font-weight: 500;
   white-space: nowrap;
-  transition: color 160ms ease;
+  transition: background 200ms ease, color 200ms ease, box-shadow 200ms ease, transform 200ms var(--ease);
 }
-.cat .lucide {
-  box-sizing: content-box;
-  width: 20px;
-  height: 20px;
-  padding: 12px;
-  border-radius: 14px;
-  background: var(--card);
-  color: var(--ink);
-  box-shadow: 0 1px 2px rgba(22, 22, 29, 0.06);
-  transition: background 200ms ease, box-shadow 200ms ease, transform 200ms var(--ease);
-}
-.cat:hover { color: var(--ink); }
-.cat:hover .lucide { transform: translateY(-2px); }
-.cat[aria-pressed="true"] { color: var(--ink); font-weight: 600; }
-.cat[aria-pressed="true"] .lucide { background: var(--press); color: #fff; box-shadow: var(--press-shadow); }
+.cat .lucide { width: 17px; height: 17px; }
+.cat:hover { color: var(--ink); transform: translateY(-1px); box-shadow: 0 4px 12px rgba(22, 22, 29, 0.1), 0 0 0 1px rgba(22, 22, 29, 0.05); }
+.cat[aria-pressed="true"] { background: var(--press); color: #fff; font-weight: 600; box-shadow: var(--press-shadow); transform: none; }
 
 .bar { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin: 20px 0 16px; }
 .bar p { margin: 0; color: var(--muted); font-size: 14px; }
@@ -563,7 +559,7 @@ svg.lucide { width: 18px; height: 18px; stroke-width: 1.75; flex: none; }
   .switch button { padding: 0 14px; height: 34px; font-size: 14px; }
   .view { padding: 16px 16px 48px; }
   .search { padding-left: 16px; }
-  .cats { margin: 18px -16px 0; padding: 0 16px; gap: 22px; }
+  .cats { margin: 16px -16px 0; padding: 4px 16px 8px; }
   .grid { grid-template-columns: 1fr; }
   .modal { padding: 0; place-items: end stretch; }
   .sheet { width: 100%; max-height: 92vh; border-radius: 20px 20px 0 0; animation-name: up; }

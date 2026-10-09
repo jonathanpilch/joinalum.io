@@ -172,7 +172,7 @@ import { account } from "./lib/account.js";
     const cats = [
       ...(hasPrefs() ? [["for-you", "For you", "sparkles"]] : []),
       ["all", "All", "layout-grid"],
-      ...[...counts.entries()].sort((a, b) => b[1] - a[1]).map(([fn]) => [fn, fn, FN_ICON[fn] || "briefcase"]),
+      ...[...counts.entries()].sort((a, b) => (a[0] === "Other") - (b[0] === "Other") || b[1] - a[1]).map(([fn]) => [fn, fn, FN_ICON[fn] || "briefcase"]),
     ];
     if (!cats.some(([k]) => k === cat)) cat = "all";
     $("#cats").innerHTML = cats.map(([k, label, ic]) => `<button class="cat" data-cat="${esc(k)}" aria-pressed="${k === cat}"><i data-lucide="${ic}"></i>${esc(label)}</button>`).join("");
