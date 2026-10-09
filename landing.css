@@ -65,11 +65,14 @@ html { scroll-behavior: smooth; scroll-padding-top: 88px; }
 .l-mini-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px 12px; padding-top: 6px; }
 .l-hero > *, .l-window { min-width: 0; }
 .l-mini-grid .job { padding: 14px; gap: 8px; min-height: 0; cursor: default; box-shadow: none; }
-.l-mini-grid .job:hover { box-shadow: none; }
-.l-mini-grid .job h3 { font-size: 14px; }
-.l-mini-grid .job-meta { font-size: 12px; }
+.l-mini-grid .job:hover { transform: none; border-color: var(--line); box-shadow: none; }
+.l-mini-grid .job:hover .logo { transform: none; }
+.l-mini-grid .job-foot { padding-top: 10px; }
+.l-mini-grid .job h3 { font-size: 15px; }
+.l-mini-grid .job-co span { font-size: 12px; }
 .l-mini-grid .logo { width: 36px; height: 36px; font-size: 13px; }
 .l-mini-grid .hokie { font-size: 11px; }
+.l-mini-grid .hokie b { font-size: 15px; }
 .l-mini-grid .save { pointer-events: none; }
 
 .l-float { position: absolute; padding: 18px; border: 1px solid var(--line); border-radius: 16px; background: #fff; box-shadow: var(--shadow-lift); }

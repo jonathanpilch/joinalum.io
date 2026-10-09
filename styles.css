@@ -199,26 +199,26 @@ svg.lucide { width: 18px; height: 18px; stroke-width: 1.75; flex: none; }
   position: relative;
   display: flex;
   flex-direction: column;
-  gap: 12px;
-  padding: 18px;
+  gap: 14px;
+  padding: 20px;
   border: 1px solid var(--line);
-  border-radius: var(--radius-lg);
+  border-radius: 20px;
   background: #fff;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
   cursor: pointer;
-  transition: box-shadow 200ms ease, transform 200ms ease;
+  transition: box-shadow 240ms var(--ease), transform 240ms var(--ease), border-color 240ms ease;
 }
-.job:hover { box-shadow: var(--shadow-lift); }
+.job:hover { transform: translateY(-4px); border-color: transparent; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.04), 0 18px 40px rgba(0, 0, 0, 0.12); }
+.job:hover .logo { transform: scale(1.06); }
 .job-top { display: flex; align-items: center; gap: 12px; padding-right: 36px; }
 .job-co { min-width: 0; }
 .job-co b { display: block; font-size: 15px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.job-co span { font-size: 13px; color: var(--muted); }
-.job h3 { font-size: 16px; font-weight: 500; line-height: 1.3; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
-.job-meta { display: flex; flex-wrap: wrap; gap: 6px 14px; font-size: 13px; color: var(--muted); }
-.job-meta span { display: inline-flex; align-items: center; gap: 5px; }
-.job-meta .lucide { width: 14px; height: 14px; }
-.job-meta .new { color: var(--good); font-weight: 600; }
-.job-foot { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-top: auto; min-height: 26px; }
-.pay { font-size: 14px; font-weight: 600; }
+.job-co span { display: block; font-size: 13px; color: var(--muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.job-co em { font-style: normal; }
+.job-co em.new { color: var(--good); font-weight: 600; }
+.job h3 { font-size: 19px; font-weight: 600; line-height: 1.25; letter-spacing: -0.01em; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
+.job-foot { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-top: auto; padding-top: 14px; border-top: 1px solid var(--line); }
+.pay { font-size: 14px; font-weight: 600; white-space: nowrap; }
 
 .save {
   position: absolute;
@@ -251,27 +251,16 @@ svg.lucide { width: 18px; height: 18px; stroke-width: 1.75; flex: none; }
   font-weight: 600;
   color: var(--muted);
 }
+.logo { transition: transform 240ms var(--ease); }
 .logo img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: contain; padding: 6px; background: #fff; opacity: 0; transition: opacity 200ms ease; }
 .logo.has-img img { opacity: 1; }
 .logo.lg { width: 56px; height: 56px; border-radius: 14px; font-size: 19px; }
 
-.hokie {
-  display: inline-flex;
-  align-items: center;
-  gap: 5px;
-  padding: 4px 9px;
-  border-radius: 999px;
-  background: var(--badge);
-  color: var(--badge-ink);
-  font-size: 12px;
-  font-weight: 600;
-  white-space: nowrap;
-}
-.hokie .lucide { width: 14px; height: 14px; }
-.hokie { max-width: 100%; overflow: hidden; text-overflow: ellipsis; }
+.hokie { min-width: 0; font-size: 13px; color: var(--muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.hokie b { margin-right: 2px; font-size: 20px; font-weight: 700; color: var(--badge-ink); letter-spacing: -0.02em; }
 
 /* What a posting asks for, on the card: clearance, citizens, grad window. */
-.tags { display: flex; flex-wrap: wrap; gap: 6px; }
+.tags { display: flex; flex-wrap: wrap; gap: 6px; margin-top: -4px; }
 .tag { max-width: 100%; overflow: hidden; text-overflow: ellipsis; display: inline-flex; align-items: center; gap: 4px; padding: 3px 8px; border-radius: 999px; border: 1px solid var(--line); font-size: 12px; font-weight: 600; color: var(--muted); white-space: nowrap; }
 .tag .lucide { flex: none; width: 13px; height: 13px; }
 .tag.clear { border-color: #c9d6ea; background: #eef3fa; color: #24456e; }

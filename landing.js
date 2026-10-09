@@ -61,14 +61,13 @@ if (today) $("#final-sub").textContent = `${fmt(today)} new internships in the l
 
 $("#shot-tally").innerHTML = `<b>${fmt(JOBS.length)}</b> internships · ${fmt(today)} new today`;
 const jobCard = (j, incoming = false) => {
-  const h = hokieLine(j.company);
+  const h = hires(j.company);
   return `<article class="job${incoming ? " incoming" : ""}">
     ${incoming ? `<span class="just-in">New today</span>` : ""}
     <span class="save"><i data-lucide="heart"></i></span>
-    <div class="job-top">${logo(j.company)}<div class="job-co"><b>${esc(j.company)}</b><span>${esc(j.level === "Co-op" ? "Co-op" : j.term || "Internship")}</span></div></div>
+    <div class="job-top">${logo(j.company)}<div class="job-co"><b>${esc(j.company)}</b><span>${esc(j.location)} · <em class="new">${ago(Math.round((now - Date.parse(j.postedAt)) / 6e4))}</em></span></div></div>
     <h3>${esc(j.title)}</h3>
-    <div class="job-meta"><span><i data-lucide="map-pin"></i>${esc(j.location)}</span><span class="new"><i data-lucide="clock"></i>${ago(Math.round((now - Date.parse(j.postedAt)) / 6e4))}</span></div>
-    ${h ? `<div class="job-foot"><span class="hokie"><i data-lucide="users"></i>${esc(h)}</span></div>` : ""}
+    ${h ? `<div class="job-foot"><span class="hokie"><b>${fmt(h.n)}</b> Hokies hired</span></div>` : ""}
   </article>`;
 };
 $("#shot-jobs").innerHTML = JOBS.slice(0, 4).map((j) => jobCard(j)).join("");

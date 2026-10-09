@@ -136,16 +136,6 @@ import { account } from "./lib/account.js";
     `<span class="logo ${cls}">${esc(initials(j.company))}${j.domain ? `<img src="https://www.google.com/s2/favicons?domain=${esc(j.domain)}&sz=128" alt="" loading="lazy" onload="this.naturalWidth>16?this.parentNode.classList.add('has-img'):this.remove()" onerror="this.remove()" />` : ""}</span>`;
   const heart = (id) => `<button class="save ${saved[id] ? "on" : ""}" data-save="${esc(id)}" aria-label="${saved[id] ? "Unsave" : "Save"}"><i data-lucide="heart"></i></button>`;
 
-  // The Hokie signal: how many VT grads this employer hired, and from where.
-  function hokieLine(j) {
-    const h = hires(j);
-    if (!h) return null;
-    const mine = profile.major && h.byMajor[profile.major];
-    if (mine) return `${fmt(h.n)} Hokies hired · ${fmt(mine)} ${short(profile.major)}`;
-    const top = Object.keys(h.byMajor).slice(0, 2).map(short);
-    return `${fmt(h.n)} Hokies hired${top.length ? ` · mostly ${top.join(", ")}` : ""}`;
-  }
-
   function tags(j) {
     const e = j.elig || {};
     const out = [];
@@ -160,21 +150,19 @@ import { account } from "./lib/account.js";
   }
 
   function card(j) {
-    const h = hokieLine(j);
-    const t = tags(j);
+    const h = hires(j);
+    const mine = h && profile.major && h.byMajor[profile.major];
+    const [tag] = tags(j);
+    const fresh = j.minutesAgo < 1440;
     return `<article class="job${knowsFit() && blocked(j) ? " out" : ""}" data-id="${esc(j.id)}">
       ${heart(j.id)}
-      <div class="job-top">${logo(j)}<div class="job-co"><b>${esc(j.company)}</b><span>${esc(j.level === "Co-op" ? "Co-op" : j.term || "Internship")}</span></div></div>
+      <div class="job-top">${logo(j)}<div class="job-co"><b>${esc(j.company)}</b><span>${esc(j.location)} · <em class="${fresh ? "new" : ""}">${when(j)}</em></span></div></div>
       <h3>${esc(j.title)}</h3>
-      <div class="job-meta">
-        <span><i data-lucide="map-pin"></i>${esc(j.location)}</span>
-        <span class="${j.minutesAgo < 1440 ? "new" : ""}"><i data-lucide="clock"></i>${when(j)}</span>
-      </div>
-      ${t.length ? `<div class="tags">${t.map(([cls, ic, label]) => `<span class="tag ${cls}"><i data-lucide="${ic}"></i>${esc(label)}</span>`).join("")}</div>` : ""}
-      <div class="job-foot">
-        ${h ? `<span class="hokie"><i data-lucide="users"></i>${esc(h)}</span>` : "<span></span>"}
+      ${tag ? `<div class="tags"><span class="tag ${tag[0]}"><i data-lucide="${tag[1]}"></i>${esc(tag[2])}</span></div>` : ""}
+      ${h || j.pay ? `<div class="job-foot">
+        ${h ? `<span class="hokie"><b>${fmt(h.n)}</b> Hokies hired${mine ? ` · ${fmt(mine)} ${esc(short(profile.major))}` : ""}</span>` : "<span></span>"}
         ${j.pay ? `<span class="pay">${esc(j.pay)}</span>` : ""}
-      </div>
+      </div>` : ""}
     </article>`;
   }
 
