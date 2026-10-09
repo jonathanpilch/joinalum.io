@@ -4,10 +4,18 @@
  * three or four columns on bigger screens. */
 
 @font-face {
-  font-family: "Satoshi";
-  src: url("assets/fonts/Satoshi-Variable.woff2") format("woff2");
-  font-weight: 300 900;
+  font-family: "Sentient";
+  src: url("assets/fonts/Sentient-Variable.woff2") format("woff2");
+  font-weight: 200 700;
   font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Sentient";
+  src: url("assets/fonts/Sentient-VariableItalic.woff2") format("woff2");
+  font-weight: 200 700;
+  font-style: italic;
   font-display: swap;
 }
 
@@ -30,7 +38,7 @@
   --radius: 12px;
   --radius-lg: 16px;
   --ease: cubic-bezier(0.2, 0.7, 0.2, 1);
-  --font: "Satoshi", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  --font: "Sentient", Georgia, "Times New Roman", serif;
   --page: 1280px;
   color-scheme: light;
 }
@@ -41,7 +49,7 @@ html, body { margin: 0; }
 body {
   font-family: var(--font);
   font-size: 15px;
-  font-weight: 500;
+  font-weight: 400;
   line-height: 1.45;
   color: var(--ink);
   background: var(--bg);
@@ -50,7 +58,7 @@ body {
 button, input, select { font: inherit; color: inherit; }
 button { cursor: pointer; background: none; border: 0; padding: 0; }
 a { color: inherit; text-decoration: none; }
-h1, h2, h3 { margin: 0; font-weight: 700; letter-spacing: -0.01em; }
+h1, h2, h3 { margin: 0; font-weight: 600; letter-spacing: -0.01em; }
 svg.lucide { width: 18px; height: 18px; stroke-width: 1.75; flex: none; }
 
 /* Top bar ------------------------------------------------------------ */
@@ -69,9 +77,9 @@ svg.lucide { width: 18px; height: 18px; stroke-width: 1.75; flex: none; }
   -webkit-backdrop-filter: saturate(180%) blur(12px);
   border-bottom: 1px solid var(--line);
 }
-.brand { display: flex; align-items: center; gap: 8px; justify-self: start; }
-.brand img { width: 26px; height: 27px; }
-.brand span { font-size: 22px; font-weight: 800; letter-spacing: -0.04em; }
+.brand { display: flex; align-items: center; gap: 10px; justify-self: start; }
+.brand img { width: 38px; height: 39px; }
+.brand span { font-size: 31px; font-weight: 700; letter-spacing: -0.02em; }
 .top-right { justify-self: end; font-size: 13px; color: var(--muted); }
 
 /* The sliding switch: a light track with a white pill that glides between
@@ -95,7 +103,7 @@ svg.lucide { width: 18px; height: 18px; stroke-width: 1.75; flex: none; }
   height: 38px;
   padding: 0 20px;
   border-radius: 999px;
-  font-weight: 600;
+  font-weight: 500;
   color: var(--muted);
   transition: color 200ms ease;
 }
@@ -167,7 +175,7 @@ svg.lucide { width: 18px; height: 18px; stroke-width: 1.75; flex: none; }
   border-bottom: 2px solid transparent;
   color: var(--muted);
   font-size: 12px;
-  font-weight: 600;
+  font-weight: 500;
   white-space: nowrap;
   transition: color 160ms ease, border-color 160ms ease;
 }
@@ -179,7 +187,7 @@ svg.lucide { width: 18px; height: 18px; stroke-width: 1.75; flex: none; }
 .bar p { margin: 0; color: var(--muted); font-size: 14px; }
 .bar p b { color: var(--ink); }
 .sort { display: flex; gap: 4px; }
-.sort button { white-space: nowrap; height: 32px; padding: 0 12px; border-radius: 999px; font-size: 13px; font-weight: 600; color: var(--muted); }
+.sort button { white-space: nowrap; height: 32px; padding: 0 12px; border-radius: 999px; font-size: 13px; font-weight: 500; color: var(--muted); }
 .sort button:hover { background: var(--hover); }
 .sort button[aria-pressed="true"] { background: var(--ink); color: #fff; }
 
@@ -204,13 +212,13 @@ svg.lucide { width: 18px; height: 18px; stroke-width: 1.75; flex: none; }
 .job-co { min-width: 0; }
 .job-co b { display: block; font-size: 15px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .job-co span { font-size: 13px; color: var(--muted); }
-.job h3 { font-size: 16px; font-weight: 600; line-height: 1.3; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+.job h3 { font-size: 16px; font-weight: 500; line-height: 1.3; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
 .job-meta { display: flex; flex-wrap: wrap; gap: 6px 14px; font-size: 13px; color: var(--muted); }
 .job-meta span { display: inline-flex; align-items: center; gap: 5px; }
 .job-meta .lucide { width: 14px; height: 14px; }
-.job-meta .new { color: var(--good); font-weight: 700; }
+.job-meta .new { color: var(--good); font-weight: 600; }
 .job-foot { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-top: auto; min-height: 26px; }
-.pay { font-size: 14px; font-weight: 700; }
+.pay { font-size: 14px; font-weight: 600; }
 
 .save {
   position: absolute;
@@ -240,7 +248,7 @@ svg.lucide { width: 18px; height: 18px; stroke-width: 1.75; flex: none; }
   border: 1px solid var(--line);
   background: var(--soft);
   font-size: 15px;
-  font-weight: 800;
+  font-weight: 600;
   color: var(--muted);
 }
 .logo img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: contain; padding: 6px; background: #fff; opacity: 0; transition: opacity 200ms ease; }
@@ -256,7 +264,7 @@ svg.lucide { width: 18px; height: 18px; stroke-width: 1.75; flex: none; }
   background: var(--badge);
   color: var(--badge-ink);
   font-size: 12px;
-  font-weight: 700;
+  font-weight: 600;
   white-space: nowrap;
 }
 .hokie .lucide { width: 14px; height: 14px; }
@@ -343,7 +351,7 @@ svg.lucide { width: 18px; height: 18px; stroke-width: 1.75; flex: none; }
   height: 48px;
   padding: 0 24px;
   border-radius: var(--radius);
-  font-weight: 700;
+  font-weight: 600;
   font-size: 15px;
   transition: background 160ms ease, transform 120ms ease;
 }
@@ -354,7 +362,7 @@ svg.lucide { width: 18px; height: 18px; stroke-width: 1.75; flex: none; }
 .ghost:hover { background: var(--soft); }
 .secondary { border: 1px solid var(--line); background: #fff; }
 .secondary:hover { background: var(--soft); }
-.link { font-weight: 700; text-decoration: underline; text-underline-offset: 3px; }
+.link { font-weight: 600; text-decoration: underline; text-underline-offset: 3px; }
 
 /* Modals: a centred sheet on desktop, a sheet from the bottom on phones. */
 
@@ -402,14 +410,14 @@ svg.lucide { width: 18px; height: 18px; stroke-width: 1.75; flex: none; }
 .section h3 { display: flex; align-items: center; gap: 8px; font-size: 17px; margin-bottom: 6px; }
 .section > p { margin: 0 0 12px; color: var(--muted); }
 .section .lucide { width: 20px; height: 20px; }
-.stat { font-size: 28px; font-weight: 800; letter-spacing: -0.02em; }
+.stat { font-size: 30px; font-weight: 300; letter-spacing: -0.02em; }
 .pills { display: flex; flex-wrap: wrap; gap: 8px; margin: 12px 0; }
 .pill { padding: 6px 12px; border-radius: 999px; border: 1px solid var(--line); font-size: 13px; }
-.pill b { margin-left: 4px; color: var(--muted); font-weight: 600; }
+.pill b { margin-left: 4px; color: var(--muted); font-weight: 500; }
 .titles { margin: 0; padding: 0; list-style: none; }
 .titles li { display: flex; justify-content: space-between; gap: 12px; padding: 9px 0; border-bottom: 1px solid var(--line); font-size: 14px; }
 .titles li:last-child { border-bottom: 0; }
-.titles b { color: var(--muted); font-weight: 600; }
+.titles b { color: var(--muted); font-weight: 500; }
 .row-actions { display: flex; flex-wrap: wrap; gap: 10px; }
 .row-actions .secondary { height: 44px; padding: 0 16px; font-size: 14px; }
 .fine { margin: 18px 0 0; font-size: 12px; color: var(--faint); }
@@ -431,14 +439,14 @@ svg.lucide { width: 18px; height: 18px; stroke-width: 1.75; flex: none; }
   border-radius: 999px;
   border: 1px solid var(--line);
   font-size: 14px;
-  font-weight: 600;
+  font-weight: 500;
   transition: border-color 160ms ease, background 160ms ease;
 }
 .chip .lucide { width: 16px; height: 16px; }
 .chip:hover { border-color: var(--ink); }
 .chip[aria-pressed="true"] { border-color: var(--ink); background: var(--ink); color: #fff; }
 .toggle { display: flex; align-items: center; justify-content: space-between; gap: 16px; padding: 6px 0; cursor: pointer; }
-.toggle small { display: block; color: var(--muted); font-size: 13px; font-weight: 500; }
+.toggle small { display: block; color: var(--muted); font-size: 13px; font-weight: 400; }
 .toggle input { appearance: none; flex: none; width: 48px; height: 30px; border-radius: 999px; background: var(--faint); position: relative; cursor: pointer; transition: background 200ms ease; }
 .toggle input::after { content: ""; position: absolute; top: 3px; left: 3px; width: 24px; height: 24px; border-radius: 999px; background: #fff; box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2); transition: transform 200ms var(--ease); }
 .toggle input:checked { background: var(--ink); }
@@ -452,14 +460,14 @@ svg.lucide { width: 18px; height: 18px; stroke-width: 1.75; flex: none; }
 .card-head h2 { font-size: 22px; }
 .card h3 { margin: 24px 0 12px; font-size: 15px; }
 .sub { margin: 6px 0 20px; color: var(--muted); }
-.saved-note { font-size: 13px; color: var(--good); font-weight: 600; transition: opacity 400ms ease; }
+.saved-note { font-size: 13px; color: var(--good); font-weight: 500; transition: opacity 400ms ease; }
 .count { color: var(--muted); font-size: 14px; }
 .fields { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
 .field.wide { grid-column: 1 / -1; }
 .sub.small { margin: 10px 0 0; font-size: 13px; }
 .field { display: flex; flex-direction: column; gap: 4px; min-width: 0; padding: 10px 14px; border: 1px solid var(--faint); border-radius: var(--radius); }
 .field:focus-within { border-color: var(--ink); box-shadow: 0 0 0 1px var(--ink); }
-.field span { font-size: 12px; font-weight: 700; color: var(--muted); }
+.field span { font-size: 12px; font-weight: 600; color: var(--muted); }
 .field input, .field select { width: 100%; min-width: 0; border: 0; outline: 0; background: none; padding: 0; font-size: 16px; }
 
 .saved { display: flex; align-items: center; gap: 12px; padding: 14px 0; border-bottom: 1px solid var(--line); }
@@ -467,7 +475,7 @@ svg.lucide { width: 18px; height: 18px; stroke-width: 1.75; flex: none; }
 .saved-text { flex: 1; min-width: 0; cursor: pointer; }
 .saved-text b { display: block; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .saved-text span { font-size: 13px; color: var(--muted); }
-.status { height: 36px; padding: 0 10px; border: 1px solid var(--line); border-radius: 999px; background: #fff; font-size: 13px; font-weight: 600; }
+.status { height: 36px; padding: 0 10px; border: 1px solid var(--line); border-radius: 999px; background: #fff; font-size: 13px; font-weight: 500; }
 .status[data-v="Applied"] { border-color: #b7d7ff; background: #f0f7ff; }
 .status[data-v="Interviewing"] { border-color: #ffd9a8; background: #fff6eb; }
 .status[data-v="Offer"] { border-color: #a7e3ad; background: #effaf0; }
@@ -488,7 +496,7 @@ svg.lucide { width: 18px; height: 18px; stroke-width: 1.75; flex: none; }
   border-radius: var(--radius);
   background: var(--ink);
   color: #fff;
-  font-weight: 600;
+  font-weight: 500;
   font-size: 14px;
   box-shadow: var(--shadow);
   animation: rise 240ms var(--ease) both;
