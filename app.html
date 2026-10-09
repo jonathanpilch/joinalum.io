@@ -26,10 +26,26 @@
       <nav class="switch" role="tablist" aria-label="Sections">
         <span class="switch-pill" aria-hidden="true"></span>
         <button role="tab" data-tab="internships" aria-selected="true"><i data-lucide="briefcase"></i>Internships</button>
-        <button role="tab" data-tab="profile" aria-selected="false"><i data-lucide="user"></i>Profile</button>
+        <button role="tab" data-tab="pro" aria-selected="false">
+          <svg class="pro-star" viewBox="0 0 24 24" aria-hidden="true">
+            <defs>
+              <linearGradient id="pro-ink" x1="0" y1="0" x2="1" y2="1">
+                <stop offset="0" stop-color="#ffb35c" />
+                <stop offset="0.5" stop-color="#e5751f" />
+                <stop offset="1" stop-color="#b8325f" />
+                <animateTransform attributeName="gradientTransform" type="rotate" values="0 .5 .5;360 .5 .5" dur="6s" repeatCount="indefinite" />
+              </linearGradient>
+            </defs>
+            <path class="pro-star-big" d="M11 3c.8 4.6 3.4 7.2 8 8-4.6.8-7.2 3.4-8 8-.8-4.6-3.4-7.2-8-8 4.6-.8 7.2-3.4 8-8Z" fill="url(#pro-ink)" />
+            <path class="pro-star-small" d="M19.5 1.5c.3 1.6 1 2.3 2.5 2.5-1.5.3-2.2 1-2.5 2.5-.3-1.5-1-2.2-2.5-2.5 1.5-.2 2.2-.9 2.5-2.5Z" fill="url(#pro-ink)" />
+          </svg>Pro
+        </button>
       </nav>
 
-      <span class="top-right" id="updated"></span>
+      <div class="top-right">
+        <span id="updated"></span>
+        <button class="profile-pill" data-tab="profile" aria-pressed="false"><i data-lucide="user-round"></i><span>Profile</span></button>
+      </div>
     </header>
 
     <!-- Internships -->
@@ -62,6 +78,19 @@
         <button class="link" id="clear-empty">Clear filters</button>
       </div>
       <div class="more"><button class="ghost" id="more">Show more</button></div>
+    </main>
+
+    <!-- Pro -->
+    <main id="pro" class="view" hidden>
+      <section class="pro-hero">
+        <svg class="pro-star pro-star-hero" viewBox="0 0 24 24" aria-hidden="true">
+          <path class="pro-star-big" d="M11 3c.8 4.6 3.4 7.2 8 8-4.6.8-7.2 3.4-8 8-.8-4.6-3.4-7.2-8-8 4.6-.8 7.2-3.4 8-8Z" fill="url(#pro-ink)" />
+          <path class="pro-star-small" d="M19.5 1.5c.3 1.6 1 2.3 2.5 2.5-1.5.3-2.2 1-2.5 2.5-.3-1.5-1-2.2-2.5-2.5 1.5-.2 2.2-.9 2.5-2.5Z" fill="url(#pro-ink)" />
+        </svg>
+        <span class="pro-badge">Coming soon</span>
+        <h1>Alum Pro</h1>
+        <p>More for the Hokies who want the internship most. We're building it now.</p>
+      </section>
     </main>
 
     <!-- Profile -->

@@ -1,4 +1,5 @@
-/* Alum -- two views behind one sliding switch: Internships and Profile.
+/* Alum -- Internships and Pro behind one sliding switch; Profile is its own
+ * pill at the right of the header.
  *
  * Internships come from data/jobs.json (written hourly by ingest/run.mjs);
  * "Hokies hired" comes from data/placements.json (VT's First Destination
@@ -512,7 +513,7 @@ import { account } from "./lib/account.js";
       console.warn(e);
       toast("Couldn't reach your account. Showing what's on this device.");
     }
-    tab($("#profile").hidden ? "internships" : "profile", true);
+    tab(view(), true);
   }
 
   // Resume -> profile --------------------------------------------------------------
@@ -643,19 +644,21 @@ import { account } from "./lib/account.js";
 
   // Tabs, modals, toasts ---------------------------------------------------------
 
+  const view = () => ["pro", "profile"].find((v) => !$(`#${v}`).hidden) || "internships";
+
   function tab(name, keepScroll = false) {
     if (!keepScroll) close();
     $(".switch").dataset.on = name;
     $$(".switch [role=tab]").forEach((b) => b.setAttribute("aria-selected", b.dataset.tab === name));
-    $("#internships").hidden = name !== "internships";
-    $("#profile").hidden = name !== "profile";
+    $(".profile-pill").setAttribute("aria-pressed", name === "profile");
+    for (const v of ["internships", "pro", "profile"]) $(`#${v}`).hidden = name !== v;
     if (name === "profile") renderProfile();
-    else { renderCats(); render(); }
+    else if (name === "internships") { renderCats(); render(); }
     // Drop one-shot email links (?job, ?radar) from the address; keep ?school.
     const keep = new URLSearchParams(location.search);
     keep.delete("job"); keep.delete("radar");
     const path = location.pathname + (keep.size ? `?${keep}` : "");
-    history.replaceState(null, "", name === "profile" ? `${path}#profile` : path);
+    history.replaceState(null, "", name === "internships" ? path : `${path}#${name}`);
     if (!keepScroll) scrollTo({ top: 0 });
   }
 
@@ -816,7 +819,7 @@ import { account } from "./lib/account.js";
   // Links from emails: ?job=<id> opens that internship, ?radar=<id> its search.
   const params = new URLSearchParams(location.search);
   renderSavedCount();
-  tab(location.hash === "#profile" || location.hash === "#radars" ? "profile" : "internships");
+  tab(location.hash === "#profile" || location.hash === "#radars" ? "profile" : location.hash === "#pro" ? "pro" : "internships");
 
   const deep = () => {
     if (params.get("radar")) openRadar(params.get("radar"));
@@ -826,7 +829,7 @@ import { account } from "./lib/account.js";
   };
 
   if (account.enabled) {
-    await account.init((u) => (u ? sync() : tab($("#profile").hidden ? "internships" : "profile", true)));
+    await account.init((u) => (u ? sync() : tab(view(), true)));
     if (account.user) await sync();
   }
   deep();
