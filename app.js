@@ -76,7 +76,7 @@ import { account } from "./lib/account.js";
   let saved = store.get("alum.saved", {});
   // [{ id, name, search: {q, cat, filters}, cadence, last_seen_at, remote }]
   let radars = store.get("alum.radars", []);
-  const saveProfile = () => { store.set("alum.profile", profile); account.saveProfile(profile); flash($("#saved-note"), "Saved"); };
+  const saveProfile = () => { store.set("alum.profile", profile); account.saveProfile(profile); flash($("#saved-note"), "Saved"); renderMe(); };
   const saveSaved = () => { store.set("alum.saved", saved); renderSavedCount(); };
   const saveRadars = () => store.set("alum.radars", radars);
   // One saved role changed: keep it here, and in the account when signed in.
@@ -316,16 +316,57 @@ import { account } from "./lib/account.js";
     $("#p-interests").innerHTML = fns.map((f) => `<button class="chip" data-i="${esc(f)}" aria-pressed="${profile.interests.includes(f)}"><i data-lucide="${FN_ICON[f] || "briefcase"}"></i>${esc(f)}</button>`).join("");
     $("#p-places").innerHTML = [...Object.keys(PLACES), "Anywhere"].map((p) => `<button class="chip" data-p="${esc(p)}" aria-pressed="${profile.places.includes(p)}">${esc(p)}</button>`).join("");
     renderAccount();
+    renderMe();
     renderRadars();
     renderSaved();
     icons();
+  }
+
+  // The top of Profile: who you are, how much of that Alum knows, and the one
+  // thing to add next (a button that takes you to it).
+  const STEPS = [
+    ["name", "add your name", "p-name"],
+    ["major", "pick your major", "p-major"],
+    ["year", "add your graduation year", "p-year"],
+    ["work", "add your work status", "p-work"],
+    ["interests", "pick what you're into", "fold-interests"],
+    ["places", "pick where you'd work", "fold-places"],
+    ["skills", "pick the tools you know", "fold-skills"],
+  ];
+  const RING = 2 * Math.PI * 30;
+  function renderMe() {
+    const has = (k) => (Array.isArray(profile[k]) ? profile[k].length : profile[k]);
+    const todo = STEPS.filter(([k]) => !has(k));
+    const pct = Math.round(((STEPS.length - todo.length) / STEPS.length) * 100);
+    const meta = [profile.major, profile.year && `Class of ${profile.year}`, profile.degree !== "Bachelor's" && profile.degree, profile.term !== "Any time" && `Looking for ${profile.term}`].filter(Boolean);
+    $("#me-id").innerHTML = `<span class="me-avatar">${profile.name ? esc(profile.name[0].toUpperCase()) : `<i data-lucide="user-round"></i>`}</span>
+      <div class="me-who">
+        <h1>${profile.name ? `Hi, ${esc(profile.name)}` : "Your profile"}</h1>
+        <p>${meta.length ? meta.map(esc).join(" · ") : `Tell Alum about you and it picks your internships.`}</p>
+        <span class="me-sync${account.user ? "" : " off"}"><i data-lucide="${account.user ? "cloud-check" : "hard-drive"}"></i>${account.user ? `Synced to ${esc(account.user.email)}` : "Saved on this device"}</span>
+      </div>`;
+    $("#me-ring").innerHTML = `<div class="ring"><svg viewBox="0 0 72 72" aria-hidden="true"><circle cx="36" cy="36" r="30" class="ring-track" /><circle cx="36" cy="36" r="30" class="ring-fill" stroke-dasharray="${RING}" stroke-dashoffset="${RING * (1 - pct / 100)}" /></svg><b>${pct}<small>%</small></b></div>
+      <div class="me-next-wrap"><small>Profile complete</small>${todo.length ? `<button class="me-next" data-goto="${todo[0][2]}">Next: ${todo[0][1]}<i data-lucide="arrow-right"></i></button>` : `<p>Alum checks every posting against you.</p>`}</div>`;
+    for (const k of ["skills", "interests", "places"]) $(`#n-${k}`).textContent = profile[k].length ? `${profile[k].length} picked` : "";
+    icons();
+  }
+
+  // Big numbers over small labels; a tap filters the tracker to that status.
+  let trackFilter = "";
+  function renderStats() {
+    const rows = Object.values(saved);
+    const n = (st) => rows.filter((s) => s.status === st).length;
+    const tiles = [["", "Tracking", rows.length], ["Applied", "Applied", n("Applied")], ["Interviewing", "Interviewing", n("Interviewing")], ["Offer", "Offers", n("Offer")]];
+    $("#me-stats").innerHTML = tiles.map(([st, label, k]) => `<button class="me-stat" data-v="${st}" data-track-filter="${st}" aria-pressed="${trackFilter === st}"><b>${fmt(k)}</b><small>${label}</small></button>`).join("")
+      + `<button class="me-stat" data-v="radar" data-goto="radars"><b>${fmt(radars.length)}</b><small>Radars</small></button>`;
   }
 
   const STATUSES = ["Saved", "Applied", "Interviewing", "Offer", "Rejected"];
   let openRow = null;
   const dateLabel = (d) => new Date(`${d}T12:00:00`).toLocaleDateString("en-US", { month: "short", day: "numeric" });
   function renderSaved() {
-    const rows = Object.entries(saved).sort((a, b) => b[1].at - a[1].at);
+    const all = Object.entries(saved).sort((a, b) => b[1].at - a[1].at);
+    const rows = trackFilter ? all.filter(([, s]) => s.status === trackFilter) : all;
     renderSavedCount();
     $("#saved-list").innerHTML = rows.length
       ? rows.map(([id, s]) => {
@@ -350,9 +391,15 @@ import { account } from "./lib/account.js";
             </div>` : ""}
           </div>`;
         }).join("")
-      : `<div class="none"><i data-lucide="heart"></i><p>Tap the heart on an internship to keep it here.</p></div>`;
+      : all.length
+        ? `<div class="none"><i data-lucide="filter-x"></i><p>Nothing marked ${esc(trackFilter)} yet. <button class="link" data-track-filter="">Show all</button></p></div>`
+        : `<div class="none"><i data-lucide="heart"></i><p>Tap the heart on an internship to track it here: status, deadline, a reminder and notes.</p><button class="secondary small" data-tab="internships">Browse internships</button></div>`;
   }
-  const renderSavedCount = () => { const n = Object.keys(saved).length; $("#saved-count").textContent = n ? `${n}` : ""; };
+  const renderSavedCount = () => {
+    const n = Object.keys(saved).length;
+    $("#saved-count").textContent = trackFilter ? `${trackFilter} · ${n} tracked` : n ? `${n}` : "";
+    renderStats();
+  };
 
   function toggleSave(id) {
     if (saved[id]) unsave(id);
@@ -418,6 +465,7 @@ import { account } from "./lib/account.js";
 
   function renderRadars() {
     $("#radar-count").textContent = radars.length ? `${radars.length}` : "";
+    renderStats();
     $("#radar-list").innerHTML = radars.length
       ? radars.map((r) => {
           const n = fresh(r);
@@ -468,7 +516,7 @@ import { account } from "./lib/account.js";
     const box = $("#account");
     box.hidden = !account.enabled;
     $("#resume-btn").hidden = !account.enabled;
-    $("#about-sub").textContent = `Picks your internships, checks who can apply against you, and shows how many ${school.demonym} from your major got hired.${account.user ? "" : " Stays on this device until you sign in."}`;
+    $("#about-sub").textContent = `Picks your internships, checks who can apply against you, and shows how many ${school.demonym} from your major got hired.`;
     if (!account.enabled) return;
     const u = account.user;
     box.innerHTML = u
@@ -730,6 +778,18 @@ import { account } from "./lib/account.js";
     if (t.dataset?.rn) { $$("#rn-cadence .chip").forEach((b) => b.setAttribute("aria-pressed", b === t)); return; }
     if (t.dataset?.radar) return openRadar(t.dataset.radar);
     if (t.dataset?.unradar) return dropRadar(t.dataset.unradar);
+    if (t.dataset && "trackFilter" in t.dataset) {
+      trackFilter = trackFilter === t.dataset.trackFilter ? "" : t.dataset.trackFilter;
+      renderSaved();
+      return icons();
+    }
+    if (t.dataset?.goto) {
+      const el = $(`#${t.dataset.goto}`);
+      if (el.tagName === "DETAILS") el.open = true;
+      el.scrollIntoView({ behavior: "smooth", block: "center" });
+      if (/^(INPUT|SELECT)$/.test(el.tagName)) el.focus({ preventScroll: true });
+      return;
+    }
     if (t.dataset?.more) { openRow = openRow === t.dataset.more ? null : t.dataset.more; renderSaved(); return icons(); }
     if (t.id === "sign-out") { account.signOut(); return; }
     if (t.id === "resume-btn") {
