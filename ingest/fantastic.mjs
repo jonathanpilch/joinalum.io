@@ -15,7 +15,7 @@
  * data/fantastic-jobs.json, which run.mjs merges into data/jobs.json. */
 
 import { readFile, writeFile } from "node:fs/promises";
-import { level, fn, places, locationLabel, term } from "./classify.mjs";
+import { level, fn, places, locationLabel, term, eligibility, skills } from "./classify.mjs";
 import { key } from "./match.mjs";
 
 const ROOT = new URL("../", import.meta.url);
@@ -140,7 +140,8 @@ for (const j of raw) {
     pay: salary(j),
     summary: j.ai_core_responsibilities || null,
     requirements: j.ai_requirements_summary || null,
-    skills: (j.ai_key_skills || []).slice(0, 8),
+    skills: skills(`${j.title} ${text}`, j.ai_key_skills || []),
+    elig: eligibility(j.title, [text, j.description_text].filter(Boolean).join(" ")) || undefined,
     postedAt: j.date_posted || j.date_created,
     postedApprox: false,
     firstSeenAt: now.toISOString(),

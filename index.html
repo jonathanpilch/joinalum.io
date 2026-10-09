@@ -50,6 +50,7 @@
         <div class="sort" role="group" aria-label="Sort">
           <button data-sort="new" aria-pressed="true">Newest</button>
           <button data-sort="hokies" aria-pressed="false">Most Hokies</button>
+          <button data-sort="fit" aria-pressed="false" hidden>Best fit</button>
         </div>
       </div>
 
@@ -69,13 +70,19 @@
           <h2>About you</h2>
           <span class="saved-note" id="saved-note"></span>
         </div>
-        <p class="sub">Picks your internships and shows how many Hokies from your major got hired. Stays on this device for now.</p>
+        <p class="sub">Picks your internships, checks who can apply against you, and shows how many Hokies from your major got hired. Stays on this device for now.</p>
         <div class="fields">
           <label class="field"><span>Name</span><input id="p-name" placeholder="First name" autocomplete="given-name" /></label>
           <label class="field"><span>Major</span><select id="p-major"></select></label>
-          <label class="field"><span>Class year</span><select id="p-year"></select></label>
+          <label class="field"><span>Graduating (May)</span><select id="p-year"></select></label>
           <label class="field"><span>Looking for</span><select id="p-term"></select></label>
+          <label class="field"><span>Degree</span><select id="p-degree"></select></label>
+          <label class="field"><span>GPA</span><input id="p-gpa" type="number" inputmode="decimal" min="0" max="4" step="0.01" placeholder="Optional" /></label>
+          <label class="field wide"><span>Work status</span><select id="p-work"></select></label>
         </div>
+        <p class="sub small">Work status decides citizenship, clearance and sponsorship rules. It never leaves this device.</p>
+        <h3>Tools you know</h3>
+        <div class="chips" id="p-skills"></div>
         <h3>Interested in</h3>
         <div class="chips" id="p-interests"></div>
         <h3>Where</h3>

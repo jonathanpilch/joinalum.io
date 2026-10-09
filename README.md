@@ -38,8 +38,10 @@ Find its board: `boards-api.greenhouse.io/v1/boards/{slug}/jobs`, `api.lever.co/
 - **Early-career:** intern/co-op/new-grad/entry-level language in the title wins over seniority words; "Senior", "Staff", "II", "Manager" drop it; a title with no signal is kept only if the posting asks for at most a year of experience (shown as "Why it's here" on the card). Recruiter roles are dropped.
 - **Tech:** the title has to land in a function (Software, Hardware, AI/ML, Data, Security, Cloud/IT, Product, Design, Engineering, Research, Quant, Tech Consulting).
 - **US only**, with locations normalized to city + state.
-- **Freshness:** the board's own publish time when it gives one (Greenhouse, Lever, Ashby, SmartRecruiters, Amazon), else Workday's "Posted N days ago" clamped to when we first saw it.
+- **Freshness:** the board's own publish time when it gives one (Greenhouse, Lever, Ashby, SmartRecruiters), else the posting day (Workday's "Posted N days ago", Amazon, Bank of America) clamped to when we first saw it. The page shows both clocks: when the employer posted, and how long after that Alum had it. The headline lag is the median over the last 14 days of postings with an exact board time.
+- **Who can apply:** `eligibility()` in `classify.mjs` reads the graduation window, "return to school after", PhD/grad-only, US citizenship, clearance (active vs. can-obtain, and the level), no sponsorship, and a GPA floor out of the posting text; `skills()` picks named tools from a fixed list. Only what the posting says: unset means not stated. The page marks each against the profile as fits, a gap, or rules you out, and hides the last by default.
+- **Hokie signal:** every card carries how many VT grads the employer hired (First Destination Report) and how many from your major.
 
 ## Not built yet
 
-Alumni on each team, match scores, alerts.
+Alumni on each team, resume parsing, accounts and alerts.

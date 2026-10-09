@@ -192,6 +192,93 @@ export function term(title, text = "") {
   return `${season[0].toUpperCase()}${season.slice(1)} ${year}`;
 }
 
+// Eligibility -------------------------------------------------------------
+//
+// The hard gates a posting states: who can graduate when, which degree, US
+// citizenship, clearance, sponsorship, a GPA floor, and the tools it asks
+// for. Only what the posting says; anything missing stays unset, so the page
+// can tell "not stated" from "no". Returns null when nothing was found.
+
+const MONTHS = { jan: 1, feb: 2, mar: 3, apr: 4, may: 5, jun: 6, jul: 7, aug: 8, sep: 9, oct: 10, nov: 11, dec: 12, spring: 5, summer: 8, fall: 12, autumn: 12, winter: 12 };
+const WHEN = String.raw`(?:(jan|feb|mar|apr|may|jun|jul|aug|sep|oct|nov|dec)[a-z]*\.?|(spring|summer|fall|autumn|winter))?,?\s*(?:of\s+)?(20\d\d)`;
+const ym = (mon, season, year, end) => {
+  const m = MONTHS[(mon || season || "").toLowerCase().slice(0, mon ? 3 : 6)];
+  return `${year}-${String(m || (end ? 12 : 1)).padStart(2, "0")}`;
+};
+
+const CLEAR_ACTIVE = /\b(active|current|existing|must (?:have|hold|possess)(?: an?)?(?: active)?|requires? an? (?:active|current))\s+(?:and\s+\w+\s+)?(?:dod\s+|u\.?s\.?\s+government\s+)?(secret|top secret|ts\/sci|ts|interim secret|security)\s*(?:\/\s*\w+\s*)?clearance/i;
+const CLEAR_ANY = /\b(security clearance|secret clearance|ts\/sci|top secret|clearance (?:is |may be |will be )?required|(?:obtain|maintain|acquire|eligib\w+ for)(?: and maintain)? (?:an? )?(?:dod |government |u\.?s\.? )?(?:security )?clearance|security investigation)\b/i;
+const CITIZEN = /\b(u\.?s\.? citizenship (?:is )?(?:required|is a requirement)|must be (?:a )?u\.?s\.? citizen|u\.?s\.? citizens? only|requires? u\.?s\.? citizenship|(?:only|solely) u\.?s\.? citizens|citizenship requirement|u\.?s\.? citizenship[^.]{0,40}required)/i;
+const NO_SPONSOR = /\b((?:not|unable to|won['’]?t|will not|cannot|can['’]?t|does not|do not|is not able to)\s+(?:be able to\s+)?(?:provide|offer|sponsor|support|consider)[^.]{0,50}(?:sponsor|visa|h-?1b)|sponsorship (?:is |will )?not (?:be )?(?:available|provided|offered)|without (?:the need for )?(?:current or future |now or in the future )?(?:employer |visa |immigration )?sponsorship|no (?:visa |immigration )?sponsorship)/i;
+const GPA = /(?:(?:minimum|min\.?|at least|cumulative|overall)\s*(?:of\s*)?(?:an?\s*)?(?:cumulative\s*|overall\s*)?(?:gpa\s*(?:of\s*)?)?([2-3]\.\d{1,2})|gpa\s*(?:of\s*)?([2-3]\.\d{1,2})\s*(?:\/\s*4\.0\s*)?(?:or (?:higher|above|better)|\+|minimum))/i;
+const RETURNING = /\b(returning to (?:school|your studies|campus|university)|at least one (?:additional )?(?:semester|term|quarter)|(?:semester|term|quarter) (?:of (?:school|study|coursework) )?remaining|continue (?:your|their) (?:studies|education) after|remain(?:ing)? enrolled (?:after|following))/i;
+
+// Tools worth matching a profile against. Order is display order fallback.
+const SKILLS = [
+  ["Python", /\bpython\b/i], ["Java", /\bjava\b(?!\s*script)/i], ["C++", /\bc\+\+|\bc\s*\/\s*c\+\+/i], ["C#", /\bc#|\.net\b/i],
+  ["C", /\b(?:c\s*\/\s*c\+\+|c and c\+\+|embedded c|ansi c|in c\b|c programming)/i], ["JavaScript", /\bjavascript\b/i], ["TypeScript", /\btypescript\b/i],
+  ["React", /\breact(?:\.js|js| native)\b|\breact\s*,|,\s*react\b/i], ["Node.js", /\bnode(?:\.js|js)\b/i], ["SQL", /\bsql\b/i], ["Go", /\bgolang\b/i], ["Rust", /\brust\b/i],
+  ["Kotlin", /\bkotlin\b/i], ["Swift", /\bswift\b/i], ["MATLAB", /\bmatlab\b/i], ["Simulink", /\bsimulink\b/i], ["LabVIEW", /\blabview\b/i],
+  ["SolidWorks", /\bsolid\s?works\b/i], ["CATIA", /\bcatia\b/i], ["Creo", /\bcreo\b/i], ["Siemens NX", /\bsiemens nx\b|\bnx cad\b/i], ["AutoCAD", /\bautocad\b/i],
+  ["ANSYS", /\bansys\b/i], ["GD&T", /\bgd\s?&\s?t\b/i], ["Verilog", /\b(?:system)?verilog\b/i], ["VHDL", /\bvhdl\b/i], ["FPGA", /\bfpgas?\b/i],
+  ["PCB design", /\bpcb\b|\baltium\b/i], ["Linux", /\blinux\b|\bunix\b/i], ["Bash", /\bbash\b|shell script/i], ["Git", /\bgit\b|\bgithub\b/i],
+  ["AWS", /\baws\b|amazon web services/i], ["Azure", /\bazure\b/i], ["GCP", /\bgcp\b|google cloud/i], ["Docker", /\bdocker\b/i], ["Kubernetes", /\bkubernetes\b|\bk8s\b/i],
+  ["Machine learning", /\bmachine learning\b/i], ["PyTorch", /\bpytorch\b/i], ["TensorFlow", /\btensorflow\b/i], ["Spark", /\b(?:apache spark|pyspark|spark sql)\b/i],
+  ["Tableau", /\btableau\b/i], ["Power BI", /\bpower\s?bi\b/i], ["Excel", /\b(?:microsoft|ms|advanced) excel\b|\bexcel\s*(?:,|\/|and\b|spreadsheets?|skills|vba|pivot)/i], ["ROS", /\bros2?\b/i], ["Networking", /\btcp\/ip\b|\bnetworking protocols\b/i],
+  ["Wireshark", /\bwireshark\b/i], ["Splunk", /\bsplunk\b/i], ["Agile", /\bagile\b|\bscrum\b/i],
+];
+
+export function skills(text, extra = []) {
+  const found = new Set();
+  for (const s of extra) { const hit = SKILLS.find(([n]) => n.toLowerCase() === String(s).toLowerCase()); if (hit) found.add(hit[0]); }
+  if (text) for (const [name, re] of SKILLS) if (re.test(text)) found.add(name);
+  return [...found].slice(0, 10);
+}
+
+export function eligibility(title, text = "") {
+  const t = `${title}. ${text}`.replace(/\s+/g, " ");
+  const e = {};
+
+  // Graduation window: "graduating between December 2027 and June 2028",
+  // "expected graduation date of Dec 2026 - May 2027", "graduate by Summer
+  // 2028", "class of 2027".
+  let m = new RegExp(String.raw`graduat\w*[^.]{0,60}?(?:between|from)\s+${WHEN}\s*(?:and|to|through|-|–|—)\s*${WHEN}`, "i").exec(t)
+    || new RegExp(String.raw`graduat\w*(?: date)?(?: of| in| :|:)?\s+${WHEN}\s*(?:-|–|—|to|through)\s*${WHEN}`, "i").exec(t);
+  if (m) e.grad = [ym(m[1], m[2], m[3]), ym(m[4], m[5], m[6], true)];
+  else if ((m = new RegExp(String.raw`graduat\w*(?: date)?[^.]{0,30}?\b(by|before|no later than|prior to)\s+${WHEN}`, "i").exec(t))) e.grad = [null, ym(m[2], m[3], m[4], true)];
+  else if ((m = new RegExp(String.raw`graduat\w*(?: date)?(?: of| in|:)\s+${WHEN}`, "i").exec(t))) e.grad = [ym(m[1], m[2], m[3]), ym(m[1], m[2], m[3], true)];
+  else if ((m = /\bclass of (20\d\d)\b/i.exec(t))) e.grad = [`${m[1]}-01`, `${m[1]}-12`];
+  if (e.grad && e.grad[0] && e.grad[1] && e.grad[0] > e.grad[1]) delete e.grad;
+  if (RETURNING.test(t)) e.returning = true;
+
+  // Degree floor, only when undergrads are plainly out.
+  const undergrad = /\b(bachelor'?s?|undergrad\w*|b\.?s\.?\b|b\.?a\.?\b|bs\/ms|ba\/bs)/i.test(t);
+  if (/\bph\.?d\b/i.test(title) && !/\b(bachelor|undergrad|b\.?s\.?|m\.?s\.?|master)/i.test(title)) e.degree = "PhD";
+  else if (!undergrad && /\b(?:enrolled in|pursuing|working towards?)\s+(?:an?\s+)?(?:ph\.?d|doctoral|doctorate)\b/i.test(t) && !/master/i.test(t)) e.degree = "PhD";
+  else if (/\bmba\b/i.test(title)) e.degree = "Grad";
+  else if (/\b(master'?s|m\.?s\.?|graduate student)\b.{0,20}\b(intern|co-?op)/i.test(title) && !/\b(bachelor|undergrad|b\.?s\.?)/i.test(title)) e.degree = "Grad";
+  else if (!undergrad && /\b(?:enrolled in|pursuing)\s+(?:an?\s+)?(?:master'?s|graduate degree|graduate program)/i.test(t)) e.degree = "Grad";
+
+  // "Active and existing clearance required after day 1" (RTX) is one to
+  // get once hired, not one to walk in with.
+  // Nor is one listed under preferred qualifications (Northrop).
+  const active = CLEAR_ACTIVE.exec(t);
+  const before = active ? t.slice(0, active.index) : "";
+  const lastAt = (re) => Math.max(-1, ...[...before.matchAll(re)].map((m) => m.index));
+  const preferred = lastAt(/preferred (?:qualifications|skills|experience)|nice to have|desired (?:qualifications|skills)|bonus points/gi) > lastAt(/(?:basic|required|minimum) qualifications|requirements:|you must have/gi);
+  if (active && !preferred && !/^.{0,40}\b(after (?:day (?:1|one)|your start|start date|hire)|upon (?:hire|start)|within \d+|once hired)/i.test(t.slice(active.index + active[0].length))) e.clearance = "active";
+  else if (active || CLEAR_ANY.test(t)) e.clearance = "obtain";
+  if (e.clearance) {
+    const lvl = /\b(ts\/sci|top secret|secret)\b/i.exec(t)?.[1].toLowerCase();
+    if (lvl) e.clearanceLevel = lvl === "ts/sci" ? "TS/SCI" : lvl === "top secret" ? "Top Secret" : "Secret";
+  }
+  if (CITIZEN.test(t) || e.clearance) e.citizen = true;
+  if (NO_SPONSOR.test(t)) e.noSponsor = true;
+  if ((m = GPA.exec(t))) { const g = Number(m[1] || m[2]); if (g >= 2 && g <= 3.9) e.gpa = g; }
+
+  return Object.keys(e).length ? e : null;
+}
+
 const PAY = /\$\s?(\d{1,3}(?:,\d{3})+|\d+(?:\.\d+)?)\s*(k|K)?\s*(?:-|–|—|to)\s*\$?\s?(\d{1,3}(?:,\d{3})+|\d+(?:\.\d+)?)\s*(k|K)?(\s*(?:\/|per)\s*(?:hour|hr|year|yr|annum))?/;
 
 export function pay(existing, text = "") {

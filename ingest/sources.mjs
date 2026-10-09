@@ -213,6 +213,7 @@ async function amazon() {
     locations: [p.normalized_location || p.location].filter(Boolean),
     url: `https://www.amazon.jobs${p.job_path}`,
     postedAt: p.posted_date ? new Date(`${p.posted_date} 12:00 UTC`).toISOString() : null,
+    postedApprox: !!p.posted_date, // a date, not a time
     employment: p.job_schedule_type || null,
     workplace: null,
     text: plain([p.description, p.basic_qualifications, p.preferred_qualifications].join(" ")),

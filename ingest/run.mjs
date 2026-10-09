@@ -13,7 +13,7 @@
 import { readFile, writeFile, mkdir } from "node:fs/promises";
 import companies from "./companies.mjs";
 import { fetchers } from "./sources.mjs";
-import { level, fn, places, arrangement, term, pay, yearsMin, locationLabel } from "./classify.mjs";
+import { level, fn, places, arrangement, term, pay, yearsMin, locationLabel, eligibility, skills } from "./classify.mjs";
 
 const ROOT = new URL("../", import.meta.url);
 const OUT = new URL("data/jobs.json", ROOT);
@@ -79,6 +79,8 @@ function shape(c, r, lvl, f, locs) {
   // never be later than when we first saw the posting.
   let postedAt = r.postedAt && Date.parse(r.postedAt) <= now.getTime() ? r.postedAt : firstSeenAt;
   if (r.postedApprox && Date.parse(firstSeenAt) < Date.parse(postedAt)) postedAt = firstSeenAt;
+  const elig = eligibility(r.title, r.text);
+  const sk = skills(`${r.title} ${r.text || ""}`);
   return {
     id,
     title: r.title.replace(/\s+/g, " ").trim(),
@@ -98,6 +100,10 @@ function shape(c, r, lvl, f, locs) {
     postedAt,
     postedApprox: !!r.postedApprox,
     firstSeenAt,
+    // What the posting says about who can apply, and the tools it names.
+    // Unset when it says nothing (or the board gives us no description).
+    ...(elig && { elig }),
+    ...(sk.length && { skills: sk }),
   };
 }
 

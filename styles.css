@@ -21,6 +21,8 @@
   --hover: #f2f2f2;
   --accent: #222222;
   --good: #008a05;
+  --warn: #b26b00;
+  --bad: #c13515;
   --badge: #f5f0e6;
   --badge-ink: #6b5418;
   --shadow: 0 6px 16px rgba(0, 0, 0, 0.12);
@@ -177,7 +179,7 @@ svg.lucide { width: 18px; height: 18px; stroke-width: 1.75; flex: none; }
 .bar p { margin: 0; color: var(--muted); font-size: 14px; }
 .bar p b { color: var(--ink); }
 .sort { display: flex; gap: 4px; }
-.sort button { height: 32px; padding: 0 12px; border-radius: 999px; font-size: 13px; font-weight: 600; color: var(--muted); }
+.sort button { white-space: nowrap; height: 32px; padding: 0 12px; border-radius: 999px; font-size: 13px; font-weight: 600; color: var(--muted); }
 .sort button:hover { background: var(--hover); }
 .sort button[aria-pressed="true"] { background: var(--ink); color: #fff; }
 
@@ -258,6 +260,28 @@ svg.lucide { width: 18px; height: 18px; stroke-width: 1.75; flex: none; }
   white-space: nowrap;
 }
 .hokie .lucide { width: 14px; height: 14px; }
+.hokie { max-width: 100%; overflow: hidden; text-overflow: ellipsis; }
+
+/* What a posting asks for, on the card: clearance, citizens, grad window. */
+.tags { display: flex; flex-wrap: wrap; gap: 6px; }
+.tag { max-width: 100%; overflow: hidden; text-overflow: ellipsis; display: inline-flex; align-items: center; gap: 4px; padding: 3px 8px; border-radius: 999px; border: 1px solid var(--line); font-size: 12px; font-weight: 600; color: var(--muted); white-space: nowrap; }
+.tag .lucide { flex: none; width: 13px; height: 13px; }
+.tag.clear { border-color: #c9d6ea; background: #eef3fa; color: #24456e; }
+.tag.no { border-color: #f1c7c4; background: #fdf1f0; color: var(--bad); }
+.job.out { opacity: 0.6; }
+.job.out:hover { opacity: 1; }
+.bar .link { font-size: inherit; color: var(--ink); }
+
+/* Who can apply, marked against the profile. */
+.asks { margin: 0; padding: 0; list-style: none; }
+.asks li { display: flex; align-items: flex-start; gap: 10px; padding: 9px 0; border-bottom: 1px solid var(--line); font-size: 14px; color: var(--ink); }
+.asks li:last-child { border-bottom: 0; }
+.asks .lucide { flex: none; width: 18px; height: 18px; margin-top: 1px; color: var(--muted); }
+.asks li.ok .lucide { color: var(--good); }
+.asks li.warn .lucide { color: var(--warn); }
+.asks li.no { color: var(--bad); }
+.asks li.no .lucide { color: var(--bad); }
+.asks b { font-weight: 800; }
 
 .empty { display: grid; justify-items: center; gap: 8px; padding: 64px 16px; color: var(--muted); }
 .empty .lucide { width: 32px; height: 32px; }
@@ -386,6 +410,8 @@ svg.lucide { width: 18px; height: 18px; stroke-width: 1.75; flex: none; }
 .saved-note { font-size: 13px; color: var(--good); font-weight: 600; transition: opacity 400ms ease; }
 .count { color: var(--muted); font-size: 14px; }
 .fields { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.field.wide { grid-column: 1 / -1; }
+.sub.small { margin: 10px 0 0; font-size: 13px; }
 .field { display: flex; flex-direction: column; gap: 4px; min-width: 0; padding: 10px 14px; border: 1px solid var(--faint); border-radius: var(--radius); }
 .field:focus-within { border-color: var(--ink); box-shadow: 0 0 0 1px var(--ink); }
 .field span { font-size: 12px; font-weight: 700; color: var(--muted); }
@@ -431,6 +457,8 @@ svg.lucide { width: 18px; height: 18px; stroke-width: 1.75; flex: none; }
 /* Phones ------------------------------------------------------------- */
 
 @media (max-width: 720px) {
+  .lag { display: none; }
+  .bar { flex-wrap: wrap; }
   .top { grid-template-columns: auto 1fr; padding: 12px 16px; }
   .top-right { display: none; }
   .switch { justify-self: end; }
