@@ -76,7 +76,7 @@ import { account } from "./lib/account.js";
   let saved = store.get("alum.saved", {});
   // [{ id, name, search: {q, cat, filters}, cadence, last_seen_at, remote }]
   let radars = store.get("alum.radars", []);
-  const saveProfile = () => { store.set("alum.profile", profile); account.saveProfile(profile); flash($("#saved-note"), "Saved"); renderMe(); };
+  const saveProfile = () => { store.set("alum.profile", profile); account.saveProfile(profile); flash($("#saved-note"), "Saved"); renderMe(); renderGap(); };
   const saveSaved = () => { store.set("alum.saved", saved); renderSavedCount(); };
   const saveRadars = () => store.set("alum.radars", radars);
   // One saved role changed: keep it here, and in the account when signed in.
@@ -307,18 +307,50 @@ import { account } from "./lib/account.js";
     $("#p-degree").innerHTML = DEGREES.map((d) => `<option ${d === profile.degree ? "selected" : ""}>${d}</option>`).join("");
     $("#p-work").innerHTML = `<option value="">Prefer not to say</option>${Object.entries(WORK).map(([k, l]) => `<option value="${k}" ${k === profile.work ? "selected" : ""}>${l}</option>`).join("")}`;
     $("#p-gpa").value = profile.gpa;
-    // The tools internships here ask for most, plus whatever you already picked.
-    const counts = new Map();
-    for (const j of JOBS) for (const s of j.skills || []) counts.set(s, (counts.get(s) || 0) + 1);
-    const tools = [...new Set([...[...counts.entries()].sort((a, b) => b[1] - a[1]).slice(0, 24).map(([s]) => s), ...profile.skills])];
-    $("#p-skills").innerHTML = tools.map((s) => `<button class="chip" data-s="${esc(s)}" aria-pressed="${profile.skills.includes(s)}">${esc(s)}</button>`).join("");
+    renderSkills();
     const fns = [...new Set(JOBS.map((j) => j.fn))].sort();
     $("#p-interests").innerHTML = fns.map((f) => `<button class="chip" data-i="${esc(f)}" aria-pressed="${profile.interests.includes(f)}"><i data-lucide="${FN_ICON[f] || "briefcase"}"></i>${esc(f)}</button>`).join("");
     $("#p-places").innerHTML = [...Object.keys(PLACES), "Anywhere"].map((p) => `<button class="chip" data-p="${esc(p)}" aria-pressed="${profile.places.includes(p)}">${esc(p)}</button>`).join("");
     renderAccount();
     renderMe();
     renderRadars();
+    renderGap();
     renderSaved();
+    icons();
+  }
+
+  // The tools internships here ask for most, plus whatever you already picked.
+  function renderSkills() {
+    const counts = new Map();
+    for (const j of JOBS) for (const s of j.skills || []) counts.set(s, (counts.get(s) || 0) + 1);
+    const tools = [...new Set([...[...counts.entries()].sort((a, b) => b[1] - a[1]).slice(0, 24).map(([s]) => s), ...profile.skills])];
+    $("#p-skills").innerHTML = tools.map((s) => `<button class="chip" data-s="${esc(s)}" aria-pressed="${profile.skills.includes(s)}">${esc(s)}</button>`).join("");
+  }
+
+  // Skills gap: what your internships ask for against what you know (lib/core.js).
+  function renderGap() {
+    const g = core.gap(JOBS, profile);
+    const pct = (x) => `${Math.round(x * 100)}%`;
+    const and = (xs) => (xs.length < 3 ? xs.join(" and ") : `${xs.slice(0, -1).join(", ")} and ${xs.at(-1)}`);
+    const scope = !g.scoped || !hasPrefs() ? "internships on Alum" : profile.interests.length ? `${and(profile.interests)} internships` : "the internships you'd see";
+    // Until they've marked a tool, "learn next" would only repeat the top of the list.
+    const next = new Set(profile.skills.length ? g.next.map((x) => x.skill) : []);
+    $("#gap-count").textContent = `${fmt(g.pool)} name their tools`;
+    $("#gap-sub").innerHTML = !profile.skills.length
+      ? `The tools ${esc(scope)} ask for most. Mark the ones you know, here or under <b>Tools you know</b>, to see what's missing.`
+      : !g.next.length
+        ? `You know every tool ${esc(scope)} ask for.`
+        : `You know <b>${pct(g.have)}</b> of the tools ${esc(scope)} ask for. Learning <b>${esc(and([...next]))}</b> would take you to <b>${pct(g.next.at(-1).share)}</b>.`;
+    $("#gap-list").innerHTML = g.demand
+      .map((d) => {
+        const end = d.have ? `<span class="gap-have"><i data-lucide="check"></i>You know it</span>` : `<button class="ghost small" data-gap="${esc(d.skill)}"><i data-lucide="plus"></i>I know it</button>`;
+        return `<div class="gap-row${d.have ? " have" : next.has(d.skill) ? " next" : ""}">
+          <span class="gap-name">${esc(d.skill)}${!d.have && next.has(d.skill) ? `<small>Learn next</small>` : ""}</span>
+          <span class="gap-bar" title="${fmt(d.n)} of ${fmt(g.pool)} ask for it"><i style="width:${pct(d.share)}"></i></span>
+          <span class="gap-n">${pct(d.share)}</span>${end}
+        </div>`;
+      })
+      .join("");
     icons();
   }
 
@@ -741,6 +773,11 @@ import { account } from "./lib/account.js";
       const v = t.dataset.s;
       profile.skills = profile.skills.includes(v) ? profile.skills.filter((x) => x !== v) : [...profile.skills, v];
       t.setAttribute("aria-pressed", profile.skills.includes(v));
+      return saveProfile();
+    }
+    if (t.dataset?.gap) {
+      profile.skills = [...new Set([...profile.skills, t.dataset.gap])];
+      renderSkills();
       return saveProfile();
     }
     if (t.id === "save-search") return newRadar();

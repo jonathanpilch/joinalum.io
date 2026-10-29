@@ -563,6 +563,20 @@ svg.lucide { width: 18px; height: 18px; stroke-width: 1.75; flex: none; }
 .fields { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
 .field.wide { grid-column: 1 / -1; }
 .sub.small { margin: 10px 0 0; font-size: 13px; }
+
+/* Skills gap: one row per tool; the bar is the share of postings asking for it. */
+.gap-row { display: grid; grid-template-columns: 150px 1fr 44px 128px; align-items: center; gap: 14px; min-height: 52px; border-top: 1px solid var(--line); }
+.gap-row:first-child { border-top: 0; }
+.gap-name { display: flex; flex-direction: column; font-weight: 600; font-size: 15px; }
+.gap-name small { font-size: 12px; font-weight: 500; color: var(--hokie); }
+.gap-bar { height: 8px; border-radius: 999px; background: var(--soft); overflow: hidden; }
+.gap-bar i { display: block; height: 100%; border-radius: inherit; background: var(--faint); }
+.gap-row.have .gap-bar i { background: var(--good); }
+.gap-row.next .gap-bar i { background: var(--hokie); }
+.gap-n { font-size: 13px; color: var(--muted); text-align: right; font-variant-numeric: tabular-nums; }
+.gap-have { display: inline-flex; align-items: center; justify-self: end; gap: 4px; font-size: 13px; font-weight: 500; color: var(--good); }
+.gap-have .lucide { width: 15px; height: 15px; }
+.gap-row .ghost.small { justify-self: end; }
 .field { display: flex; flex-direction: column; gap: 4px; min-width: 0; padding: 10px 14px; border: 1px solid var(--faint); border-radius: var(--radius); }
 .field:focus-within { border-color: var(--ink); box-shadow: 0 0 0 1px var(--ink); }
 .field span { font-size: 12px; font-weight: 600; color: var(--muted); }
@@ -618,6 +632,8 @@ svg.lucide { width: 18px; height: 18px; stroke-width: 1.75; flex: none; }
   .signin { flex-direction: column; }
   .signin .primary { height: 48px; }
   .saved-more { grid-template-columns: 1fr; padding-left: 0; }
+  .gap-row { grid-template-columns: 1fr 44px auto; row-gap: 8px; padding: 12px 0; }
+  .gap-bar { grid-column: 1 / -1; grid-row: 2; }
   .top { padding: 12px 16px; }
   .top { grid-template-columns: auto 1fr auto; gap: 10px; }
   #updated { display: none; }
