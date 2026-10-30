@@ -94,6 +94,16 @@ import { account } from "./lib/account.js";
     return mine ? { n: mine, label: `${fmt(mine)} ${short(profile.major)} Hokies hired` } : { n: h.n, label: `${fmt(h.n)} Hokies hired` };
   }
 
+  // Median full-time starting salary of Hokies hired here: your major's when
+  // VT reports it (10+ salaries), else all majors.
+  function startPay(j) {
+    const s = hires(j)?.salary;
+    if (!s) return null;
+    const mine = profile.major && s.byMajor[profile.major];
+    return mine ? { ...mine, major: profile.major, all: s } : { ...s, major: null, all: s };
+  }
+  const k$ = (n) => `$${Math.round(n / 1000)}k`;
+
   // Fit: the profile against what a posting asks for (lib/core.js).
   const asks = (j) => core.asks(j, profile);
   const blocked = (j) => core.blocked(j, profile);
@@ -155,6 +165,7 @@ import { account } from "./lib/account.js";
     const mine = h && profile.major && h.byMajor[profile.major];
     const [tag] = tags(j);
     const fresh = j.minutesAgo < 1440;
+    const sp = !j.pay && startPay(j);
     return `<article class="job${knowsFit() && blocked(j) ? " out" : ""}" data-id="${esc(j.id)}">
       ${heart(j.id)}
       <div class="job-top">${logo(j)}<div class="job-co"><b>${esc(j.company)}</b><span>${esc(j.location)} · <em class="${fresh ? "new" : ""}">${when(j)}</em></span></div></div>
@@ -162,7 +173,7 @@ import { account } from "./lib/account.js";
       ${tag ? `<div class="tags"><span class="tag ${tag[0]}"><i data-lucide="${tag[1]}"></i>${esc(tag[2])}</span></div>` : ""}
       ${h || j.pay ? `<div class="job-foot">
         ${h ? `<span class="hokie"><b>${fmt(h.n)}</b> Hokies hired${mine ? ` · ${fmt(mine)} ${esc(short(profile.major))}` : ""}</span>` : "<span></span>"}
-        ${j.pay ? `<span class="pay">${esc(j.pay)}</span>` : ""}
+        ${j.pay ? `<span class="pay">${esc(j.pay)}</span>` : sp ? `<span class="start" title="Median full-time starting salary of ${sp.major ? esc(sp.major) : "VT"} grads hired here">${k$(sp.median)}<small>Hokie start</small></span>` : ""}
       </div>` : ""}
     </article>`;
   }
@@ -200,6 +211,8 @@ import { account } from "./lib/account.js";
   function detail(j) {
     const h = hires(j);
     const mine = h && profile.major ? h.byMajor[profile.major] : 0;
+    const sp = startPay(j);
+    const classes = P?.salary ? `classes of ${P.salary.years[0]}–${P.salary.years[1]}` : "";
     const linkedin = `https://www.linkedin.com/school/virginia-tech/people/?keywords=${encodeURIComponent(j.company)}`;
     const facts = [
       ["map-pin", j.location],
@@ -235,6 +248,10 @@ import { account } from "./lib/account.js";
         ${h ? `
           <div class="stat">${fmt(h.n)}</div>
           <p>VT grads went to ${esc(j.company)} since the class of ${since}, ${fmt(h.recent)} of them from ${recentSpan}.${mine ? ` ${fmt(mine)} were ${esc(profile.major)} majors.` : ""}</p>
+          ${sp ? `<div class="start-pay"><i data-lucide="banknote"></i><div>
+            <p><b>${k$(sp.median)}</b> median full-time starting salary for ${sp.major ? `${esc(sp.major)} grads` : "Hokies"} hired here</p>
+            <small>${fmt(sp.n)} salaries reported, ${classes}${sp.major ? ` · all majors ${k$(sp.all.median)}` : profile.major ? ` · too few ${esc(profile.major)} salaries to show yours` : ", all majors"}</small>
+          </div></div>` : ""}
           <div class="pills">${Object.entries(h.byMajor).slice(0, 6).map(([m, n]) => `<span class="pill">${esc(m)}<b>${n}</b></span>`).join("")}</div>
           <ul class="titles">${h.titles.slice(0, 5).map(([t, n]) => `<li><span>${esc(t)}</span><b>${n}</b></li>`).join("")}</ul>`
         : `<p>No VT grads reported a first job here since the class of ${since}. Could be a new door.</p>`}
@@ -254,7 +271,7 @@ import { account } from "./lib/account.js";
         <div id="notes" data-job="${esc(j.id)}"><p>Loading…</p></div>
       </div>` : ""}
 
-      <p class="fine">${h ? `Hiring numbers from <a href="${esc(P.sourceUrl)}" target="_blank" rel="noopener">VT's First Destination Report</a>, self-reported first jobs. ` : ""}Not affiliated with Virginia Tech.</p>`;
+      <p class="fine">${h ? `Hiring numbers from <a href="${esc(P.sourceUrl)}" target="_blank" rel="noopener">VT's First Destination Report</a>, self-reported first jobs. ` : ""}${sp ? `Salaries from <a href="${esc(P.salary.sourceUrl)}" target="_blank" rel="noopener">VT's First Destination dashboard</a>. ` : ""}Not affiliated with Virginia Tech.</p>`;
     open("#detail");
     if (account.enabled) renderNotes(j);
   }

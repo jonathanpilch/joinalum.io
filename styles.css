@@ -310,6 +310,14 @@ svg.lucide { width: 18px; height: 18px; stroke-width: 1.75; flex: none; }
 .job h3 { font-size: 19px; font-weight: 600; line-height: 1.25; letter-spacing: -0.01em; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
 .job-foot { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-top: auto; padding-top: 14px; border-top: 1px solid var(--line); }
 .pay { padding: 4px 10px; border-radius: 999px; background: var(--soft); font-size: 13px; font-weight: 600; white-space: nowrap; }
+/* What Hokies hired here started at, full time: not this internship's pay. */
+.start { display: flex; flex-direction: column; align-items: flex-end; font-size: 15px; font-weight: 700; line-height: 1.1; white-space: nowrap; }
+.start small { font-size: 10px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); }
+.start-pay { display: flex; gap: 12px; align-items: flex-start; margin: 12px 0; padding: 14px 16px; border-radius: var(--radius); background: var(--soft); }
+.start-pay > .lucide { flex: none; width: 20px; height: 20px; margin-top: 2px; color: var(--hokie); }
+.start-pay p { margin: 0; }
+.start-pay b { font-size: 18px; color: var(--hokie); }
+.start-pay small { display: block; margin-top: 4px; font-size: 12px; color: var(--muted); }
 
 .save {
   position: absolute;
