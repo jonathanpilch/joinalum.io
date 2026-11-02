@@ -1,5 +1,5 @@
 {
- "generatedAt": "2026-10-26T16:17:24.159Z",
+ "generatedAt": "2026-11-02T19:43:49.398Z",
  "launchMajors": [
   "Computer Science",
   "Computer Engineering",
@@ -267,11 +267,9 @@
     "Finance": 13,
     "Accounting and Information Systems": 64
    },
-   "source": "fantastic",
-   "board": null,
-   "domains": [
-    "rsmus.com"
-   ]
+   "source": "direct",
+   "board": "RSM",
+   "domains": null
   },
   {
    "name": "GE",
@@ -288,13 +286,9 @@
     "Finance": 4,
     "Accounting and Information Systems": 1
    },
-   "source": "fantastic",
-   "board": null,
-   "domains": [
-    "ge.com",
-    "geaerospace.com",
-    "gevernova.com"
-   ]
+   "source": "direct",
+   "board": "GE",
+   "domains": null
   },
   {
    "name": "CGI",
@@ -525,11 +519,9 @@
     "Finance": 15,
     "Accounting and Information Systems": 14
    },
-   "source": "fantastic",
-   "board": null,
-   "domains": [
-    "bakertilly.com"
-   ]
+   "source": "direct",
+   "board": "Baker Tilly",
+   "domains": null
   },
   {
    "name": "Vanguard",
@@ -798,11 +790,9 @@
     "Finance": 22,
     "Accounting and Information Systems": 3
    },
-   "source": "fantastic",
-   "board": null,
-   "domains": [
-    "citi.com"
-   ]
+   "source": "direct",
+   "board": "Citi",
+   "domains": null
   },
   {
    "name": "Kearney & Company",
@@ -920,11 +910,9 @@
     "Finance": 5,
     "Computational Modeling and Data Analytics": 1
    },
-   "source": "fantastic",
-   "board": null,
-   "domains": [
-    "fidelity.com"
-   ]
+   "source": "direct",
+   "board": "Fidelity Investments",
+   "domains": null
   },
   {
    "name": "Goldman Sachs",
@@ -1184,11 +1172,9 @@
     "Business Information Technology": 6,
     "Finance": 3
    },
-   "source": "fantastic",
-   "board": null,
-   "domains": [
-    "lowes.com"
-   ]
+   "source": "direct",
+   "board": "Lowe's Companies, Inc.",
+   "domains": null
   },
   {
    "name": "Johns Hopkins APL",
@@ -1235,12 +1221,9 @@
     "Industrial and Systems Engineering": 1,
     "Business Information Technology": 3
    },
-   "source": "fantastic",
-   "board": null,
-   "domains": [
-    "kollmorgen.com",
-    "regalrexnord.com"
-   ]
+   "source": "direct",
+   "board": "Kollmorgen Corporation",
+   "domains": null
   },
   {
    "name": "NTT DATA",
@@ -1269,11 +1252,9 @@
     "Business Information Technology": 7,
     "Finance": 2
    },
-   "source": "fantastic",
-   "board": null,
-   "domains": [
-    "clarkconstruction.com"
-   ]
+   "source": "direct",
+   "board": "Clark Construction Group",
+   "domains": null
   },
   {
    "name": "ExxonMobil",
@@ -1520,11 +1501,9 @@
     "Business Information Technology": 2,
     "Finance": 1
    },
-   "source": "fantastic",
-   "board": null,
-   "domains": [
-    "moog.com"
-   ]
+   "source": "direct",
+   "board": "Moog",
+   "domains": null
   },
   {
    "name": "SAIC",
@@ -1585,11 +1564,9 @@
     "Finance": 1,
     "Computational Modeling and Data Analytics": 2
    },
-   "source": "fantastic",
-   "board": null,
-   "domains": [
-    "verizon.com"
-   ]
+   "source": "direct",
+   "board": "Verizon",
+   "domains": null
   },
   {
    "name": "Rolls-Royce",
@@ -1600,11 +1577,9 @@
     "Aerospace Engineering": 3,
     "Industrial and Systems Engineering": 3
    },
-   "source": "fantastic",
-   "board": null,
-   "domains": [
-    "rolls-royce.com"
-   ]
+   "source": "direct",
+   "board": "Rolls-Royce",
+   "domains": null
   },
   {
    "name": "Technomics",
@@ -1647,11 +1622,9 @@
     "Business Information Technology": 3,
     "Computational Modeling and Data Analytics": 1
    },
-   "source": "fantastic",
-   "board": null,
-   "domains": [
-    "parsons.com"
-   ]
+   "source": "direct",
+   "board": "Parsons",
+   "domains": null
   },
   {
    "name": "Red Hat",
@@ -1663,11 +1636,9 @@
     "Business Information Technology": 1,
     "Computational Modeling and Data Analytics": 1
    },
-   "source": "fantastic",
-   "board": null,
-   "domains": [
-    "redhat.com"
-   ]
+   "source": "direct",
+   "board": "Red Hat",
+   "domains": null
   },
   {
    "name": "MicroStrategy, Inc.",
@@ -1753,11 +1724,9 @@
     "Electrical Engineering": 6,
     "Mechanical Engineering": 4
    },
-   "source": "fantastic",
-   "board": null,
-   "domains": [
-    "aecom.com"
-   ]
+   "source": "direct",
+   "board": "AECOM",
+   "domains": null
   },
   {
    "name": "Noblis",
@@ -1800,11 +1769,9 @@
     "Industrial and Systems Engineering": 1,
     "Business Information Technology": 5
    },
-   "source": "fantastic",
-   "board": null,
-   "domains": [
-    "guidehouse.com"
-   ]
+   "source": "direct",
+   "board": "Guidehouse",
+   "domains": null
   },
   {
    "name": "Keiter",
@@ -1894,11 +1861,9 @@
     "Business Information Technology": 2,
     "Finance": 1
    },
-   "source": "fantastic",
-   "board": null,
-   "domains": [
-    "hitt.com"
-   ]
+   "source": "direct",
+   "board": "HITT Contracting, Inc.",
+   "domains": null
   },
   {
    "name": "Parker Hannifin Corporation",
@@ -1929,11 +1894,9 @@
     "Finance": 1,
     "Computational Modeling and Data Analytics": 2
    },
-   "source": "fantastic",
-   "board": null,
-   "domains": [
-    "att.com"
-   ]
+   "source": "direct",
+   "board": "AT&T",
+   "domains": null
   },
   {
    "name": "W.L. Gore & Associates, Inc.",
@@ -2000,11 +1963,9 @@
     "Finance": 1,
     "Accounting and Information Systems": 7
    },
-   "source": "fantastic",
-   "board": null,
-   "domains": [
-    "claconnect.com"
-   ]
+   "source": "direct",
+   "board": "CliftonLarsonAllen",
+   "domains": null
   },
   {
    "name": "Ferguson Enterprises, Inc.",
@@ -2117,11 +2078,9 @@
     "Computer Engineering": 1,
     "Industrial and Systems Engineering": 3
    },
-   "source": "fantastic",
-   "board": null,
-   "domains": [
-    "walmart.com"
-   ]
+   "source": "direct",
+   "board": "Walmart",
+   "domains": null
   },
   {
    "name": "Caterpillar Inc.",
@@ -2234,11 +2193,9 @@
     "Industrial and Systems Engineering": 6,
     "Business Information Technology": 2
    },
-   "source": "fantastic",
-   "board": null,
-   "domains": [
-    "ups.com"
-   ]
+   "source": "direct",
+   "board": "UPS (United Parcel Service)",
+   "domains": null
   },
   {
    "name": "CohnReznick",
@@ -2345,11 +2302,9 @@
     "Computer Science": 3,
     "Business Information Technology": 4
    },
-   "source": "fantastic",
-   "board": null,
-   "domains": [
-    "visa.com"
-   ]
+   "source": "direct",
+   "board": "Visa",
+   "domains": null
   },
   {
    "name": "BIT Systems, Inc.",
