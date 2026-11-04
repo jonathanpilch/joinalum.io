@@ -17,7 +17,7 @@ const SAMPLE = { ...core.PROFILE, year: "2028", degree: "Bachelor's", work: "cit
 
 // Returning students go straight to their board from the header.
 try {
-  if (localStorage.getItem("alum.saved") || localStorage.getItem("alum.profile")) $("#nav-cta").textContent = "Open your board";
+  if (localStorage.getItem("alum.email") || localStorage.getItem("alum.saved") || localStorage.getItem("alum.profile")) $("#nav-cta").textContent = "Open your board";
 } catch {}
 
 const [data, P, LOGOS] = await Promise.all([
@@ -54,7 +54,7 @@ $("#n-companies").textContent = `${fmt(companies)} employers`;
 if (P) $("#n-placed").textContent = `${fmt(P.placed)}`;
 if (P?.sourceUrl) $("#source").href = P.sourceUrl;
 document.querySelectorAll("[data-count-cta]").forEach((a) => (a.firstChild.textContent = `Browse ${fmt(JOBS.length)} internships`));
-$("#proof").innerHTML = [P && `<b data-count="${P.placed}">${fmt(P.placed)}</b> Hokie first jobs tracked`, today && `<b data-count="${today}">${fmt(today)}</b> new internships today`, "free, no sign-up to browse"].filter(Boolean).join(" · ");
+$("#proof").innerHTML = [P && `<b data-count="${P.placed}">${fmt(P.placed)}</b> Hokie first jobs tracked`, today && `<b data-count="${today}">${fmt(today)}</b> new internships today`, "free for every Hokie"].filter(Boolean).join(" · ");
 if (today) $("#final-sub").textContent = `${fmt(today)} new internships in the last 24 hours. See them before everyone else does.`;
 
 // Hero shots -----------------------------------------------------------------------

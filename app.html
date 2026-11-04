@@ -15,36 +15,42 @@
     <meta property="og:url" content="https://joinalum.io/app" />
     <meta name="twitter:card" content="summary" />
     <link rel="stylesheet" href="styles.css" />
+    <script>
+      // No email on this device yet: cover the board before it paints. app.js
+      // makes the actual decision (see gate()).
+      try { if (!localStorage.getItem("alum.email") && !Object.keys(localStorage).some((k) => /^sb-.*-auth-token$/.test(k))) document.documentElement.classList.add("gated"); }
+      catch { document.documentElement.classList.add("gated"); }
+    </script>
   </head>
   <body>
+    <!-- The way in: a school email, then a beat, then the board. -->
+    <div class="gate" id="gate">
+      <form class="gate-card" id="gate-form" novalidate>
+        <img src="assets/brand/alum-mark-dark.svg" alt="Alum" />
+        <h1 id="gate-title">Verify your school email</h1>
+        <label class="field"><span>School email</span><input id="gate-email" type="email" autocomplete="email" autocapitalize="none" spellcheck="false" /></label>
+        <p class="gate-error" id="gate-error" role="alert" hidden></p>
+        <button class="primary" type="submit">Continue</button>
+      </form>
+      <div class="gate-wait" id="gate-wait" role="status" hidden>
+        <span class="gate-spinner" aria-hidden="true"></span>
+        <p>Verifying your email…</p>
+      </div>
+    </div>
+
     <header class="top">
       <a class="brand" href="./" aria-label="Alum home">
         <img src="assets/brand/alum-mark-dark.svg" alt="" />
         <span>Alum</span>
       </a>
 
-      <nav class="switch" role="tablist" aria-label="Sections">
-        <span class="switch-pill" aria-hidden="true"></span>
-        <button role="tab" data-tab="internships" aria-selected="true"><i data-lucide="briefcase"></i>Internships</button>
-        <button role="tab" data-tab="pro" aria-selected="false">
-          <svg class="pro-star" viewBox="0 0 24 24" aria-hidden="true">
-            <defs>
-              <linearGradient id="pro-ink" x1="0" y1="0" x2="1" y2="1">
-                <stop offset="0" stop-color="#ffb35c" />
-                <stop offset="0.5" stop-color="#e5751f" />
-                <stop offset="1" stop-color="#b8325f" />
-                <animateTransform attributeName="gradientTransform" type="rotate" values="0 .5 .5;360 .5 .5" dur="6s" repeatCount="indefinite" />
-              </linearGradient>
-            </defs>
-            <path class="pro-star-big" d="M11 3c.8 4.6 3.4 7.2 8 8-4.6.8-7.2 3.4-8 8-.8-4.6-3.4-7.2-8-8 4.6-.8 7.2-3.4 8-8Z" fill="url(#pro-ink)" />
-            <path class="pro-star-small" d="M19.5 1.5c.3 1.6 1 2.3 2.5 2.5-1.5.3-2.2 1-2.5 2.5-.3-1.5-1-2.2-2.5-2.5 1.5-.2 2.2-.9 2.5-2.5Z" fill="url(#pro-ink)" />
-          </svg>Pro
-        </button>
-      </nav>
-
       <div class="top-right">
         <span id="updated"></span>
-        <button class="profile-pill" data-tab="profile" aria-pressed="false"><i data-lucide="user-round"></i><span>Profile</span></button>
+        <nav class="switch" role="tablist" aria-label="Sections">
+          <span class="switch-pill" aria-hidden="true"></span>
+          <button role="tab" data-tab="internships" aria-selected="true"><i data-lucide="briefcase"></i>Internships</button>
+          <button role="tab" data-tab="profile" aria-selected="false"><i data-lucide="user-round"></i>Profile</button>
+        </nav>
       </div>
     </header>
 
@@ -80,21 +86,8 @@
       <div class="more"><button class="ghost" id="more">Show more</button></div>
     </main>
 
-    <!-- Pro -->
-    <main id="pro" class="view" hidden>
-      <section class="pro-hero">
-        <svg class="pro-star pro-star-hero" viewBox="0 0 24 24" aria-hidden="true">
-          <path class="pro-star-big" d="M11 3c.8 4.6 3.4 7.2 8 8-4.6.8-7.2 3.4-8 8-.8-4.6-3.4-7.2-8-8 4.6-.8 7.2-3.4 8-8Z" fill="url(#pro-ink)" />
-          <path class="pro-star-small" d="M19.5 1.5c.3 1.6 1 2.3 2.5 2.5-1.5.3-2.2 1-2.5 2.5-.3-1.5-1-2.2-2.5-2.5 1.5-.2 2.2-.9 2.5-2.5Z" fill="url(#pro-ink)" />
-        </svg>
-        <span class="pro-badge">Coming soon</span>
-        <h1>Alum Pro</h1>
-        <p>More for the Hokies who want the internship most. We're building it now.</p>
-      </section>
-    </main>
-
     <!-- Profile: one column. Who you are, your applications, your radars,
-         then what Alum knows about you. -->
+         your connections, then what Alum knows about you. -->
     <main id="profile" class="view" hidden>
       <header class="me" id="me"></header>
 
@@ -116,6 +109,15 @@
         </div>
         <p class="sub" id="radar-sub">Save any search with <b>Alert me</b> and Alum tells you when something new lands in it.</p>
         <div id="radar-list"></div>
+      </section>
+
+      <!-- Filled by renderConnections(); hidden when the site has no Supabase config. -->
+      <section class="card" id="connections" hidden>
+        <div class="card-head">
+          <h2>Connections</h2>
+        </div>
+        <p class="sub">Your deadlines, reminders and interviews, on the calendar you already use.</p>
+        <div id="conn-list"></div>
       </section>
 
       <section class="card" id="about">

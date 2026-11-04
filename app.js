@@ -1,18 +1,21 @@
-/* Alum -- Internships and Pro behind one sliding switch; Profile is its own
- * pill at the right of the header.
+/* Alum -- Internships and Profile behind one sliding switch at the right of
+ * the header, past a school-email gate.
  *
  * Internships come from data/jobs.json (written hourly by ingest/run.mjs);
  * "Hokies hired" comes from data/placements.json (VT's First Destination
- * Report). The profile and saved internships live in localStorage until
- * sign-in exists. Icons are Lucide: render HTML with <i data-lucide>, then
+ * Report). The profile and saved internships live in localStorage, kept per
+ * email (the account is whichever email was entered at the gate); confirming
+ * that email by code syncs them. Icons are Lucide: render HTML with <i data-lucide>, then
  * call icons().
  *
  * Fit is explained, never a bare percentage: each thing a posting asks for
  * (graduation window, degree, citizenship, clearance, sponsorship, GPA,
  * tools) becomes a row that the profile marks ok, a gap, or a dealbreaker.
  * That logic lives in lib/core.js so the radar emails judge jobs the same
- * way; lib/account.js is sign-in and sync (Supabase), absent when the site
- * isn't configured, in which case everything stays on this device. */
+ * way; lib/account.js is confirmed sign-in and sync (Supabase), absent when the
+ * site isn't configured, in which case everything stays on this device.
+ * Connections (Profile) put the tracker's dates on the student's calendar:
+ * Google directly, anything else by a subscribe link. */
 import * as core from "./lib/core.js";
 import { LEVELS, PIPELINE, PLACES, DEGREES, WORK, PROFILE, esc, gradSpan } from "./lib/core.js";
 import { account } from "./lib/account.js";
@@ -37,16 +40,61 @@ import { account } from "./lib/account.js";
     "Audit & Assurance": "clipboard-check", Tax: "receipt", Accounting: "calculator", Finance: "landmark",
     Consulting: "briefcase", "Supply Chain & Ops": "truck",
   };
+  // The gate -----------------------------------------------------------------
+  //
+  // The board opens once this device has a school email. The check is the
+  // address's domain and nothing more: no email is sent, so it isn't proof of
+  // who someone is. That's why data on the server stays behind the emailed code
+  // (renderAccount, lib/account.js). A confirmed session names the account by
+  // itself, so students who've already signed in never see this.
+
+  const GATE_MS = 1600;
+  const root = document.documentElement;
+  const remembered = () => { try { return localStorage.getItem("alum.email"); } catch { return null; } };
+
+  function gate() {
+    const known = account.storedEmail() || remembered();
+    if (known) return Promise.resolve(known);
+    root.classList.add("gated");
+    $("#gate-title").textContent = `Verify your ${school.domain} email`;
+    $("#gate-email").placeholder = `you@${school.domain}`;
+    $("#gate-email").focus();
+    return new Promise((resolve) => {
+      $("#gate-form").addEventListener("submit", (e) => {
+        e.preventDefault();
+        const email = $("#gate-email").value.trim().toLowerCase();
+        const ok = /^[^\s@]+@[^\s@]+$/.test(email) && email.endsWith(`@${school.domain}`);
+        $("#gate-error").hidden = ok;
+        if (!ok) {
+          $("#gate-error").textContent = `Use your @${school.domain} email address.`;
+          return $("#gate-email").focus();
+        }
+        $("#gate-form").hidden = true;
+        $("#gate-wait").hidden = false;
+        setTimeout(() => resolve(email), GATE_MS);
+      });
+    });
+  }
+
   // Data ------------------------------------------------------------------
+
+  // Fetched behind the gate, so the board is ready the moment it opens.
+  const jobsFile = fetch("data/jobs.json", { cache: "no-cache" }).then((r) => r.json());
+  const placementsFile = fetch("data/placements.json", { cache: "no-cache" }).then((r) => r.json()).catch(() => null);
+  jobsFile.catch(() => {}); // handled below, once the gate has passed
+
+  const me = await gate();
+  try { localStorage.setItem("alum.email", me); } catch {}
 
   let data;
   try {
-    data = await fetch("data/jobs.json", { cache: "no-cache" }).then((r) => r.json());
+    data = await jobsFile;
   } catch {
+    root.classList.remove("gated");
     $("#grid").innerHTML = '<p class="empty">No data yet. Run <code>npm run ingest</code>.</p>';
     return;
   }
-  const P = await fetch("data/placements.json", { cache: "no-cache" }).then((r) => r.json()).catch(() => null);
+  const P = await placementsFile;
   const now = Date.now();
   const minutes = (iso) => Math.max(0, Math.round((now - Date.parse(iso)) / 60000));
   const JOBS = data.jobs.filter((j) => LEVELS.includes(j.level)).map((j) => ({ ...j, minutesAgo: minutes(j.postedAt) }));
@@ -71,19 +119,30 @@ import { account } from "./lib/account.js";
 
   // Profile + saved ---------------------------------------------------------
 
-  let profile = { ...PROFILE, ...store.get("alum.profile", {}) };
-  // id -> { status, at, updatedAt, job: {snapshot}, deadline, remindOn, notes, history }
-  let saved = store.get("alum.saved", {});
+  // Each email has its own profile, tracker and radars on this device. What
+  // was here before accounts had emails goes to the first email entered.
+  const mine = (k) => `alum.${k}:${me}`;
+  try {
+    for (const k of ["profile", "saved", "radars"]) {
+      const old = localStorage.getItem(`alum.${k}`);
+      if (old != null && localStorage.getItem(mine(k)) == null) localStorage.setItem(mine(k), old);
+      localStorage.removeItem(`alum.${k}`);
+    }
+  } catch {}
+
+  let profile = { ...PROFILE, ...store.get(mine("profile"), {}) };
+  // id -> { status, at, updatedAt, job: {snapshot}, deadline, remindOn, interviewAt, notes, history }
+  let saved = store.get(mine("saved"), {});
   // [{ id, name, search: {q, cat, filters}, cadence, last_seen_at, remote }]
-  let radars = store.get("alum.radars", []);
-  const saveProfile = () => { store.set("alum.profile", profile); account.saveProfile(profile); flash($("#saved-note"), "Saved"); renderMe(); };
-  const saveSaved = () => { store.set("alum.saved", saved); renderSavedCount(); };
-  const saveRadars = () => store.set("alum.radars", radars);
+  let radars = store.get(mine("radars"), []);
+  const saveProfile = () => { store.set(mine("profile"), profile); account.saveProfile(profile); flash($("#saved-note"), "Saved"); renderMe(); };
+  const saveSaved = () => { store.set(mine("saved"), saved); renderSavedCount(); };
+  const saveRadars = () => store.set(mine("radars"), radars);
   // One saved role changed: keep it here, and in the account when signed in.
   function touch(id) {
     saved[id].updatedAt = Date.now();
     saveSaved();
-    account.putSaved(id, saved[id])?.catch(() => toast("Couldn't sync that change. It's saved on this device."));
+    account.putSaved(id, saved[id])?.then(pushCalendar, () => toast("Couldn't sync that change. It's saved on this device."));
   }
   const hasPrefs = () => profile.interests.length || profile.places.filter((p) => p !== "Anywhere").length;
 
@@ -318,6 +377,7 @@ import { account } from "./lib/account.js";
     renderAccount();
     renderMe();
     renderRadars();
+    renderConnections();
     renderSaved();
     icons();
   }
@@ -325,7 +385,7 @@ import { account } from "./lib/account.js";
   // The top of Profile: who you are, and where your profile lives.
   function renderMe() {
     const meta = [profile.major, profile.year && `Class of ${profile.year}`, profile.term !== "Any time" && profile.term].filter(Boolean).map(esc);
-    const where = account.user ? `Synced to ${esc(account.user.email)} · <button class="link" id="sign-out">Sign out</button>` : "Saved on this device";
+    const where = `${esc(me)} · ${account.user ? "Synced" : "Saved on this device"} · <button class="link" id="sign-out">Sign out</button>`;
     $("#me").innerHTML = `<span class="me-avatar">${profile.name ? esc(profile.name[0].toUpperCase()) : `<i data-lucide="user-round"></i>`}</span>
       <div><h1>${profile.name ? esc(profile.name) : "Your profile"}</h1><p>${[...meta, where].join(" · ")}</p></div>`;
     icons();
@@ -344,6 +404,10 @@ import { account } from "./lib/account.js";
   const STATUSES = ["Saved", "Applied", "Interviewing", "Offer", "Rejected"];
   let openRow = null;
   const dateLabel = (d) => new Date(`${d}T12:00:00`).toLocaleDateString("en-US", { month: "short", day: "numeric" });
+  const timeLabel = (iso) => new Date(iso).toLocaleString("en-US", { month: "short", day: "numeric", hour: "numeric", minute: "2-digit" });
+  // ISO <-> the local "2026-11-01T15:30" a datetime-local input wants.
+  const localInput = (iso) => { if (!iso) return ""; const d = new Date(iso); return new Date(d - d.getTimezoneOffset() * 6e4).toISOString().slice(0, 16); };
+  const upcoming = (iso) => iso && Date.parse(iso) > Date.now() - 36e5;
   function renderSaved() {
     renderTrackTabs();
     const all = Object.entries(saved).sort((a, b) => b[1].at - a[1].at);
@@ -351,7 +415,7 @@ import { account } from "./lib/account.js";
     $("#saved-list").innerHTML = rows.length
       ? rows.map(([id, s]) => {
           const j = byId.get(id) || s.job;
-          const due = s.deadline ? `Due ${dateLabel(s.deadline)}` : s.remindOn ? `Reminder ${dateLabel(s.remindOn)}` : "";
+          const due = upcoming(s.interviewAt) && s.status !== "Rejected" ? `Interview ${timeLabel(s.interviewAt)}` : s.deadline ? `Due ${dateLabel(s.deadline)}` : s.remindOn ? `Reminder ${dateLabel(s.remindOn)}` : "";
           return `<div class="saved-wrap">
             <div class="saved">
               ${logo(j)}
@@ -362,8 +426,9 @@ import { account } from "./lib/account.js";
             ${openRow === id ? `<div class="saved-more">
               <label class="field"><span>Application deadline</span><input type="date" data-track="${esc(id)}" data-field="deadline" value="${esc(s.deadline || "")}" /></label>
               <label class="field"><span>Remind me on</span><input type="date" data-track="${esc(id)}" data-field="remindOn" value="${esc(s.remindOn || "")}" /></label>
+              ${s.status === "Interviewing" || s.interviewAt ? `<label class="field wide"><span>Interview</span><input type="datetime-local" data-track="${esc(id)}" data-field="interviewAt" value="${esc(localInput(s.interviewAt))}" /></label>` : ""}
               <label class="field wide"><span>Notes</span><textarea data-track="${esc(id)}" data-field="notes" rows="3" maxlength="4000" placeholder="Referral from…, recruiter's name, what to follow up on">${esc(s.notes || "")}</textarea></label>
-              ${account.enabled ? `<p class="fine-inline">${account.user ? "We'll email you on the reminder date." : "Sign in above to get the reminder by email."}</p>` : ""}
+              ${account.enabled ? `<p class="fine-inline">${account.user ? `We'll email you on the reminder date.${conns.google?.status === "ok" ? " These dates are on your Google Calendar too." : ""}` : "Confirm your email above to get the reminder by email."}</p>` : ""}
               <div class="row-actions">
                 ${account.user && s.status !== "Saved" ? `<button class="secondary" data-report="${esc(id)}"><i data-lucide="message-square-plus"></i>Share how it went</button>` : ""}
                 <button class="secondary" data-unsave="${esc(id)}"><i data-lucide="trash-2"></i>Remove</button>
@@ -388,7 +453,7 @@ import { account } from "./lib/account.js";
   function unsave(id) {
     delete saved[id];
     saveSaved();
-    account.dropSaved(id);
+    account.dropSaved(id)?.then(pushCalendar, () => {});
   }
 
   // A tracked role moves along. Past the application, ask how it went: the
@@ -399,6 +464,7 @@ import { account } from "./lib/account.js";
     s.status = status;
     s.history = [...(s.history || []), { status, at: new Date().toISOString() }];
     touch(id);
+    if (status === "Interviewing" && view() === "profile") { openRow = id; renderSaved(); icons(); }
     if (["Interviewing", "Offer", "Rejected"].includes(status) && account.user) {
       toast(`Help the next Hokie: <button class="link" data-report="${esc(id)}" style="color:#fff;margin-left:6px">share how ${esc(s.job.company)} went</button>`, 9000);
     }
@@ -418,7 +484,7 @@ import { account } from "./lib/account.js";
     const name = core.describe({ ...search, filters });
     $("#radar-new-body").innerHTML = `
       <label class="field"><span>Name</span><input id="rn-name" maxlength="80" value="${esc(name)}" /></label>
-      <p class="sub small">${fmt(list().length)} internships match today. ${account.user ? "How often should we email you new ones?" : `Your Profile will count new matches.${account.enabled ? " Sign in there to get them by email." : ""}`}</p>
+      <p class="sub small">${fmt(list().length)} internships match today. ${account.user ? "How often should we email you new ones?" : `Your Profile will count new matches.${account.enabled ? " Confirm your email there to get them by email." : ""}`}</p>
       ${account.user ? `<div class="chips" id="rn-cadence">${Object.entries(CADENCES).map(([k, l]) => `<button class="chip" data-rn="${k}" aria-pressed="${k === "daily"}">${l}</button>`).join("")}</div>` : ""}`;
     open("#radar-new");
     $("#rn-name").select();
@@ -483,6 +549,157 @@ import { account } from "./lib/account.js";
     icons();
   }
 
+  // Connections -------------------------------------------------------------------
+  //
+  // The tracker's deadlines, reminders and interviews on the student's own
+  // calendar. Google connects directly: Alum makes an "Alum" calendar there
+  // and keeps it in step, and can't see anything else
+  // (supabase/functions/google-calendar). Any other calendar subscribes to a
+  // private feed (supabase/functions/calendar-feed). Both need an account.
+
+  let conns = { google: null, feed: null }; // google: { account_email, status, synced_at }; feed: token
+  let feedOpen = false;
+  let calSyncing = false;
+
+  async function loadConnections() {
+    conns = { google: null, feed: null };
+    if (!account.user) return;
+    try {
+      const [rows, feed] = await Promise.all([account.connections(), account.feed()]);
+      conns = { google: rows.find((r) => r.provider === "google") || null, feed: feed?.token || null };
+    } catch (e) {
+      console.warn("alum: connections", e);
+    }
+  }
+
+  const GOOGLE_G = `<svg viewBox="0 0 48 48" aria-hidden="true"><path fill="#EA4335" d="M24 9.5c3.5 0 6.6 1.2 9.1 3.6l6.8-6.8C35.8 2.4 30.2 0 24 0 14.6 0 6.6 5.4 2.7 13.2l7.9 6.2C12.5 13.6 17.8 9.5 24 9.5z"/><path fill="#4285F4" d="M46.1 24.5c0-1.6-.1-3.1-.4-4.5H24v9h12.4c-.5 2.9-2.2 5.3-4.6 6.9l7.4 5.8c4.3-4 6.9-9.9 6.9-17.2z"/><path fill="#FBBC05" d="M10.5 28.6c-.5-1.4-.8-3-.8-4.6s.3-3.2.8-4.6l-7.9-6.2C1 16.5 0 20.1 0 24s1 7.5 2.7 10.8l7.8-6.2z"/><path fill="#34A853" d="M24 48c6.5 0 11.9-2.1 15.9-5.8l-7.4-5.8c-2.1 1.4-4.8 2.3-8.5 2.3-6.2 0-11.5-4.1-13.4-9.8l-7.9 6.2C6.6 42.6 14.6 48 24 48z"/></svg>`;
+
+  function renderConnections() {
+    const box = $("#connections");
+    box.hidden = !account.enabled;
+    if (box.hidden) return;
+    if (!account.user) {
+      $("#conn-list").innerHTML = `<div class="none"><i data-lucide="calendar-days"></i><p>Confirm your email above to put your deadlines, reminders and interviews on Google Calendar, Apple Calendar or Outlook.</p></div>`;
+      return;
+    }
+    const g = conns.google;
+    const gText = calSyncing ? "Syncing…"
+      : g?.status === "ok" ? `On the Alum calendar in ${esc(g.account_email || "your Google account")}${g.synced_at ? ` · synced ${ago(minutes(g.synced_at)).toLowerCase()}` : ""}`
+      : g?.status === "revoked" ? `<em>Google disconnected Alum.</em> Connect again to keep your calendar up to date.`
+      : "Deadlines, reminders and interviews on an Alum calendar in your Google account. Alum can't see your other events.";
+    const gBtn = g?.status === "ok"
+      ? `<button class="secondary small" id="google-disconnect">Disconnect</button>`
+      : `<button class="primary small" id="google-connect">${g ? "Reconnect" : "Connect"}</button>`;
+    const url = conns.feed && account.feedUrl(conns.feed);
+    $("#conn-list").innerHTML = `
+      <div class="saved-wrap"><div class="saved">
+        <span class="logo conn">${GOOGLE_G}</span>
+        <div class="saved-text"><b>Google Calendar</b><span>${gText}</span></div>
+        ${gBtn}
+      </div></div>
+      <div class="saved-wrap"><div class="saved">
+        <span class="logo radar"><i data-lucide="calendar-plus"></i></span>
+        <div class="saved-text"><b>Apple, Outlook and more</b><span>Subscribe once to a private link and your calendar keeps itself up to date.</span></div>
+        <button class="secondary small" id="feed-open" aria-expanded="${feedOpen}">${feedOpen ? "Hide" : "Get link"}</button>
+      </div>
+      ${feedOpen && url ? `<div class="saved-more">
+        <label class="field wide"><span>Your private calendar link</span><input id="feed-url" readonly value="${esc(url)}" /></label>
+        <div class="row-actions">
+          <a class="secondary" href="${esc(url.replace(/^https:/, "webcal:"))}"><i data-lucide="calendar"></i>Apple Calendar</a>
+          <a class="secondary" href="https://outlook.office.com/calendar/0/addfromweb?${new URLSearchParams({ url, name: "Alum" })}" target="_blank" rel="noopener"><i data-lucide="mail"></i>Outlook</a>
+          <button class="secondary" id="feed-copy"><i data-lucide="copy"></i>Copy link</button>
+        </div>
+        <p class="fine-inline">Anyone with this link can see your tracker's dates, so keep it to yourself. <button class="link" id="feed-reset">Make a new link</button> if it gets out. Calendar apps check for changes every few hours; Google Calendar above updates right away.</p>
+      </div>` : ""}</div>`;
+  }
+
+  async function connectGoogle(btn) {
+    btn.disabled = true;
+    try {
+      const { url } = await account.google("start", { redirect_uri: `${location.origin}/app`, time_zone: Intl.DateTimeFormat().resolvedOptions().timeZone });
+      location.assign(url);
+    } catch (e) {
+      btn.disabled = false;
+      toast(esc(e.message || "Couldn't reach Google."), 5000);
+    }
+  }
+
+  // Back from Google's consent screen with ?code&state (or ?error).
+  async function finishGoogle(p) {
+    if (p.get("error")) return toast(p.get("error") === "access_denied" ? "Google Calendar wasn't connected." : "Google didn't connect. Try again.", 4000);
+    if (!account.user) return toast("Confirm your email first, then connect Google Calendar.", 4000);
+    tab("profile");
+    calSyncing = true;
+    renderConnections();
+    icons();
+    try {
+      const r = await account.google("finish", { code: p.get("code"), state: p.get("state") });
+      conns.google = { provider: "google", ...r };
+      toast(r.events ? `Google Calendar connected. ${fmt(r.events)} ${r.events === 1 ? "date is" : "dates are"} on your Alum calendar.` : "Google Calendar connected. Dates you add show up on your Alum calendar.", 5000);
+    } catch (e) {
+      toast(esc(e.message || "Couldn't connect Google Calendar."), 6000);
+      await loadConnections();
+    }
+    calSyncing = false;
+    if (view() === "profile") { renderConnections(); renderSaved(); icons(); }
+  }
+
+  // After a tracker change has reached the account: bring Google along.
+  // Debounced, and one at a time, so a burst of edits is one sync.
+  let calTimer, calBusy = false, calAgain = false;
+  function pushCalendar() {
+    if (conns.google?.status !== "ok") return;
+    clearTimeout(calTimer);
+    calTimer = setTimeout(async function run() {
+      if (calBusy) { calAgain = true; return; }
+      calBusy = true;
+      try {
+        conns.google = { ...conns.google, ...(await account.google("sync")) };
+      } catch (e) {
+        console.warn("alum: calendar", e);
+        if (/connect it again/i.test(e.message)) conns.google = { ...conns.google, status: "revoked" };
+      }
+      calBusy = false;
+      if (view() === "profile") { renderConnections(); icons(); }
+      if (calAgain) { calAgain = false; run(); }
+    }, 1200);
+  }
+
+  async function disconnectGoogle() {
+    if (!confirm("Disconnect Google Calendar? Alum removes its calendar from your Google account.")) return;
+    try {
+      await account.google("disconnect");
+      conns.google = null;
+      toast("Google Calendar disconnected.");
+    } catch (e) {
+      toast(esc(e.message || "Couldn't disconnect. Try again."));
+    }
+    renderConnections();
+    renderSaved();
+    icons();
+  }
+
+  async function openFeed() {
+    feedOpen = !feedOpen;
+    if (feedOpen && !conns.feed) {
+      try { conns.feed = (await account.makeFeed()).token; } catch (e) { feedOpen = false; console.warn(e); toast("Couldn't make your calendar link. Try again."); }
+    }
+    renderConnections();
+    icons();
+  }
+
+  async function resetFeed() {
+    if (!confirm("Make a new link? The old one stops working, so calendars subscribed to it stop updating until you subscribe to the new one.")) return;
+    try {
+      conns.feed = (await account.resetFeed()).token;
+      toast("New link made. Subscribe to it again in your calendar.", 4000);
+    } catch {
+      toast("Couldn't make a new link. Try again.");
+    }
+    renderConnections();
+    icons();
+  }
+
   // Account -------------------------------------------------------------------
 
   function renderAccount() {
@@ -492,29 +709,34 @@ import { account } from "./lib/account.js";
     $("#resume-btn").hidden = !account.enabled;
     $("#about-sub").textContent = `Picks your internships, checks who can apply against you, and shows how many ${school.demonym} from your major got hired.`;
     if (box.hidden) return;
-    box.innerHTML = `<div class="card-head"><h2>Sign in with your ${esc(school.domain)} email</h2></div>
-         <p class="sub">Sync across devices, get radar alerts and reminders by email, fill your profile from your resume, and read interview notes from other ${esc(school.demonym)}.</p>
-         <form class="signin" id="signin">
-           <label class="field"><span>School email</span><input id="signin-email" type="email" autocomplete="email" placeholder="you@${esc(school.domain)}" required /></label>
-           <button class="primary" type="submit">Email me a link</button>
-         </form>`;
+    box.innerHTML = `<div class="card-head"><h2>Confirm your email to sync</h2></div>
+         <p class="sub">We'll send a code to <b>${esc(me)}</b>. It turns on sync across devices, radar alerts and reminders by email, filling your profile from your resume, and interview notes from other ${esc(school.demonym)}.</p>
+         <form class="signin" id="signin"><button class="primary" type="submit">Email me a code</button></form>`;
   }
 
-  async function signIn(email) {
-    if (!email.toLowerCase().endsWith(`@${school.domain}`)) return toast(`Use your @${esc(school.domain)} address.`);
+  async function signIn() {
+    const email = me;
     try {
       await account.signIn(email);
       $("#signin").outerHTML = `<p class="sent"><i data-lucide="mail-check"></i>We emailed ${esc(email)}. Type the code from it here.</p>
         <form class="signin" id="code-form" data-email="${esc(email)}">
           <label class="field"><span>Code</span><input id="signin-code" inputmode="numeric" autocomplete="one-time-code" pattern="[0-9]{6,10}" maxlength="10" placeholder="12345678" required /></label>
-          <button class="primary" type="submit">Sign in</button>
+          <button class="primary" type="submit">Confirm</button>
         </form>
         <p class="fine-inline">Can't find it? Check junk and quarantine: school mail filters sometimes hold new senders.</p>`;
       icons();
       $("#signin-code").focus();
     } catch (e) {
-      toast(esc(e.message || "Couldn't send the link."));
+      toast(esc(e.message || "Couldn't send the code."));
     }
+  }
+
+  // Leave this account: back to the gate. Its data stays under its email on
+  // this device, for when that email comes back.
+  async function signOut() {
+    try { await account.signOut(); } catch (e) { console.warn(e); }
+    try { localStorage.removeItem("alum.email"); } catch {}
+    location.replace(location.pathname + location.search);
   }
 
   // Pull the account down, push this device's changes up, redraw.
@@ -524,13 +746,14 @@ import { account } from "./lib/account.js";
       profile = { ...PROFILE, ...r.profile };
       saved = r.saved;
       radars = r.radars;
-      store.set("alum.profile", profile);
+      store.set(mine("profile"), profile);
       saveSaved();
       saveRadars();
     } catch (e) {
       console.warn(e);
       toast("Couldn't reach your account. Showing what's on this device.");
     }
+    await loadConnections();
     tab(view(), true);
   }
 
@@ -546,7 +769,7 @@ import { account } from "./lib/account.js";
 
   async function readResume(file) {
     $("#resume-file").value = "";
-    if (!account.user) return toast("Sign in first: resume reading runs on your account.");
+    if (!account.user) return toast("Confirm your email first: resume reading runs on your account.");
     if (file.size > 5 * 1024 * 1024) return toast("That PDF is over 5 MB. Try exporting a smaller one.");
     const box = $("#resume-review");
     box.hidden = false;
@@ -602,7 +825,7 @@ import { account } from "./lib/account.js";
     const box = $("#notes");
     if (!box) return;
     if (!account.user) {
-      box.innerHTML = `<p>Sign in with your ${esc(school.domain)} email on <button class="link" data-tab="profile">Profile</button> to read what ${esc(school.demonym)} say about interviewing at ${esc(j.company)}.</p>`;
+      box.innerHTML = `<p>Confirm your email on <button class="link" data-tab="profile">Profile</button> to read what ${esc(school.demonym)} say about interviewing at ${esc(j.company)}.</p>`;
       return;
     }
     let rs;
@@ -662,19 +885,18 @@ import { account } from "./lib/account.js";
 
   // Tabs, modals, toasts ---------------------------------------------------------
 
-  const view = () => ["pro", "profile"].find((v) => !$(`#${v}`).hidden) || "internships";
+  const view = () => ($("#profile").hidden ? "internships" : "profile");
 
   function tab(name, keepScroll = false) {
     if (!keepScroll) close();
     $(".switch").dataset.on = name;
     $$(".switch [role=tab]").forEach((b) => b.setAttribute("aria-selected", b.dataset.tab === name));
-    $(".profile-pill").setAttribute("aria-pressed", name === "profile");
-    for (const v of ["internships", "pro", "profile"]) $(`#${v}`).hidden = name !== v;
+    for (const v of ["internships", "profile"]) $(`#${v}`).hidden = name !== v;
     if (name === "profile") renderProfile();
     else if (name === "internships") { renderCats(); render(); }
-    // Drop one-shot email links (?job, ?radar) from the address; keep ?school.
+    // Drop one-shot links (?job, ?radar from emails; Google's OAuth return) from the address; keep ?school.
     const keep = new URLSearchParams(location.search);
-    keep.delete("job"); keep.delete("radar");
+    for (const k of ["job", "radar", "code", "state", "scope", "authuser", "hd", "prompt", "iss", "error"]) keep.delete(k);
     const path = location.pathname + (keep.size ? `?${keep}` : "");
     history.replaceState(null, "", name === "internships" ? path : `${path}#${name}`);
     if (!keepScroll) scrollTo({ top: 0 });
@@ -754,9 +976,17 @@ import { account } from "./lib/account.js";
       return icons();
     }
     if (t.dataset?.more) { openRow = openRow === t.dataset.more ? null : t.dataset.more; renderSaved(); return icons(); }
-    if (t.id === "sign-out") { account.signOut(); return; }
+    if (t.id === "sign-out") return signOut();
+    if (t.id === "google-connect") return connectGoogle(t);
+    if (t.id === "google-disconnect") return disconnectGoogle();
+    if (t.id === "feed-open") return openFeed();
+    if (t.id === "feed-reset") return resetFeed();
+    if (t.id === "feed-copy") {
+      navigator.clipboard?.writeText(account.feedUrl(conns.feed)).then(() => toast("Link copied. Add it in your calendar as a subscription."), () => toast("Couldn't copy"));
+      return;
+    }
     if (t.id === "resume-btn") {
-      if (!account.user) return toast("Sign in first: resume reading runs on your account.");
+      if (!account.user) return toast("Confirm your email first: resume reading runs on your account.");
       return $("#resume-file").click();
     }
     if (t.id === "resume-apply") return applyResume();
@@ -783,7 +1013,7 @@ import { account } from "./lib/account.js";
     if (t.dataset.status) { setStatus(t.dataset.status, t.value); t.dataset.v = t.value; return; }
     if (t.dataset.track) {
       const [id, field] = [t.dataset.track, t.dataset.field];
-      saved[id][field] = t.value || null;
+      saved[id][field] = field === "interviewAt" && t.value ? new Date(t.value).toISOString() : t.value || null;
       return touch(id);
     }
     if (t.dataset.cadence) return setCadence(t.dataset.cadence, t.value);
@@ -797,7 +1027,7 @@ import { account } from "./lib/account.js";
   document.addEventListener("submit", async (e) => {
     if (e.target.id === "signin") {
       e.preventDefault();
-      return signIn($("#signin-email").value.trim());
+      return signIn();
     }
     if (e.target.id === "code-form") {
       e.preventDefault();
@@ -806,7 +1036,7 @@ import { account } from "./lib/account.js";
       try {
         // The sign-in listener (account.init) runs sync() and redraws.
         await account.verifyCode(e.target.dataset.email, $("#signin-code").value.trim());
-        toast("Signed in.");
+        toast("Email confirmed. You're synced.");
       } catch (err) {
         btn.disabled = false;
         toast(/expired|invalid/i.test(err.message) ? "That code didn't work or has expired. Request a new one." : esc(err.message));
@@ -842,7 +1072,8 @@ import { account } from "./lib/account.js";
   // Links from emails: ?job=<id> opens that internship, ?radar=<id> its search.
   const params = new URLSearchParams(location.search);
   renderSavedCount();
-  tab(location.hash === "#profile" || location.hash === "#radars" ? "profile" : location.hash === "#pro" ? "pro" : "internships");
+  tab(location.hash === "#profile" || location.hash === "#radars" ? "profile" : "internships");
+  root.classList.remove("gated");
 
   const deep = () => {
     if (params.get("radar")) openRadar(params.get("radar"));
@@ -852,8 +1083,9 @@ import { account } from "./lib/account.js";
   };
 
   if (account.enabled) {
-    await account.init((u) => (u ? sync() : tab(view(), true)));
+    await account.init((u) => (u ? sync() : (conns = { google: null, feed: null }, tab(view(), true))));
     if (account.user) await sync();
+    if (params.get("state") && (params.get("code") || params.get("error"))) await finishGoogle(params);
   }
   deep();
 })();
