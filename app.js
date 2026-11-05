@@ -412,7 +412,8 @@ import { account } from "./lib/account.js";
     const scope = !g.scoped || !hasPrefs() ? "internships on Alum" : profile.interests.length ? `${and(profile.interests)} internships` : "the internships you'd see";
     // Until they've marked a tool, "learn next" would only repeat the top of the list.
     const next = new Set(profile.skills.length ? g.next.map((x) => x.skill) : []);
-    $("#gap-count").textContent = `${fmt(g.pool)} name their tools`;
+    const first = g.next[0]?.skill;
+    $("#skills-sum").textContent = !profile.skills.length ? "Mark what you know and see what to learn next" : `${profile.skills.length} tool${profile.skills.length === 1 ? "" : "s"}${first ? ` · learn ${first} next` : ""}`;
     $("#gap-sub").innerHTML = !profile.skills.length
       ? `The tools ${esc(scope)} ask for most. Mark the ones you know, here or under <b>Tools you know</b>, to see what's missing.`
       : !g.next.length
@@ -431,12 +432,13 @@ import { account } from "./lib/account.js";
     icons();
   }
 
-  // The top of Profile: who you are, and where your profile lives.
+  // The top of Profile: the fields edit themselves, so only what's derived
+  // from them is drawn here. Never redraw the inputs: this runs on every keystroke.
   function renderMe() {
-    const meta = [profile.major, profile.year && `Class of ${profile.year}`, profile.term !== "Any time" && profile.term].filter(Boolean).map(esc);
-    const where = `${esc(me)} · ${account.user ? "Synced" : "Saved on this device"} · <button class="link" id="sign-out">Sign out</button>`;
-    $("#me").innerHTML = `<span class="me-avatar">${profile.name ? esc(profile.name[0].toUpperCase()) : `<i data-lucide="user-round"></i>`}</span>
-      <div><h1>${profile.name ? esc(profile.name) : "Your profile"}</h1><p>${[...meta, where].join(" · ")}</p></div>`;
+    $("#me-avatar").innerHTML = profile.name ? esc(profile.name[0].toUpperCase()) : `<i data-lucide="user-round"></i>`;
+    $("#me-line").innerHTML = `${esc(me)}${account.user ? " · Synced" : ""} · <button class="link" id="sign-out">Sign out</button>`;
+    const wants = [profile.interests.join(", "), profile.places.join(", ")].filter(Boolean).join(" · ");
+    $("#prefs-sum").textContent = wants || "Pick fields and places for your For you list";
     icons();
   }
 
@@ -477,7 +479,7 @@ import { account } from "./lib/account.js";
               <label class="field"><span>Remind me on</span><input type="date" data-track="${esc(id)}" data-field="remindOn" value="${esc(s.remindOn || "")}" /></label>
               ${s.status === "Interviewing" || s.interviewAt ? `<label class="field wide"><span>Interview</span><input type="datetime-local" data-track="${esc(id)}" data-field="interviewAt" value="${esc(localInput(s.interviewAt))}" /></label>` : ""}
               <label class="field wide"><span>Notes</span><textarea data-track="${esc(id)}" data-field="notes" rows="3" maxlength="4000" placeholder="Referral from…, recruiter's name, what to follow up on">${esc(s.notes || "")}</textarea></label>
-              ${account.enabled ? `<p class="fine-inline">${account.user ? `We'll email you on the reminder date.${conns.google?.status === "ok" ? " These dates are on your Google Calendar too." : ""}` : "Confirm your email above to get the reminder by email."}</p>` : ""}
+              ${account.enabled ? `<p class="fine-inline">${account.user ? `We'll email you on the reminder date.${conns.google?.status === "ok" ? " These dates are on your Google Calendar too." : ""}` : "Confirm your email under Sync to get the reminder by email."}</p>` : ""}
               <div class="row-actions">
                 ${account.user && s.status !== "Saved" ? `<button class="secondary" data-report="${esc(id)}"><i data-lucide="message-square-plus"></i>Share how it went</button>` : ""}
                 <button class="secondary" data-unsave="${esc(id)}"><i data-lucide="trash-2"></i>Remove</button>
@@ -553,7 +555,8 @@ import { account } from "./lib/account.js";
   }
 
   function renderRadars() {
-    $("#radar-count").textContent = radars.length ? `${radars.length}` : "";
+    const newCount = radars.reduce((a, r) => a + fresh(r), 0);
+    $("#radars-sum").textContent = !radars.length ? "Get told when new matches land" : `${radars.length} saved${newCount ? ` · ${fmt(newCount)} new` : ""}`;
     $("#radar-list").innerHTML = radars.length
       ? radars.map((r) => {
           const n = fresh(r);
@@ -564,7 +567,7 @@ import { account } from "./lib/account.js";
             <button class="remove" data-unradar="${esc(r.id)}" aria-label="Delete radar"><i data-lucide="x"></i></button>
           </div>`;
         }).join("")
-      : `<div class="none"><i data-lucide="radar"></i><p>No radars yet. Set up a search on Internships, then tap <b>Alert me</b>.</p></div>`;
+      : `<p class="sub flush">Set up a search on Internships, then tap <b>Alert me</b>. Alum tells you when something new lands in it.</p>`;
   }
 
   // Open a radar: run its search, and reset its "new" count.
@@ -628,10 +631,12 @@ import { account } from "./lib/account.js";
     box.hidden = !account.enabled;
     if (box.hidden) return;
     if (!account.user) {
-      $("#conn-list").innerHTML = `<div class="none"><i data-lucide="calendar-days"></i><p>Confirm your email above to put your deadlines, reminders and interviews on Google Calendar, Apple Calendar or Outlook.</p></div>`;
+      $("#connections-sum").textContent = "Put your deadlines on your calendar";
+      $("#conn-list").innerHTML = `<p class="sub flush">Confirm your email under Sync to put your deadlines, reminders and interviews on Google Calendar, Apple Calendar or Outlook.</p>`;
       return;
     }
     const g = conns.google;
+    $("#connections-sum").textContent = g?.status === "ok" ? "On your Google Calendar" : conns.feed ? "Subscribed by link" : "Put your deadlines on your calendar";
     const gText = calSyncing ? "Syncing…"
       : g?.status === "ok" ? `On the Alum calendar in ${esc(g.account_email || "your Google account")}${g.synced_at ? ` · synced ${ago(minutes(g.synced_at)).toLowerCase()}` : ""}`
       : g?.status === "revoked" ? `<em>Google disconnected Alum.</em> Connect again to keep your calendar up to date.`
@@ -756,10 +761,8 @@ import { account } from "./lib/account.js";
     // Signed in, the header says so; the card is only for signing in.
     box.hidden = !account.enabled || !!account.user;
     $("#resume-btn").hidden = !account.enabled;
-    $("#about-sub").textContent = `Picks your internships, checks who can apply against you, and shows how many ${school.demonym} from your major got hired.`;
     if (box.hidden) return;
-    box.innerHTML = `<div class="card-head"><h2>Confirm your email to sync</h2></div>
-         <p class="sub">We'll send a code to <b>${esc(me)}</b>. It turns on sync across devices, radar alerts and reminders by email, filling your profile from your resume, and interview notes from other ${esc(school.demonym)}.</p>
+    $("#account-body").innerHTML = `<p class="sub">We'll send a code to <b>${esc(me)}</b>. It turns on sync across devices, radar alerts and reminders by email, filling your profile from your resume, and interview notes from other ${esc(school.demonym)}.</p>
          <form class="signin" id="signin"><button class="primary" type="submit">Email me a code</button></form>`;
   }
 
@@ -1126,6 +1129,7 @@ import { account } from "./lib/account.js";
   // Links from emails: ?job=<id> opens that internship, ?radar=<id> its search.
   const params = new URLSearchParams(location.search);
   renderSavedCount();
+  if (location.hash === "#radars") $("#radars").open = true;
   tab(location.hash === "#profile" || location.hash === "#radars" ? "profile" : "internships");
   root.classList.remove("gated");
 

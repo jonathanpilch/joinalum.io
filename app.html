@@ -86,13 +86,32 @@
       <div class="more"><button class="ghost" id="more">Show more</button></div>
     </main>
 
-    <!-- Profile: one column. Who you are, your applications, your radars,
-         your connections, your skills gap, then what Alum knows about you. -->
+    <!-- Profile: who you are (edited right there), your applications, then
+         everything else folded into one list of rows. -->
     <main id="profile" class="view" hidden>
-      <header class="me" id="me"></header>
-
-      <!-- Filled by renderAccount(); hidden when the site has no Supabase config. -->
-      <section class="card account" id="account" hidden></section>
+      <section class="card me">
+        <span class="saved-note" id="saved-note" role="status"></span>
+        <div class="me-head">
+          <span class="me-avatar" id="me-avatar" aria-hidden="true"></span>
+          <div class="me-id">
+            <label class="me-name"><input id="p-name" placeholder="Your name" aria-label="Your name" autocomplete="given-name" /><i data-lucide="pencil"></i></label>
+            <p id="me-line"></p>
+          </div>
+          <div class="me-actions">
+            <button class="ghost small" id="resume-btn" hidden><i data-lucide="file-up"></i>Fill from resume</button>
+            <input type="file" id="resume-file" accept="application/pdf" hidden />
+          </div>
+        </div>
+        <div class="review" id="resume-review" hidden></div>
+        <div class="me-grid">
+          <label class="me-cell span"><span>Major</span><select id="p-major"></select></label>
+          <label class="me-cell"><span>Graduating (May)</span><select id="p-year"></select></label>
+          <label class="me-cell"><span>Looking for</span><select id="p-term"></select></label>
+          <label class="me-cell"><span>Degree</span><select id="p-degree"></select></label>
+          <label class="me-cell"><span>GPA</span><input id="p-gpa" type="number" inputmode="decimal" min="0" max="4" step="0.01" placeholder="Optional" /></label>
+          <label class="me-cell span"><span>Work status</span><select id="p-work"></select></label>
+        </div>
+      </section>
 
       <section class="card" id="tracker">
         <div class="card-head">
@@ -102,58 +121,47 @@
         <div id="saved-list"></div>
       </section>
 
-      <section class="card" id="radars">
-        <div class="card-head">
-          <h2>Radars</h2>
-          <span class="count" id="radar-count"></span>
-        </div>
-        <p class="sub" id="radar-sub">Save any search with <b>Alert me</b> and Alum tells you when something new lands in it.</p>
-        <div id="radar-list"></div>
-      </section>
+      <section class="card rows">
+        <details class="row" id="prefs">
+          <summary><span class="row-icon"><i data-lucide="compass"></i></span><span class="row-text"><b>What you're after</b><small id="prefs-sum"></small></span><i class="row-caret" data-lucide="chevron-down"></i></summary>
+          <div class="row-body">
+            <h3>Interested in</h3>
+            <div class="chips" id="p-interests"></div>
+            <h3>Where</h3>
+            <div class="chips" id="p-places"></div>
+          </div>
+        </details>
 
-      <!-- Filled by renderConnections(); hidden when the site has no Supabase config. -->
-      <section class="card" id="connections" hidden>
-        <div class="card-head">
-          <h2>Connections</h2>
-        </div>
-        <p class="sub">Your deadlines, reminders and interviews, on the calendar you already use.</p>
-        <div id="conn-list"></div>
-      </section>
+        <details class="row" id="skills">
+          <summary><span class="row-icon"><i data-lucide="wrench"></i></span><span class="row-text"><b>Skills</b><small id="skills-sum"></small></span><i class="row-caret" data-lucide="chevron-down"></i></summary>
+          <div class="row-body">
+            <p class="sub" id="gap-sub"></p>
+            <div id="gap-list"></div>
+            <h3>Tools you know</h3>
+            <div class="chips" id="p-skills"></div>
+          </div>
+        </details>
 
-      <section class="card" id="gap">
-        <div class="card-head">
-          <h2>Skills gap</h2>
-          <span class="count" id="gap-count"></span>
-        </div>
-        <p class="sub" id="gap-sub"></p>
-        <div id="gap-list"></div>
-      </section>
+        <details class="row" id="radars">
+          <summary><span class="row-icon"><i data-lucide="radar"></i></span><span class="row-text"><b>Radars</b><small id="radars-sum"></small></span><i class="row-caret" data-lucide="chevron-down"></i></summary>
+          <div class="row-body">
+            <div id="radar-list"></div>
+          </div>
+        </details>
 
-      <section class="card" id="about">
-        <div class="card-head">
-          <h2>About you</h2>
-          <span class="saved-note" id="saved-note"></span>
-          <button class="ghost small" id="resume-btn" hidden><i data-lucide="file-up"></i>Fill from resume</button>
-          <input type="file" id="resume-file" accept="application/pdf" hidden />
-        </div>
-        <p class="sub" id="about-sub">Picks your internships, checks who can apply against you, and shows how many Hokies from your major got hired.</p>
-        <div class="review" id="resume-review" hidden></div>
-        <div class="fields">
-          <label class="field"><span>Name</span><input id="p-name" placeholder="First name" autocomplete="given-name" /></label>
-          <label class="field"><span>Major</span><select id="p-major"></select></label>
-          <label class="field"><span>Graduating (May)</span><select id="p-year"></select></label>
-          <label class="field"><span>Looking for</span><select id="p-term"></select></label>
-          <label class="field"><span>Degree</span><select id="p-degree"></select></label>
-          <label class="field"><span>GPA</span><input id="p-gpa" type="number" inputmode="decimal" min="0" max="4" step="0.01" placeholder="Optional" /></label>
-          <label class="field wide"><span>Work status</span><select id="p-work"></select></label>
-        </div>
-        <p class="sub small">Work status decides citizenship, clearance and sponsorship rules. It never leaves this device.</p>
-        <h3>Interested in</h3>
-        <div class="chips" id="p-interests"></div>
-        <h3>Where</h3>
-        <div class="chips" id="p-places"></div>
-        <h3>Tools you know</h3>
-        <div class="chips" id="p-skills"></div>
+        <!-- Filled by renderConnections(); hidden when the site has no Supabase config. -->
+        <details class="row" id="connections" hidden>
+          <summary><span class="row-icon"><i data-lucide="calendar-days"></i></span><span class="row-text"><b>Calendar</b><small id="connections-sum"></small></span><i class="row-caret" data-lucide="chevron-down"></i></summary>
+          <div class="row-body">
+            <div id="conn-list"></div>
+          </div>
+        </details>
+
+        <!-- Filled by renderAccount(); hidden when synced, or with no Supabase config. -->
+        <details class="row" id="account" hidden>
+          <summary><span class="row-icon"><i data-lucide="refresh-cw"></i></span><span class="row-text"><b>Sync</b><small>Use Alum on any device</small></span><i class="row-caret" data-lucide="chevron-down"></i></summary>
+          <div class="row-body" id="account-body"></div>
+        </details>
       </section>
     </main>
 
