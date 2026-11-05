@@ -171,4 +171,30 @@ export default [
   gh("PsiQuantum", "psiquantum", "psiquantum.com", "Quantum"),
   gh("Tenstorrent", "tenstorrent", "tenstorrent.com", "Semiconductors"),
   gh("Lightmatter", "lightmatter", "lightmatter.co", "Semiconductors"),
+
+  // Big VT employers we used to get through fantastic.jobs (its trial ended
+  // October 2026). Probed 2026-10-29. Names match data/targets.json so the
+  // Hokie numbers line up.
+  wd("GE", "gevernova", "wd5", "Vernova_ExternalSite", "gevernova.com", "Energy"),
+  wd("GE", "geaerospace", "wd5", "GE_ExternalSite", "geaerospace.com", "Aerospace"),
+  wd("RSM", "rsm", "wd1", "RSMCareers", "rsmus.com", "Consulting"),
+  wd("Baker Tilly", "bakertilly", "wd5", "BTCareers", "bakertilly.com", "Consulting"),
+  wd("CliftonLarsonAllen", "cliftonlarsonallen", "wd115", "CLA", "claconnect.com", "Consulting"),
+  wd("Guidehouse", "guidehouse", "wd1", "External", "guidehouse.com", "Consulting"),
+  wd("Citi", "citi", "wd5", "2", "citi.com", "Finance"),
+  wd("Fidelity Investments", "fmr", "wd1", "targeted", "fidelity.com", "Finance"),
+  wd("Visa", "visa", "wd5", "Visa", "visa.com", "Fintech"),
+  wd("Parsons", "parsons", "wd5", "Search", "parsons.com", "Defense"),
+  wd("Moog", "moog", "wd5", "MOOG_External_Career_Site", "moog.com", "Aerospace"),
+  wd("Rolls-Royce", "rollsroyce", "wd3", "Intern_Graduate", "rolls-royce.com", "Aerospace"),
+  wd("Kollmorgen Corporation", "regalrexnord", "wd1", "Student_and_EarlyCareer", "kollmorgen.com", "Hardware"),
+  wd("Verizon", "verizon", "wd12", "verizon-careers", "verizon.com", "Networking"),
+  wd("AT&T", "att", "wd1", "ATTCollege", "att.com", "Networking"),
+  wd("Red Hat", "redhat", "wd5", "Jobs", "redhat.com", "Software"),
+  wd("Walmart", "walmart", "wd504", "WalmartExternal", "walmart.com", "Retail Tech"),
+  wd("Lowe's Companies, Inc.", "lowes", "wd5", "LWS_External_CS", "lowes.com", "Retail Tech"),
+  wd("UPS (United Parcel Service)", "hcmportal", "wd5", "Search", "ups.com", "Logistics"),
+  wd("Clark Construction Group", "clark", "wd503", "ClarkExternal", "clarkconstruction.com", "Construction"),
+  wd("HITT Contracting, Inc.", "hitt", "wd503", "HITT", "hitt.com", "Construction"),
+  sr("AECOM", "AECOM2", "aecom.com", "Construction"),
 ];

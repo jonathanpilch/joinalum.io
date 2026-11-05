@@ -8,14 +8,22 @@
  * data/placements.json, which the page reads for "Hokies hired here",
  * the pipeline filter and "hires my major". It also prints the biggest VT
  * employers we don't pull jobs from yet. VT publishes once a year; weekly
- * is plenty. */
+ * is plenty.
+ *
+ * Starting salaries come from a second VT source, the First Destination
+ * dashboard behind career.vt.edu ("uConnect"): median full-time salary by
+ * employer, and by employer and major, classes of 2020 on. VT hides any
+ * group under 10 salaries, so only the biggest employers have one. */
 
-import { writeFile, mkdir } from "node:fs/promises";
+import { readFile, writeFile, mkdir } from "node:fs/promises";
 import { canonical, key, board } from "./match.mjs";
 
 const ROOT = new URL("../", import.meta.url);
 const OUT = new URL("data/placements.json", ROOT);
 const BASE = "https://fds.career.vt.edu/EmployerList";
+const SALARY_API = "https://career.vt.edu/api/uconnect/v1/odv/get-data";
+const SALARY_PAGE = "https://vt.uconnectlabs.com/outcomes/";
+const UA = "joinalum-ingest (student project)";
 const FIRST = 2013; // earliest cohort with data (2013-2014)
 const RECENT = 3; // "recent" = the last three cohorts with data
 
@@ -26,9 +34,25 @@ for (let y = FIRST; y <= thisYear; y++) cohorts.push(`${y}-${y + 1}`);
 const decode = (s) => s.replace(/<[^>]+>/g, "").replace(/&#39;/g, "'").replace(/&quot;/g, '"').replace(/&amp;/g, "&").replace(/&nbsp;/g, " ").replace(/\s+/g, " ").trim();
 const NA = /^-*\s*not applicable$|^'?-+$|^$/i;
 const clean = (v) => (NA.test(v) ? null : v.replace(/\*+$/, "").trim());
+const majorName = (m) => m?.replace(/\s*&\s*/g, " and ");
+
+// One uConnect query: salary count and median, grouped by `groupBy`.
+async function salaries(groupBy) {
+  const body = {
+    data_queries: { a: [{ groupBy, select: { job_salary: ["count", "median"] }, filter: {} }] },
+    instance: { id: "default", title: "Default", template: "nace_first_destination", description: "" },
+    community: false,
+    program: "",
+  };
+  const r = await fetch(SALARY_API, { method: "POST", headers: { "content-type": "application/json", "user-agent": UA }, body: JSON.stringify(body), signal: AbortSignal.timeout(90000) });
+  if (!r.ok) throw new Error(`HTTP ${r.status}`);
+  const a = (await r.json()).a?.[0];
+  if (!a?.data) throw new Error(a?.error || "no data");
+  return a.data;
+}
 
 async function fetchCohort(c) {
-  const r = await fetch(`${BASE}?cohort=${c}`, { headers: { "user-agent": "joinalum-ingest (student project)" }, signal: AbortSignal.timeout(90000) });
+  const r = await fetch(`${BASE}?cohort=${c}`, { headers: { "user-agent": UA }, signal: AbortSignal.timeout(90000) });
   if (!r.ok) throw new Error(`${c}: HTTP ${r.status}`);
   const html = await r.text();
   const head = [...html.matchAll(/<th[^>]*>([\s\S]*?)<\/th>/g)].map((m) => decode(m[1]));
@@ -37,7 +61,7 @@ async function fetchCohort(c) {
   return html.split(/<tr[\s>]/).slice(1)
     .map((tr) => [...tr.matchAll(/<td[^>]*>([\s\S]*?)<\/td>/g)].map((m) => decode(m[1])))
     .filter((cells) => cells.length === 7)
-    .map(([major, org, title, type, city, state, country]) => ({ cohort: c, major: clean(major)?.replace(/\s*&\s*/g, " and "), org: clean(org), title: clean(title), type: clean(type)?.toLowerCase().replace("-", " "), city: clean(city), state: clean(state), country: clean(country) }));
+    .map(([major, org, title, type, city, state, country]) => ({ cohort: c, major: majorName(clean(major)), org: clean(org), title: clean(title), type: clean(type)?.toLowerCase().replace("-", " "), city: clean(city), state: clean(state), country: clean(country) }));
 }
 
 // Fetch -------------------------------------------------------------------
@@ -84,11 +108,13 @@ for (const r of rows) {
 
 const out = {};
 const boardIndex = {};
-for (const e of employers.values()) {
+const nameByKey = new Map();
+for (const [k, e] of employers) {
   const name = e.canonical || top(e.spellings, 1)[0][0];
   const b = board(name);
   // One-offs only matter if they're a board company.
   if (e.n < 2 && !b) continue;
+  nameByKey.set(k, name);
   out[name] = {
     n: e.n,
     recent: e.recent,
@@ -101,6 +127,36 @@ for (const e of employers.values()) {
   if (b) boardIndex[b] = name;
 }
 
+// Starting salaries ----------------------------------------------------------
+
+// uConnect spells employers its own way ("KPMG LLP"); key() folds them onto
+// the report's. Where two spellings land on one employer (Raytheon, Collins
+// Aerospace -> RTX), the one with more salaries wins.
+let salaryYears = null;
+try {
+  const [byEmployer, byEmployerMajor, byYear] = await Promise.all([salaries(["job_employer"]), salaries(["job_employer", "major"]), salaries(["year"])]);
+  const into = (raw) => out[nameByKey.get(key(raw))];
+  for (const { key: org, value: v } of byEmployer) {
+    const e = into(org);
+    if (e && !(e.salary?.n >= v.count)) e.salary = { n: v.count, median: Math.round(v.median), byMajor: e.salary?.byMajor || {} };
+  }
+  for (const { key: [org, [major]], value: v } of byEmployerMajor) {
+    const e = into(org);
+    const m = majorName(major);
+    if (e?.salary && m && !(e.salary.byMajor[m]?.n >= v.count)) e.salary.byMajor[m] = { n: v.count, median: Math.round(v.median) };
+  }
+  const years = byYear.map((y) => y.key).sort();
+  salaryYears = [years[0], years.at(-1)];
+  const missed = byEmployer.filter((x) => x.key && !into(x.key)).map((x) => x.key);
+  console.log(`salaries: ${byEmployer.length - missed.length} of ${byEmployer.length} employers matched${missed.length ? ` (not matched: ${missed.join(", ")})` : ""}`);
+} catch (e) {
+  // Keep last week's numbers rather than dropping them.
+  const prev = await readFile(OUT, "utf8").then(JSON.parse).catch(() => null);
+  for (const [name, e] of Object.entries(out)) if (prev?.employers?.[name]?.salary) e.salary = prev.employers[name].salary;
+  salaryYears = prev?.salary?.years || null;
+  console.log(`salaries failed (${e.message}); kept the last ones`);
+}
+
 await mkdir(new URL("data/", ROOT), { recursive: true });
 await writeFile(OUT, JSON.stringify({
   source: "Virginia Tech Career and Professional Development, First Destination Report",
@@ -111,6 +167,7 @@ await writeFile(OUT, JSON.stringify({
   rows: rows.length,
   placed,
   majors: top(majors, 500),
+  salary: salaryYears && { source: "Virginia Tech First Destination dashboard (uConnect)", sourceUrl: SALARY_PAGE, years: salaryYears },
   boardIndex,
   employers: out,
 }));

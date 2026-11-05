@@ -113,10 +113,13 @@ const touched = new Set(targets.filter((_, i) => results[i]).map((c) => c.name))
 let jobs = previous.jobs.filter((j) => j.ats !== "fantastic" && !touched.has(j.company));
 for (const r of results) if (r) jobs.push(...r);
 
-// fantastic.jobs rows (written daily by ingest/fantastic.mjs) go in after the
-// direct ones, so a direct copy of the same posting wins the merge below.
+// fantastic.jobs rows (from ingest/fantastic.mjs, idle since the trial ended)
+// go in after the direct ones, so a direct copy of the same posting wins the
+// merge below. Never for a company we now pull ourselves, and a month after
+// posting at most, since nothing refreshes them.
 const fantastic = await readJson(new URL("data/fantastic-jobs.json", ROOT), { jobs: [] });
-jobs.push(...fantastic.jobs);
+const direct = new Set(companies.map((c) => c.name));
+jobs.push(...fantastic.jobs.filter((j) => !direct.has(j.company) && now - Date.parse(j.postedAt) < 30 * 864e5));
 
 // Same title, same company, same level, posted as separate reqs per city:
 // one row, every location.

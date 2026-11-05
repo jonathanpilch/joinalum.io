@@ -1,6 +1,8 @@
 # Hourly: pull every board, commit data/ if anything changed. Each commit
 # rebuilds the site on Cloudflare (Workers Builds, ~20-40s a build).
-# Daily: fantastic.jobs for the target employers we can't pull directly.
+# fantastic.jobs (target employers we can't pull directly) is off: the trial
+# ended in October 2026 and the key returns 401. To bring it back on a paid
+# plan, restore a schedule and a step running `node ingest/fantastic.mjs`.
 # Every run: radar and reminder emails (ingest/notify.mjs).
 # Weekly: VT's placement report and the target list built from it.
 name: ingest
@@ -9,9 +11,6 @@ on:
     - cron: "7 * * * *"
     # VT's placement report changes once a year; Mondays is plenty.
     - cron: "37 9 * * 1"
-    # fantastic.jobs once a day (7am ET) while on the trial's 50 requests a
-    # week. After upgrading, delete the `if` on that step to run it hourly.
-    - cron: "17 11 * * *"
   workflow_dispatch:
 permissions:
   contents: write
@@ -29,12 +28,6 @@ jobs:
           node-version: 22
       - if: github.event.schedule == '37 9 * * 1' || github.event_name == 'workflow_dispatch'
         run: node ingest/placements.mjs && node ingest/targets.mjs
-      - if: github.event.schedule == '17 11 * * *' || github.event_name == 'workflow_dispatch'
-        env:
-          FANTASTIC_KEY: ${{ secrets.FANTASTIC_KEY }}
-        run: |
-          if [ -z "$FANTASTIC_KEY" ]; then echo "No FANTASTIC_KEY secret; skipping"; exit 0; fi
-          node ingest/fantastic.mjs
       - run: node ingest/run.mjs
       - name: Commit data
         run: |
